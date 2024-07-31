@@ -1,6 +1,6 @@
 # Welcome to APT Ghana's GitHub Profile!
 
-![APT Ghana Logo](https://aptghana.com/wp-content/uploads/2020/10/APT_logo.png)  <!-- Replace with actual link to the logo -->
+![APT Ghana Logo](/public/APT_Logo.png) 
 
 ## About Us
 
