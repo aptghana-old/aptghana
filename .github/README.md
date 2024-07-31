@@ -1,6 +1,6 @@
 # Welcome to APT Ghana's GitHub Profile!
 
-![APT Ghana Logo](/public/APT_Logo.png) 
+![APT Ghana Logo](../public/APT_Logo.png) 
 
 ## About Us
 
