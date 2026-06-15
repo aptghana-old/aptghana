@@ -37,15 +37,22 @@ const nextConfig: NextConfig = {
           { key: "Permissions-Policy",         value: "camera=(), microphone=(), geolocation=()" },
           { key: "Strict-Transport-Security",  value: "max-age=63072000; includeSubDomains; preload" },
           {
+            // P-07: Web/marketing pages are primarily static (ISR), making nonce-based
+            // CSP incompatible without forcing dynamic rendering on every page.
+            // unsafe-inline is retained until a full nonce migration is done.
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline'",    // TODO: replace with nonce-based CSP (M-19)
+              "script-src 'self' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' https: blob:",           // L-09: removed data:
+              "img-src 'self' https: blob:",
               "connect-src 'self'",
               "font-src 'self'",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
               "frame-ancestors 'none'",
+              "upgrade-insecure-requests",
             ].join("; "),
           },
         ],

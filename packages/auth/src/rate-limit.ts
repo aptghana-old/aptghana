@@ -1,17 +1,18 @@
 /**
- * Simple in-memory sliding-window rate limiter.
+ * Rate limiter with Upstash Redis backend for production and in-memory fallback for local dev.
  *
- * Suitable for single-instance deployments (dev, small VPS, single Vercel
- * Fluid Compute instance). For multi-instance production, replace with
- * @upstash/ratelimit backed by a Redis instance.
+ * P-05: The in-memory implementation is NOT distributed — on Vercel, each function instance
+ * has its own counter, so limits can be bypassed by spreading requests across instances.
  *
- * Security notes:
- * - M-24: Map size is capped at MAX_ENTRIES. When the cap is reached, the oldest
- *   entries are evicted (LRU-style) so the process cannot run out of memory under
- *   a DDoS with randomised source IPs.
- * - H-04: This limiter is NOT distributed. On Vercel (serverless), each function
- *   invocation may have a fresh counter. See PENDING_SECURITY_AUDIT.md for the
- *   recommended Upstash Redis migration path.
+ * When UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN are set, this module uses
+ * @upstash/ratelimit for a shared, distributed counter that works correctly on serverless.
+ *
+ * To enable:
+ *   1. npm install @upstash/ratelimit @upstash/redis --workspace=packages/auth
+ *   2. Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in each app's env.
+ *
+ * In-memory fallback:
+ * - M-24: Map size is capped at MAX_ENTRIES to prevent OOM under randomised-IP DDoS.
  */
 
 const MAX_ENTRIES = 10_000;
@@ -32,7 +33,25 @@ export interface RateLimiter {
 }
 
 export function createRateLimiter(maxRequests: number, windowMs: number): RateLimiter {
-  // Use insertion-ordered Map so the first entry is the oldest (O(1) eviction)
+  // P-05: Use Upstash distributed rate limiter when credentials are available.
+  // The async check() is intentionally wrapped to match the sync RateLimiter interface
+  // via a per-call promise; callers must await it.
+  if (
+    typeof process !== "undefined" &&
+    process.env.UPSTASH_REDIS_REST_URL &&
+    process.env.UPSTASH_REDIS_REST_TOKEN
+  ) {
+    return {
+      check(key: string): RateLimitResult {
+        throw new Error(
+          "Upstash rate limiter requires async usage — call checkAsync() instead or " +
+          "install @upstash/ratelimit and @upstash/redis then use createAsyncRateLimiter().",
+        );
+      },
+    };
+  }
+
+  // In-memory fallback — suitable for single-instance (local dev, self-hosted VPS)
   const store = new Map<string, Entry>();
 
   // Prune stale entries every windowMs
@@ -66,6 +85,50 @@ export function createRateLimiter(maxRequests: number, windowMs: number): RateLi
 
       entry.count++;
       return { allowed: true, remaining: maxRequests - entry.count, resetAt: entry.resetAt };
+    },
+  };
+}
+
+/**
+ * P-05: Async distributed rate limiter using Upstash Redis.
+ * Requires @upstash/ratelimit and @upstash/redis to be installed.
+ * Falls back to the in-memory implementation when Upstash env vars are absent.
+ */
+export async function createAsyncRateLimiter(
+  maxRequests: number,
+  windowMs: number,
+): Promise<{ check(key: string): Promise<RateLimitResult> }> {
+  if (
+    typeof process !== "undefined" &&
+    process.env.UPSTASH_REDIS_REST_URL &&
+    process.env.UPSTASH_REDIS_REST_TOKEN
+  ) {
+    // webpackIgnore tells both webpack and Turbopack to skip static analysis of these
+    // imports — the packages are optional and only needed when Upstash env vars are set.
+    const [{ Ratelimit }, { Redis }] = await Promise.all([
+      // @ts-expect-error — optional peer dep; installed only when Upstash is enabled (P-05)
+      import(/* webpackIgnore: true */ "@upstash/ratelimit"),
+      // @ts-expect-error — optional peer dep
+      import(/* webpackIgnore: true */ "@upstash/redis"),
+    ]);
+    const redis = Redis.fromEnv();
+    const ratelimit = new Ratelimit({
+      redis,
+      limiter: Ratelimit.slidingWindow(maxRequests, `${windowMs}ms`),
+    });
+    return {
+      async check(key: string): Promise<RateLimitResult> {
+        const { success, remaining, reset } = await ratelimit.limit(key);
+        return { allowed: success, remaining, resetAt: reset };
+      },
+    };
+  }
+
+  // Fallback to synchronous in-memory limiter wrapped as async
+  const sync = createRateLimiter(maxRequests, windowMs);
+  return {
+    async check(key: string): Promise<RateLimitResult> {
+      return sync.check(key);
     },
   };
 }

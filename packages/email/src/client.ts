@@ -20,11 +20,8 @@ export function getResendClient(): Resend {
 
 export const DEFAULT_FROM =
   process.env.EMAIL_FROM ??
-  process.env.SMTP_FROM ??
   `APT Ghana <${EMAIL_NOREPLY}>`;
 
 export const BASE_URL =
   process.env.AUTH_URL ??
-  process.env.NEXTAUTH_URL ??
-  process.env.NEXT_PUBLIC_APP_URL ??
   STORE_URL;

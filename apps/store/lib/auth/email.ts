@@ -2,7 +2,6 @@ import { emailService, type SendOptions } from "@apt/email";
 
 const BASE_URL =
   process.env.AUTH_URL ??
-  process.env.NEXTAUTH_URL ??
   "http://localhost:3001";
 
 export async function sendVerificationEmail(

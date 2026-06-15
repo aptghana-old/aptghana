@@ -68,6 +68,9 @@ const UserSchema = new Schema(
     passwordResetExpires: { type: Date, select: false },
     mfaSecret: { type: String, select: false },
     mfaEnabled: { type: Boolean, default: false },
+    // P-06: OTP brute-force protection — locked after 5 consecutive failures
+    otpFailedAttempts: { type: Number, default: 0 },
+    otpLockedUntil: { type: Date },
     // Bumping this invalidates every issued JWT ("sign out all devices")
     sessionVersion: { type: Number, default: 0 },
     loginHistory: { type: [LoginEventSchema], default: [], select: false },

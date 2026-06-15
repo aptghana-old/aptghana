@@ -3,10 +3,15 @@
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
-import Header from "@/components/layout/Header";
+import Header, { type SessionUser } from "@/components/layout/Header";
 import CommandPalette from "@/components/layout/CommandPalette";
 
-export default function DashboardShell({ children }: { children: React.ReactNode }) {
+interface DashboardShellProps {
+  children: React.ReactNode;
+  user: SessionUser;
+}
+
+export default function DashboardShell({ children, user }: DashboardShellProps) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const pathname = usePathname();
@@ -32,6 +37,7 @@ export default function DashboardShell({ children }: { children: React.ReactNode
       />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header
+          user={user}
           onCommandPalette={() => setPaletteOpen(true)}
           onMobileMenuToggle={() => setMobileNavOpen((v) => !v)}
         />

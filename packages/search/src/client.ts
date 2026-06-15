@@ -6,7 +6,8 @@ export function getMeilisearchClient(): MeiliSearch {
   if (!_client) {
     _client = new MeiliSearch({
       host: process.env.MEILISEARCH_HOST ?? "http://localhost:7700",
-      apiKey: process.env.MEILISEARCH_API_KEY ?? "",
+      // P-04: Admin app sets MEILISEARCH_ADMIN_KEY (write key); store/web fall back to MEILISEARCH_API_KEY (search-only)
+    apiKey: process.env.MEILISEARCH_ADMIN_KEY ?? process.env.MEILISEARCH_API_KEY ?? "",
     });
   }
   return _client;

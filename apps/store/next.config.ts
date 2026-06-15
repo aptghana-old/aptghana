@@ -33,20 +33,30 @@ const nextConfig: NextConfig = {
       {
         source: "/(.*)",
         headers: [
-          { key: "X-Frame-Options",           value: "DENY" },
-          { key: "X-Content-Type-Options",     value: "nosniff" },
-          { key: "Referrer-Policy",            value: "strict-origin-when-cross-origin" },
-          { key: "Strict-Transport-Security",  value: "max-age=63072000; includeSubDomains; preload" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+          {
+            // P-07: Nonce-based CSP requires all pages to be dynamically rendered.
+            // The store has ISR/static pages, so unsafe-inline is kept here as a
+            // fallback; the full nonce migration is tracked in PENDING_SECURITY_AUDIT.md.
             key: "Content-Security-Policy",
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline'",    // TODO: replace with nonce-based CSP (M-19)
+              "script-src 'self' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline'",
-              "img-src 'self' https: blob:",           // L-09: removed data:
-              "connect-src 'self' https://search.aptghana.com https://search.pontissystems.com",
+              "img-src 'self' https: blob:",
+              "connect-src 'self' https://search.aptghana.com",
               "font-src 'self'",
+              "object-src 'none'",
+              "base-uri 'self'",
+              "form-action 'self'",
               "frame-ancestors 'none'",
+              "upgrade-insecure-requests",
             ].join("; "),
           },
         ],

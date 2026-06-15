@@ -1,8 +1,10 @@
 "use client";
 
-import { Bell, Search, ChevronRight, Moon, Sun, Menu } from "lucide-react";
+import { Bell, Search, ChevronRight, Moon, Sun, Menu, LogOut, Settings, User } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { logoutAction } from "@/lib/auth/actions";
+import type { AdminRole } from "@/types/next-auth";
 
 const ROUTE_LABELS: Record<string, string> = {
   "/dashboard":             "Dashboard",
@@ -26,6 +28,14 @@ const ROUTE_LABELS: Record<string, string> = {
   "/dashboard/audit":       "Audit Log",
   "/dashboard/integrations":"Integrations",
   "/dashboard/settings":    "Settings",
+};
+
+const ROLE_LABELS: Record<AdminRole, string> = {
+  super_admin: "Super Admin",
+  manager:     "Manager",
+  editor:      "Editor",
+  viewer:      "Viewer",
+  support:     "Support",
 };
 
 function Breadcrumb() {
@@ -69,12 +79,162 @@ function Breadcrumb() {
   );
 }
 
+function UserMenu({
+  name,
+  email,
+  role,
+  image,
+}: {
+  name: string;
+  email: string;
+  role: AdminRole;
+  image?: string | null;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Close on click outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  // Close on Escape
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, []);
+
+  const initials = name
+    .split(" ")
+    .map((n) => n[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-haspopup="true"
+        className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-md hover:bg-[var(--apt-bg-raised)] transition-colors"
+      >
+        {image ? (
+          <img
+            src={image}
+            alt={name}
+            className="w-7 h-7 rounded-full object-cover shrink-0"
+          />
+        ) : (
+          <div
+            className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
+            style={{ background: "#0057b8" }}
+          >
+            {initials}
+          </div>
+        )}
+        <div className="hidden lg:block text-left">
+          <div className="text-[13px] font-medium leading-tight" style={{ color: "var(--apt-text-primary)" }}>
+            {name}
+          </div>
+          <div className="text-[10px] leading-tight" style={{ color: "var(--apt-text-muted)" }}>
+            {ROLE_LABELS[role] ?? role}
+          </div>
+        </div>
+      </button>
+
+      {open && (
+        <div
+          className="absolute right-0 top-full mt-1.5 w-56 rounded-lg shadow-lg z-50 py-1 animate-scale-in"
+          style={{
+            background: "var(--apt-bg)",
+            border: "1px solid var(--apt-border)",
+            boxShadow: "var(--shadow-lg)",
+          }}
+          role="menu"
+        >
+          {/* User info */}
+          <div className="px-3 py-2.5" style={{ borderBottom: "1px solid var(--apt-border)" }}>
+            <div className="text-[13px] font-semibold truncate" style={{ color: "var(--apt-text-primary)" }}>
+              {name}
+            </div>
+            <div className="text-[11px] truncate" style={{ color: "var(--apt-text-muted)" }}>
+              {email}
+            </div>
+            <div
+              className="inline-flex items-center mt-1 px-1.5 py-0.5 rounded text-[10px] font-semibold"
+              style={{
+                background: "rgba(0,87,184,0.1)",
+                color: "#0057b8",
+              }}
+            >
+              {ROLE_LABELS[role] ?? role}
+            </div>
+          </div>
+
+          {/* Menu items */}
+          <div className="py-1">
+            <a
+              href="/dashboard/settings/profile"
+              className="flex items-center gap-2.5 px-3 py-2 text-[13px] transition-colors hover:bg-[var(--apt-bg-raised)]"
+              style={{ color: "var(--apt-text-primary)" }}
+              role="menuitem"
+              onClick={() => setOpen(false)}
+            >
+              <User size={13} style={{ color: "var(--apt-text-muted)" }} />
+              Profile settings
+            </a>
+            <a
+              href="/dashboard/settings"
+              className="flex items-center gap-2.5 px-3 py-2 text-[13px] transition-colors hover:bg-[var(--apt-bg-raised)]"
+              style={{ color: "var(--apt-text-primary)" }}
+              role="menuitem"
+              onClick={() => setOpen(false)}
+            >
+              <Settings size={13} style={{ color: "var(--apt-text-muted)" }} />
+              Settings
+            </a>
+          </div>
+
+          {/* Logout */}
+          <div className="py-1" style={{ borderTop: "1px solid var(--apt-border)" }}>
+            <form action={logoutAction}>
+              <button
+                type="submit"
+                className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] transition-colors hover:bg-[var(--color-error-50)] text-left"
+                style={{ color: "var(--color-error-600)" }}
+                role="menuitem"
+              >
+                <LogOut size={13} />
+                Sign out
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export interface SessionUser {
+  name: string;
+  email: string;
+  role: AdminRole;
+  image?: string | null;
+}
+
 interface HeaderProps {
+  user: SessionUser;
   onCommandPalette(): void;
   onMobileMenuToggle(): void;
 }
 
-export default function Header({ onCommandPalette, onMobileMenuToggle }: HeaderProps) {
+export default function Header({ user, onCommandPalette, onMobileMenuToggle }: HeaderProps) {
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
@@ -113,7 +273,7 @@ export default function Header({ onCommandPalette, onMobileMenuToggle }: HeaderP
 
       {/* Right actions */}
       <div className="flex items-center gap-1">
-        {/* Search trigger — hidden on very small screens */}
+        {/* Search trigger */}
         <button
           onClick={onCommandPalette}
           className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-md text-xs transition-colors"
@@ -133,7 +293,7 @@ export default function Header({ onCommandPalette, onMobileMenuToggle }: HeaderP
           </kbd>
         </button>
 
-        {/* Mobile search icon */}
+        {/* Mobile search */}
         <button
           onClick={onCommandPalette}
           className="sm:hidden w-8 h-8 rounded-md flex items-center justify-center transition-colors hover:bg-[var(--apt-bg-raised)]"
@@ -163,18 +323,13 @@ export default function Header({ onCommandPalette, onMobileMenuToggle }: HeaderP
           <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#ff6b00]" />
         </button>
 
-        {/* Avatar */}
-        <button className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-md hover:bg-[var(--apt-bg-raised)] transition-colors">
-          <div
-            className="w-7 h-7 rounded-full flex items-center justify-center text-[11px] font-bold text-white shrink-0"
-            style={{ background: "#1e4278" }}
-          >
-            A
-          </div>
-          <span className="hidden lg:block text-[13px] font-medium" style={{ color: "var(--apt-text-primary)" }}>
-            Admin
-          </span>
-        </button>
+        {/* User menu */}
+        <UserMenu
+          name={user.name}
+          email={user.email}
+          role={user.role}
+          image={user.image}
+        />
       </div>
     </header>
   );

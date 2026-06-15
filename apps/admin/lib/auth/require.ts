@@ -11,17 +11,35 @@ export async function requireAdmin(): Promise<NextResponse | null> {
 }
 
 /** Returns a 403 Response if the admin lacks the required role. */
-export async function requireRole(
-  ...roles: string[]
-): Promise<NextResponse | null> {
+export async function requireRole(...roles: string[]): Promise<NextResponse | null> {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const userRole = (session.user as any).role as string | undefined;
-  if (userRole !== "super_admin" && !roles.includes(userRole ?? "")) {
+  const { role } = session.user;
+  if (role !== "super_admin" && !roles.includes(role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  return null;
+}
+
+/**
+ * P-10: Require that the admin re-authenticated within maxAgeSeconds ago.
+ * Apply to bulk deletes, user management, role changes, data exports, and
+ * any operation that is hard to reverse.
+ */
+export async function requireFreshSession(maxAgeSeconds = 1800): Promise<NextResponse | null> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  // iat is in the raw JWT but not in the session object; fall back to lastActivityAt
+  const issuedAt = (session as unknown as { iat?: number }).iat ?? 0;
+  if (issuedAt && Date.now() / 1000 - issuedAt > maxAgeSeconds) {
+    return NextResponse.json(
+      { error: "Session expired — please sign in again to continue this operation." },
+      { status: 403 },
+    );
   }
   return null;
 }

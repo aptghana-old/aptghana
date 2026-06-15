@@ -51,15 +51,13 @@ http:
       basicAuth:
         usersFile: "/auth/.htpasswd"
 
-    # Restrict MinIO console and other admin UIs to known office/VPN IPs.
-    # Replace with actual admin IP addresses before deploying.
+    # P-13: Restrict MinIO console to known admin IPs only.
+    # Add/remove IPs as team access needs change. Use /32 for static IPs, /24 for subnets.
     admin-ip-allowlist:
       ipAllowList:
         sourceRange:
-          - "127.0.0.1/32"
-          # Add production admin IP addresses here, e.g.:
-          # - "203.0.113.10/32"   # Office static IP
-          # - "10.8.0.0/24"       # VPN subnet
+          - "197.251.223.178/32"  # APT Ghana admin (detected 2026-06-15)
+          # - "10.8.0.0/24"       # Add VPN subnet here if using WireGuard/OpenVPN
 
     # Meilisearch: only allow read methods from browser origins.
     # Write operations must only originate from server-side API routes.

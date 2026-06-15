@@ -47,7 +47,7 @@ const INTEGRATIONS = [
     version: "v2 API",
     lastSync: "Awaiting configuration",
     actions: ["Configure", "Test Webhook"],
-    fields: ["PAYSTACK_PUBLIC_KEY", "PAYSTACK_SECRET_KEY", "PAYSTACK_WEBHOOK_SECRET"],
+    fields: ["NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY", "PAYSTACK_SECRET_KEY", "PAYSTACK_WEBHOOK_SECRET"],
   },
   {
     id: "posthog",

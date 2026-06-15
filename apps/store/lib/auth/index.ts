@@ -27,7 +27,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         await connectDB();
         const user = await UserModel
           .findOne({ email: (credentials.email as string).toLowerCase().trim() })
-          .select("+passwordHash +mfaSecret")
+          .select("+passwordHash +mfaSecret +otpFailedAttempts +otpLockedUntil")
           .lean<{
             _id: unknown;
             email: string;
@@ -36,6 +36,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             emailVerified: boolean;
             mfaEnabled: boolean;
             mfaSecret?: string;
+            otpFailedAttempts?: number;
+            otpLockedUntil?: Date;
             status: string;
             accountType: string;
             avatar?: string;
@@ -53,8 +55,29 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         if (user.mfaEnabled) {
           const otp = (credentials.otp as string | undefined)?.trim();
           if (!otp) throw new Error("NEEDS_MFA");
+
+          // P-06: Enforce OTP lockout before attempting verification
+          if (user.otpLockedUntil && user.otpLockedUntil > new Date()) {
+            throw new Error("ACCOUNT_LOCKED");
+          }
+
           const result = await totpVerify({ token: otp, secret: user.mfaSecret! });
-          if (!result.valid) throw new Error("INVALID_OTP");
+          if (!result.valid) {
+            const failures = (user.otpFailedAttempts ?? 0) + 1;
+            await UserModel.findByIdAndUpdate(user._id, {
+              $inc: { otpFailedAttempts: 1 },
+              ...(failures >= 5 ? {
+                $set: { otpLockedUntil: new Date(Date.now() + 15 * 60 * 1000) },
+              } : {}),
+            });
+            throw new Error("INVALID_OTP");
+          }
+
+          // Clear lockout state on successful OTP
+          await UserModel.findByIdAndUpdate(user._id, {
+            $set: { otpFailedAttempts: 0 },
+            $unset: { otpLockedUntil: 1 },
+          });
         }
 
         // Record the sign-in for the security page (keeps the last 20 events)

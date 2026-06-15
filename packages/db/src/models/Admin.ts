@@ -18,6 +18,8 @@ const AdminSchema = new Schema(
     status: { type: String, enum: ["active", "suspended"], default: "active", index: true },
     lastLoginAt: Date,
     avatar: String,
+    passwordResetToken: { type: String, select: false },
+    passwordResetExpiry: { type: Date, select: false },
   },
   { timestamps: true, collection: "admins_v2" }
 );
