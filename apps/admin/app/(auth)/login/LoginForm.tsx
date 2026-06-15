@@ -105,7 +105,7 @@ export default function LoginForm({ from, reason, reset }: Props) {
 
               <div className="flex items-center justify-between">
                 <label className="flex items-center gap-2 cursor-pointer select-none">
-                  <input name="rememberMe" type="checkbox" className="w-3.5 h-3.5 rounded accent-[#0057b8]" />
+                  <input name="rememberMe" type="checkbox" className="w-3.5 h-3.5 rounded accent-navy-500" />
                   <span className="text-[12px]" style={{ color: "var(--apt-text-secondary)" }}>
                     Remember me for 30 days
                   </span>
@@ -157,7 +157,7 @@ export default function LoginForm({ from, reason, reset }: Props) {
                   pattern="\d{6}"
                   required
                   placeholder="000000"
-                  className="w-full h-12 rounded-md border text-[22px] font-mono tracking-[0.5em] text-center transition-colors placeholder:text-[var(--apt-text-muted)] placeholder:tracking-normal placeholder:text-[14px] focus:outline-none focus:ring-2 focus:ring-[var(--apt-border-focus)]"
+                  className="w-full h-12 rounded-md border text-[22px] font-mono tracking-[0.5em] text-center transition-colors placeholder:text-(--apt-text-muted) placeholder:tracking-normal placeholder:text-[14px] focus:outline-none focus:ring-2 focus:ring-(--apt-border-focus)"
                   style={{ background: "var(--apt-bg)", borderColor: "var(--apt-border)", color: "var(--apt-text-primary)" }}
                 />
                 <p className="text-[11px] mt-1" style={{ color: "var(--apt-text-muted)" }}>
@@ -192,7 +192,7 @@ export default function LoginForm({ from, reason, reset }: Props) {
 // ─── Shared sub-components ────────────────────────────────────────────────────
 
 const INPUT_CLS =
-  "w-full h-9 rounded-md border text-[13px] px-3 transition-colors placeholder:text-[var(--apt-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--apt-border-focus)] disabled:opacity-50";
+  "w-full h-9 rounded-md border text-[13px] px-3 transition-colors placeholder:text-(--apt-text-muted) focus:outline-none focus:ring-2 focus:ring-(--apt-border-focus) disabled:opacity-50";
 
 const INPUT_STYLE = {
   background: "var(--apt-bg)",
@@ -230,7 +230,7 @@ function TogglePassword({ show, onToggle }: { show: boolean; onToggle(): void })
       type="button"
       onClick={onToggle}
       tabIndex={-1}
-      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded transition-colors hover:bg-[var(--apt-bg-raised)]"
+      className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded transition-colors hover:bg-(--apt-bg-raised)"
       style={{ color: "var(--apt-text-muted)" }}
       aria-label={show ? "Hide password" : "Show password"}
     >

@@ -113,11 +113,11 @@ export default function ResetPasswordForm({ token }: { token: string }) {
                 autoComplete="new-password" autoFocus required minLength={8}
                 value={password} onChange={(e) => setPassword(e.target.value)}
                 placeholder="At least 8 characters"
-                className="w-full h-9 rounded-md border text-[13px] pl-3 pr-10 transition-colors placeholder:text-[var(--apt-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--apt-border-focus)] disabled:opacity-50"
+                className="w-full h-9 rounded-md border text-[13px] pl-3 pr-10 transition-colors placeholder:text-(--apt-text-muted) focus:outline-none focus:ring-2 focus:ring-(--apt-border-focus) disabled:opacity-50"
                 style={{ background: "var(--apt-bg)", borderColor: "var(--apt-border)", color: "var(--apt-text-primary)" }}
               />
               <button type="button" tabIndex={-1} onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-[var(--apt-bg-raised)] transition-colors"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-(--apt-bg-raised) transition-colors"
                 style={{ color: "var(--apt-text-muted)" }} aria-label={showPassword ? "Hide" : "Show"}>
                 {showPassword ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>
@@ -133,11 +133,11 @@ export default function ResetPasswordForm({ token }: { token: string }) {
               <input
                 name="confirmPassword" type={showConfirm ? "text" : "password"}
                 autoComplete="new-password" required placeholder="Repeat your new password"
-                className="w-full h-9 rounded-md border text-[13px] pl-3 pr-10 transition-colors placeholder:text-[var(--apt-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--apt-border-focus)] disabled:opacity-50"
+                className="w-full h-9 rounded-md border text-[13px] pl-3 pr-10 transition-colors placeholder:text-(--apt-text-muted) focus:outline-none focus:ring-2 focus:ring-(--apt-border-focus) disabled:opacity-50"
                 style={{ background: "var(--apt-bg)", borderColor: "var(--apt-border)", color: "var(--apt-text-primary)" }}
               />
               <button type="button" tabIndex={-1} onClick={() => setShowConfirm((v) => !v)}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-[var(--apt-bg-raised)] transition-colors"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-0.5 rounded hover:bg-(--apt-bg-raised) transition-colors"
                 style={{ color: "var(--apt-text-muted)" }} aria-label={showConfirm ? "Hide" : "Show"}>
                 {showConfirm ? <EyeOff size={14} /> : <Eye size={14} />}
               </button>

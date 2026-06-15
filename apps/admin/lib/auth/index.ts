@@ -9,7 +9,12 @@ const DEFAULT_SESSION_AGE = 8 * 60 * 60;    // 8 hours
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  secret: process.env.ADMIN_AUTH_SECRET ?? process.env.AUTH_SECRET,
+  // Pass both secrets so NextAuth tries each on decryption — allows key rotation
+  // without invalidating existing sessions. New tokens are always signed with [0].
+  secret: [
+    process.env.ADMIN_AUTH_SECRET,
+    process.env.AUTH_SECRET,
+  ].filter(Boolean) as string[],
   session: {
     strategy: "jwt",
     maxAge: REMEMBER_ME_AGE, // upper bound; short sessions enforced via token.exp

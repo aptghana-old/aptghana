@@ -67,7 +67,7 @@ export default function ForgotPasswordPage() {
             <input
               name="email" type="email" autoComplete="email" autoFocus required
               placeholder="you@aptghana.com"
-              className="w-full h-9 rounded-md border text-[13px] px-3 transition-colors placeholder:text-[var(--apt-text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--apt-border-focus)] disabled:opacity-50"
+              className="w-full h-9 rounded-md border text-[13px] px-3 transition-colors placeholder:text-(--apt-text-muted) focus:outline-none focus:ring-2 focus:ring-(--apt-border-focus) disabled:opacity-50"
               style={{ background: "var(--apt-bg)", borderColor: "var(--apt-border)", color: "var(--apt-text-primary)" }}
             />
           </div>
