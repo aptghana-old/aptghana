@@ -1,0 +1,13 @@
+Contact: mailto:security@aptghana.com
+Expires: 2027-06-15T00:00:00.000Z
+Preferred-Languages: en
+Canonical: https://aptghana.com/.well-known/security.txt
+Policy: https://aptghana.com/security-policy
+
+# APT Ghana Enterprise Platform — Security Contact
+# If you have discovered a vulnerability in the APT Ghana platform, please
+# report it responsibly to security@aptghana.com.
+# We aim to acknowledge receipt within 48 hours and provide a resolution
+# timeline within 7 business days.
+# Please do not publicly disclose the vulnerability until we have had a
+# reasonable opportunity to address it.

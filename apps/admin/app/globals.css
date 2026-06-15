@@ -1,0 +1,267 @@
+@import "tailwindcss";
+
+/* ─── Design tokens ───────────────────────────────────────────────────────── */
+@theme {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+
+  /* Brand */
+  --color-navy-950: #060d1a;
+  --color-navy-900: #0a1628;
+  --color-navy-800: #0e2040;
+  --color-navy-700: #133261;
+  --color-navy-600: #1a4480;
+  --color-navy-500: #0057b8;
+  --color-navy-400: #3b82f6;
+  --color-navy-300: #93c5fd;
+  --color-navy-100: #dbeafe;
+  --color-navy-50:  #eff6ff;
+
+  --color-orange-600: #ea5800;
+  --color-orange-500: #ff6b00;
+  --color-orange-400: #ff8c38;
+  --color-orange-100: #ffedd5;
+  --color-orange-50:  #fff7ed;
+
+  /* Neutrals (slate scale) */
+  --color-slate-950: #020617;
+  --color-slate-900: #0f172a;
+  --color-slate-800: #1e293b;
+  --color-slate-700: #334155;
+  --color-slate-600: #475569;
+  --color-slate-500: #64748b;
+  --color-slate-400: #94a3b8;
+  --color-slate-300: #cbd5e1;
+  --color-slate-200: #e2e8f0;
+  --color-slate-100: #f1f5f9;
+  --color-slate-50:  #f8fafc;
+
+  /* Status */
+  --color-success-700: #15803d;
+  --color-success-600: #16a34a;
+  --color-success-500: #22c55e;
+  --color-success-100: #dcfce7;
+  --color-success-50:  #f0fdf4;
+
+  --color-warning-700: #b45309;
+  --color-warning-600: #d97706;
+  --color-warning-500: #f59e0b;
+  --color-warning-100: #fef3c7;
+  --color-warning-50:  #fffbeb;
+
+  --color-error-700: #b91c1c;
+  --color-error-600: #dc2626;
+  --color-error-500: #ef4444;
+  --color-error-100: #fee2e2;
+  --color-error-50:  #fef2f2;
+
+  --color-info-700: #0369a1;
+  --color-info-600: #0284c7;
+  --color-info-500: #38bdf8;
+  --color-info-100: #e0f2fe;
+  --color-info-50:  #f0f9ff;
+
+  /* Radii */
+  --radius-xs:  3px;
+  --radius-sm:  5px;
+  --radius-md:  8px;
+  --radius-lg:  12px;
+  --radius-xl:  16px;
+  --radius-2xl: 20px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.07), 0 8px 10px -6px rgb(0 0 0 / 0.04);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.18);
+}
+
+/* ─── Semantic CSS variables (theme-switchable) ───────────────────────────── */
+:root {
+  color-scheme: light;
+
+  /* Surfaces */
+  --apt-bg:           #ffffff;
+  --apt-bg-subtle:    #f8fafc;
+  --apt-bg-raised:    #f1f5f9;
+  --apt-bg-overlay:   rgba(15, 23, 42, 0.45);
+
+  /* Borders */
+  --apt-border:       #e2e8f0;
+  --apt-border-strong:#cbd5e1;
+  --apt-border-focus: #0057b8;
+
+  /* Text */
+  --apt-text-primary:   #0f172a;
+  --apt-text-secondary: #475569;
+  --apt-text-muted:     #94a3b8;
+  --apt-text-disabled:  #cbd5e1;
+  --apt-text-inverse:   #ffffff;
+  --apt-text-brand:     #0057b8;
+  --apt-text-accent:    #ff6b00;
+
+  /* Interactive */
+  --apt-ring:         rgba(0, 87, 184, 0.35);
+
+  /* Sidebar */
+  --apt-sidebar-bg:   #0a1628;
+  --apt-sidebar-text: rgba(255,255,255,0.6);
+  --apt-sidebar-text-active: #ffffff;
+  --apt-sidebar-active: rgba(255,255,255,0.08);
+  --apt-sidebar-active-indicator: #0057b8;
+  --apt-sidebar-border: rgba(255,255,255,0.07);
+}
+
+[data-theme="dark"] {
+  color-scheme: dark;
+
+  --apt-bg:           #0f172a;
+  --apt-bg-subtle:    #1e293b;
+  --apt-bg-raised:    #293548;
+  --apt-bg-overlay:   rgba(0,0,0,0.6);
+
+  --apt-border:       #1e293b;
+  --apt-border-strong:#334155;
+  --apt-border-focus: #3b82f6;
+
+  --apt-text-primary:   #f1f5f9;
+  --apt-text-secondary: #94a3b8;
+  --apt-text-muted:     #475569;
+  --apt-text-disabled:  #334155;
+  --apt-text-brand:     #60a5fa;
+
+  --apt-sidebar-bg:   #060d1a;
+  --apt-sidebar-border: rgba(255,255,255,0.05);
+}
+
+/* ─── Base reset ──────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+}
+
+body {
+  height: 100%;
+  background: var(--apt-bg-subtle);
+  color: var(--apt-text-primary);
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* ─── Focus ring ──────────────────────────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--apt-border-focus);
+  outline-offset: 2px;
+}
+
+/* ─── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar               { width: 5px; height: 5px; }
+::-webkit-scrollbar-track         { background: transparent; }
+::-webkit-scrollbar-thumb         { background: var(--apt-border-strong); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover   { background: var(--apt-text-muted); }
+
+/* ─── Typography ──────────────────────────────────────────────────────────── */
+.text-display  { font-size: 30px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; }
+.text-heading  { font-size: 22px; font-weight: 700; letter-spacing: -0.02em;  line-height: 1.3; }
+.text-title    { font-size: 17px; font-weight: 600; letter-spacing: -0.01em;  line-height: 1.4; }
+.text-body     { font-size: 14px; font-weight: 400; line-height: 1.5; }
+.text-small    { font-size: 12px; font-weight: 400; line-height: 1.4; }
+.text-label    { font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; }
+
+/* ─── Surface utilities ───────────────────────────────────────────────────── */
+.card {
+  background: var(--apt-bg);
+  border: 1px solid var(--apt-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+}
+
+.card-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--apt-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.card-body {
+  padding: 20px;
+}
+
+/* ─── Animations ──────────────────────────────────────────────────────────── */
+@keyframes fade-in    { from { opacity: 0 } to { opacity: 1 } }
+@keyframes slide-up   { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: translateY(0) } }
+@keyframes slide-down { from { opacity: 0; transform: translateY(-6px) } to { opacity: 1; transform: translateY(0) } }
+@keyframes scale-in   { from { opacity: 0; transform: scale(0.96) } to { opacity: 1; transform: scale(1) } }
+@keyframes spin       { to { transform: rotate(360deg) } }
+@keyframes pulse-ring { 0%,100% { opacity: 1 } 50% { opacity: 0.4 } }
+
+.animate-fade-in    { animation: fade-in 0.15s ease forwards; }
+.animate-slide-up   { animation: slide-up 0.2s ease forwards; }
+.animate-slide-down { animation: slide-down 0.2s ease forwards; }
+.animate-scale-in   { animation: scale-in 0.15s ease forwards; }
+
+/* ─── Skeleton loader ─────────────────────────────────────────────────────── */
+@keyframes shimmer {
+  from { background-position: -400px 0 }
+  to   { background-position: 400px 0 }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--apt-bg-raised) 25%,
+    var(--apt-bg-subtle) 50%,
+    var(--apt-bg-raised) 75%
+  );
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── Table ───────────────────────────────────────────────────────────────── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.data-table th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--apt-text-muted);
+  border-bottom: 1px solid var(--apt-border);
+  white-space: nowrap;
+  background: var(--apt-bg-subtle);
+}
+
+.data-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--apt-border);
+  color: var(--apt-text-primary);
+  vertical-align: middle;
+}
+
+.data-table tbody tr {
+  transition: background 0.1s;
+}
+
+.data-table tbody tr:hover {
+  background: var(--apt-bg-subtle);
+}
+
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}

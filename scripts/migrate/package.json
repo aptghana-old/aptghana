@@ -1,0 +1,26 @@
+{
+  "name": "@apt/migrate",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "migrate": "tsx src/index.ts",
+    "migrate:products": "tsx src/products.ts",
+    "migrate:categories": "tsx src/categories.ts",
+    "migrate:brands": "tsx src/brands.ts",
+    "migrate:users": "tsx src/users.ts"
+  },
+  "dependencies": {
+    "@apt/db": "*",
+    "@apt/search": "*",
+    "@apt/types": "*",
+    "meilisearch": "^0.47.0",
+    "mongoose": "^8.9.5",
+    "@apt/config": "*"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "dotenv": "^16.4.7"
+  }
+}

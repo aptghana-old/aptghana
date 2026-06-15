@@ -1,0 +1,40 @@
+{
+  "name": "aptghana",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "lint": "turbo lint",
+    "type-check": "turbo type-check",
+    "migrate": "tsx scripts/migrate/src/index.ts",
+    "migrate:products": "tsx scripts/migrate/src/products.ts",
+    "migrate:categories": "tsx scripts/migrate/src/categories.ts",
+    "migrate:brands": "tsx scripts/migrate/src/brands.ts",
+    "seed:content": "tsx scripts/seed-content.ts",
+    "infra:migrate-db": "tsx scripts/migrate-atlas-to-selfhosted.ts",
+    "infra:migrate-assets": "tsx scripts/migrate-assets-to-minio.ts",
+    "infra:reindex": "tsx scripts/reindex-meilisearch.ts",
+    "infra:validate": "tsx scripts/validate-migration.ts",
+    "infra:backup": "bash scripts/ops/backup.sh",
+    "infra:health": "bash scripts/ops/health-check.sh"
+  },
+  "devDependencies": {
+    "dotenv": "^17.4.2",
+    "tsx": "^4.19.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.3"
+  },
+  "packageManager": "npm@11.5.1",
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@react-email/components": "^1.0.12",
+    "resend": "^6.12.4"
+  }
+}

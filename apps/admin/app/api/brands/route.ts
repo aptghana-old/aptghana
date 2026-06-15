@@ -1,0 +1,44 @@
+import { NextRequest, NextResponse } from "next/server";
+import { connectDB, BrandModel } from "@apt/db";
+import { requireAdmin } from "@/lib/auth/require";
+
+function slugify(text: string) {
+  return text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
+}
+
+export async function POST(req: NextRequest) {
+  const deny = await requireAdmin();
+  if (deny) return deny;
+  try {
+    await connectDB();
+    const body = await req.json();
+    const { name, slug, description, country, website, logoUrl, status, isFeatured } = body;
+
+    if (!name?.trim()) {
+      return NextResponse.json({ error: "Brand name is required" }, { status: 422 });
+    }
+
+    const finalSlug = (slug?.trim() || slugify(name)).toLowerCase();
+
+    const existing = await BrandModel.findOne({ slug: finalSlug });
+    if (existing) {
+      return NextResponse.json({ error: `Slug "${finalSlug}" is already in use` }, { status: 409 });
+    }
+
+    const brand = await BrandModel.create({
+      name: name.trim(),
+      slug: finalSlug,
+      description: description?.trim() ?? "",
+      country: country || undefined,
+      website: website?.trim() || undefined,
+      logo: { url: logoUrl?.trim() || "", alt: name.trim() },
+      status: status ?? "active",
+      isFeatured: isFeatured ?? false,
+    });
+
+    return NextResponse.json({ id: brand._id.toString() }, { status: 201 });
+  } catch (err) {
+    console.error("POST /api/brands", err);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}

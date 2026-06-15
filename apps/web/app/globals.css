@@ -1,0 +1,255 @@
+@import "tailwindcss";
+
+/* ─── Dark mode via .dark class ─────────────────────────────────────────────── */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ─── Adaptive colour tokens ────────────────────────────────────────────────── */
+:root {
+  --apt-bg:          #ffffff;
+  --apt-bg-subtle:   #F8FAFC;
+  --apt-bg-raised:   #F1F5F9;
+  --apt-border:      #E2E8F0;
+  --apt-text:        #0F172A;
+  --apt-text-2:      #475569;
+  --apt-text-3:      #4B5563;
+  --apt-text-muted:  #94A3B8;
+  --apt-card:        #ffffff;
+  --apt-card-border: #E2E8F0;
+}
+.dark {
+  --apt-bg:          #0A0F1E;
+  --apt-bg-subtle:   #0D1526;
+  --apt-bg-raised:   #111827;
+  --apt-border:      rgba(255,255,255,0.08);
+  --apt-text:        #F1F5F9;
+  --apt-text-2:      #94A3B8;
+  --apt-text-3:      #9CA3AF;
+  --apt-text-muted:  #64748B;
+  --apt-card:        #111827;
+  --apt-card-border: rgba(255,255,255,0.08);
+}
+
+/* ─── APT Design System ────────────────────────────────────────────────────── */
+
+@theme {
+  /* Brand Colors — Industrial Navy */
+  --color-navy-950: #020b14;
+  --color-navy-900: #0a1628;
+  --color-navy-800: #0e2040;
+  --color-navy-700: #16305e;
+  --color-navy-600: #1e4278;
+  --color-navy-500: #0057b8;
+  --color-navy-400: #1a73e8;
+  --color-navy-300: #60a5fa;
+  --color-navy-200: #bdd7f7;
+  --color-navy-100: #ddeeff;
+  --color-navy-50:  #f0f7ff;
+
+  /* Brand Colors — Industrial Orange */
+  --color-orange-700: #b34700;
+  --color-orange-600: #cc5500;
+  --color-orange-500: #ff6b00;
+  --color-orange-400: #ff8c33;
+  --color-orange-300: #ffad66;
+  --color-orange-200: #ffd4aa;
+  --color-orange-100: #fff0e6;
+  --color-orange-50:  #fff9f5;
+
+  /* Surface Colors */
+  --color-surface-900: #111827;
+  --color-surface-800: #1f2937;
+  --color-surface-700: #374151;
+  --color-surface-600: #4b5563;
+  --color-surface-500: #6b7280;
+  --color-surface-400: #9ca3af;
+  --color-surface-300: #d1d5db;
+  --color-surface-200: #e5e7eb;
+  --color-surface-100: #f3f4f6;
+  --color-surface-50:  #f9fafb;
+
+  /* Status Colors */
+  --color-success: #00c875;
+  --color-warning: #f59e0b;
+  --color-danger:  #ef4444;
+  --color-info:    #0ea5e9;
+
+  /* Typography */
+  --font-display: var(--font-geist-sans);
+  --font-body:    var(--font-geist-sans);
+  --font-mono:    var(--font-geist-mono);
+
+  /* Font Sizes */
+  --text-display-2xl: 4.5rem;
+  --text-display-xl:  3.75rem;
+  --text-display-lg:  3rem;
+  --text-display-md:  2.25rem;
+  --text-display-sm:  1.875rem;
+  --text-display-xs:  1.5rem;
+
+  /* Spacing */
+  --spacing-section: 6rem;
+  --spacing-section-sm: 4rem;
+
+  /* Shadows */
+  --shadow-card: 0 1px 3px 0 rgba(0,0,0,.08), 0 4px 16px -2px rgba(0,0,0,.06);
+  --shadow-card-hover: 0 4px 6px -1px rgba(0,0,0,.1), 0 16px 32px -4px rgba(0,0,0,.1);
+  --shadow-nav: 0 1px 0 0 rgba(0,0,0,.06), 0 4px 24px -4px rgba(0,0,0,.12);
+  --shadow-glow-blue: 0 0 40px rgba(0,87,184,.25);
+  --shadow-glow-orange: 0 0 40px rgba(255,107,0,.25);
+
+  /* Border Radius */
+  --radius-card: 0.75rem;
+  --radius-pill: 9999px;
+
+  /* Transitions */
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+}
+
+/* ─── Base ──────────────────────────────────────────────────────────────────── */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--apt-bg);
+  color: var(--apt-text);
+  font-family: var(--font-body);
+  line-height: 1.6;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* ─── Utility Classes ────────────────────────────────────────────────────────── */
+
+.container-apt {
+  width: 100%;
+  max-width: 1280px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .container-apt { padding-left: 2rem; padding-right: 2rem; }
+}
+
+@media (min-width: 1280px) {
+  .container-apt { padding-left: 2.5rem; padding-right: 2.5rem; }
+}
+
+.section-py {
+  padding-top: var(--spacing-section);
+  padding-bottom: var(--spacing-section);
+}
+
+@media (max-width: 768px) {
+  .section-py {
+    padding-top: var(--spacing-section-sm);
+    padding-bottom: var(--spacing-section-sm);
+  }
+}
+
+/* Text gradient */
+.text-gradient-blue {
+  background: linear-gradient(135deg, #1a73e8 0%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-orange {
+  background: linear-gradient(135deg, #ff6b00 0%, #ffad66 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Card */
+.card-apt {
+  background: white;
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--color-surface-200);
+  transition: box-shadow var(--duration-base) var(--ease-smooth),
+              transform var(--duration-base) var(--ease-smooth);
+}
+
+.card-apt:hover {
+  box-shadow: var(--shadow-card-hover);
+  transform: translateY(-2px);
+}
+
+/* Focus ring */
+*:focus-visible {
+  outline: 2px solid var(--color-navy-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ─── Grid Patterns ─────────────────────────────────────────────────────────── */
+
+.bg-grid-pattern {
+  background-image:
+    linear-gradient(rgba(255,255,255,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+.bg-dot-pattern {
+  background-image: radial-gradient(rgba(255,255,255,.1) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* ─── Animations ─────────────────────────────────────────────────────────────── */
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slide-in-right {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes count-up {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-up    { animation: fade-up 0.6s var(--ease-smooth) both; }
+.animate-fade-in    { animation: fade-in 0.4s var(--ease-smooth) both; }
+.animate-count-up   { animation: count-up 0.5s var(--ease-smooth) both; }
+
+@keyframes mega-menu-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-mega-menu  { animation: mega-menu-in 0.18s cubic-bezier(0.4, 0, 0.2, 1) both; }
+
+.animation-delay-100 { animation-delay: 100ms; }
+.animation-delay-200 { animation-delay: 200ms; }
+.animation-delay-300 { animation-delay: 300ms; }
+.animation-delay-400 { animation-delay: 400ms; }
+.animation-delay-500 { animation-delay: 500ms; }
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────────── */
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--color-surface-300); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-surface-400); }

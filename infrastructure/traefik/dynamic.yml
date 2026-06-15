@@ -1,0 +1,74 @@
+http:
+  routers:
+    search:
+      rule: "Host(`search.aptghana.com`)"
+      entryPoints: [websecure]
+      service: meilisearch
+      tls:
+        certResolver: letsencrypt
+      middlewares: [search-cors]
+
+    minio-s3:
+      rule: "Host(`assets.aptghana.com`)"
+      entryPoints: [websecure]
+      service: minio-s3
+      tls:
+        certResolver: letsencrypt
+
+    # MinIO console restricted to allowlisted admin IPs only.
+    # To add an IP: add it to the allowlisted-ips sourceRange list below.
+    minio-console:
+      rule: "Host(`storage-console.aptghana.com`)"
+      entryPoints: [websecure]
+      service: minio-console
+      tls:
+        certResolver: letsencrypt
+      middlewares: [auth-basic, admin-ip-allowlist]
+
+    # Traefik dashboard is disabled (--api.dashboard=false in docker-compose.prod.yml).
+    # If you need dashboard access, use an SSH tunnel:
+    #   ssh -L 8080:localhost:8080 user@vps-host
+    # Then access http://localhost:8080/dashboard/
+
+  services:
+    meilisearch:
+      loadBalancer:
+        servers:
+          - url: "http://aptghana-meilisearch:7700"
+
+    minio-s3:
+      loadBalancer:
+        servers:
+          - url: "http://aptghana-minio:9000"
+
+    minio-console:
+      loadBalancer:
+        servers:
+          - url: "http://aptghana-minio:9001"
+
+  middlewares:
+    auth-basic:
+      basicAuth:
+        usersFile: "/auth/.htpasswd"
+
+    # Restrict MinIO console and other admin UIs to known office/VPN IPs.
+    # Replace with actual admin IP addresses before deploying.
+    admin-ip-allowlist:
+      ipAllowList:
+        sourceRange:
+          - "127.0.0.1/32"
+          # Add production admin IP addresses here, e.g.:
+          # - "203.0.113.10/32"   # Office static IP
+          # - "10.8.0.0/24"       # VPN subnet
+
+    # Meilisearch: only allow read methods from browser origins.
+    # Write operations must only originate from server-side API routes.
+    search-cors:
+      headers:
+        accessControlAllowMethods: ["GET", "POST", "OPTIONS"]
+        accessControlAllowHeaders: ["Content-Type", "Authorization"]
+        accessControlAllowOriginList:
+          - "https://aptghana.com"
+          - "https://store-v2.aptghana.com"
+          - "https://admin-v2.aptghana.com"
+        accessControlMaxAge: 100

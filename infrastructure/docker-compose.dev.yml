@@ -1,0 +1,99 @@
+# ╔══════════════════════════════════════════════════════════════════════════╗
+# ║  ⚠  DEVELOPMENT ONLY — DO NOT RUN ON PRODUCTION SERVERS               ║
+# ║  This file uses hardcoded weak credentials (minioadmin, devpassword).   ║
+# ║  Use infrastructure/docker-compose.prod.yml for production deployments. ║
+# ╚══════════════════════════════════════════════════════════════════════════╝
+name: aptghana-dev
+
+networks:
+  dev:
+    name: aptghana-dev
+
+volumes:
+  mongodb-data-dev:
+  meilisearch-data-dev:
+  minio-data-dev:
+
+services:
+  # ─── MongoDB ──────────────────────────────────────────────────────────────────
+  mongodb:
+    image: mongo:8.0
+    container_name: aptghana-mongodb-dev
+    restart: unless-stopped
+    networks: [dev]
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: devpassword
+      MONGO_INITDB_DATABASE: aptghana_v2
+    volumes:
+      - mongodb-data-dev:/data/db
+      - ./mongodb/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  # ─── Meilisearch ──────────────────────────────────────────────────────────────
+  meilisearch:
+    image: getmeili/meilisearch:v1.11
+    container_name: aptghana-meilisearch-dev
+    restart: unless-stopped
+    networks: [dev]
+    ports:
+      - "7700:7700"
+    environment:
+      MEILI_MASTER_KEY: dev-master-key-change-in-production
+      MEILI_ENV: development
+    volumes:
+      - meilisearch-data-dev:/meili_data
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:7700/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  # ─── MinIO ────────────────────────────────────────────────────────────────────
+  minio:
+    image: minio/minio:RELEASE.2024-11-07T00-52-20Z
+    container_name: aptghana-minio-dev
+    restart: unless-stopped
+    networks: [dev]
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # Console → http://localhost:9001
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    volumes:
+      - minio-data-dev:/data
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 15s
+      timeout: 10s
+      retries: 3
+
+  # ─── MinIO Bootstrap ──────────────────────────────────────────────────────────
+  minio-init:
+    image: minio/mc:RELEASE.2024-11-05T11-29-45Z
+    container_name: aptghana-minio-init-dev
+    networks: [dev]
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+        mc alias set local http://minio:9000 minioadmin minioadmin &&
+        mc mb --ignore-existing local/aptghana-assets &&
+        mc anonymous set download local/aptghana-assets/products &&
+        mc anonymous set download local/aptghana-assets/brands &&
+        mc anonymous set download local/aptghana-assets/categories &&
+        mc anonymous set download local/aptghana-assets/homepage &&
+        mc anonymous set download local/aptghana-assets/marketing &&
+        echo 'Dev MinIO ready'
+      "
+    restart: "no"
