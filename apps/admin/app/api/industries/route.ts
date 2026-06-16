@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB, IndustryModel } from "@apt/db";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 function slugify(t: string) {
   return t.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
 }
 
 export async function GET() {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("content:view");
   if (deny) return deny;
   try {
     await connectDB();
@@ -23,7 +23,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("content:edit");
   if (deny) return deny;
   try {
     await connectDB();

@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB, HomepageConfigModel, HomepageHistoryModel } from "@apt/db";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 /* ─── GET — list version history ─────────────────────────────────────────── */
 export async function GET() {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("content:view");
   if (deny) return deny;
   try {
     await connectDB();
@@ -21,7 +21,7 @@ export async function GET() {
 
 /* ─── POST — restore a history version to draft ──────────────────────────── */
 export async function POST(req: NextRequest) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("content:edit");
   if (deny) return deny;
   try {
     await connectDB();

@@ -12,13 +12,13 @@ import {
   type ProductForIndex,
   type CategoryForIndex,
 } from "@apt/search";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 import type { MeiliSettings } from "@apt/types";
 
 const BATCH_SIZE = 250;
 
 export async function POST() {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("search:edit");
   if (deny) return deny;
   const encoder = new TextEncoder();
 
@@ -156,7 +156,7 @@ export async function POST() {
 
 // GET: quick stats on current index state
 export async function GET() {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("search:view");
   if (deny) return deny;
   try {
     const client = getMeilisearchClient();
@@ -170,7 +170,7 @@ export async function GET() {
 
 // DELETE: wipe the products index entirely
 export async function DELETE() {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("search:edit");
   if (deny) return deny;
   try {
     const client = getMeilisearchClient();

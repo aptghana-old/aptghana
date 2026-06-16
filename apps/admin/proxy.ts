@@ -12,7 +12,13 @@ import { NextRequest, NextResponse } from "next/server";
 import NextAuth from "next-auth";
 import { authConfig } from "@/lib/auth/config";
 
-const { auth } = NextAuth(authConfig);
+const { auth } = NextAuth({
+  ...authConfig,
+  secret: [
+    process.env.ADMIN_AUTH_SECRET,
+    process.env.AUTH_SECRET,
+  ].filter(Boolean) as string[],
+});
 
 const isDev = process.env.NODE_ENV === "development";
 

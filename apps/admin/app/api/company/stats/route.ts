@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB, CompanyStatModel } from "@apt/db";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 export async function POST(req: NextRequest) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission('content:edit');
   if (deny) return deny;
   try {
     await connectDB();

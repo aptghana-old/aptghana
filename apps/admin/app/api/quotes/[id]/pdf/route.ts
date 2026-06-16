@@ -6,13 +6,13 @@ import {
   renderBusinessDocument,
   type QuoteLike,
 } from "@apt/documents";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 interface Params { params: Promise<{ id: string }> }
 
 /** Quote / proforma / receipt PDF for the sales team. */
 export async function GET(req: NextRequest, { params }: Params) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission('quotes:view');
   if (deny) return deny;
   const { id } = await params;
   if (!/^[a-f0-9]{24}$/i.test(id)) return NextResponse.json({ error: "Not found" }, { status: 404 });

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB, SearchConfigModel } from "@apt/db";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 type Params = { params: Promise<{ index: string }> };
 
@@ -10,7 +10,7 @@ type Params = { params: Promise<{ index: string }> };
  * Pass ?versionId=<id> to export a specific version.
  */
 export async function GET(req: NextRequest, { params }: Params) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission('search:view');
   if (deny) return deny;
 
   const { index } = await params;

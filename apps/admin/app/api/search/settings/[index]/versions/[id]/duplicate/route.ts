@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB, SearchConfigModel } from "@apt/db";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 import { auth } from "@/lib/auth";
 
 type Params = { params: Promise<{ index: string; id: string }> };
@@ -11,7 +11,7 @@ type Params = { params: Promise<{ index: string; id: string }> };
  * Body: { note?: string }
  */
 export async function POST(req: NextRequest, { params }: Params) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission('search:edit');
   if (deny) return deny;
 
   const { index, id } = await params;

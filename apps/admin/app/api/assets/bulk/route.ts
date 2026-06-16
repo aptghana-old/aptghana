@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { connectDB, AssetModel } from "@apt/db";
 import { deleteFiles, copyFile, keyToUrl } from "@apt/storage";
 import { removeAssetFromIndex, indexAssets } from "@apt/search";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 type BulkOperation = "delete" | "archive" | "restore" | "move" | "add-tags" | "remove-tags" | "favorite" | "unfavorite";
 
@@ -16,7 +16,7 @@ interface BulkBody {
 }
 
 export async function POST(req: Request) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission('media:delete');
   if (deny) return deny;
   try {
     const body = await req.json() as BulkBody;

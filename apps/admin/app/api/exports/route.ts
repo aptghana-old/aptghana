@@ -10,7 +10,7 @@ import {
   type DatasetKey,
   type ExportData,
 } from "@apt/documents";
-import { requireRole } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 const MAX_ROWS = 5000;
 const SALES_STATUSES = ["confirmed", "processing", "shipped", "delivered"];
@@ -21,8 +21,8 @@ const SALES_STATUSES = ["confirmed", "processing", "shipped", "delivered"];
  *              &from=YYYY-MM-DD&to=YYYY-MM-DD&status=…&q=<customer search>
  */
 export async function GET(req: NextRequest) {
-  // M-08: Exports contain PII and financial data — restrict to super_admin and manager roles
-  const deny = await requireRole("super_admin", "manager");
+  // M-08: Exports contain PII and financial data — requires exports:run permission
+  const deny = await requirePermission("exports:run");
   if (deny) return deny;
   const sp = req.nextUrl.searchParams;
   const dataset = sp.get("dataset") as DatasetKey | null;

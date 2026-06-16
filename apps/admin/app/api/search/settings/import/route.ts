@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB, SearchConfigModel } from "@apt/db";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 import { auth } from "@/lib/auth";
 import type { MeiliSettings } from "@apt/types";
 
@@ -18,7 +18,7 @@ const REQUIRED_SETTING_KEYS: (keyof MeiliSettings)[] = [
  * Creates a new draft version from imported JSON (does NOT auto-apply).
  */
 export async function POST(req: NextRequest) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission('search:edit');
   if (deny) return deny;
 
   let body: {

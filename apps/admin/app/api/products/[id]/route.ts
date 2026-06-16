@@ -8,7 +8,7 @@ import {
   type CategoryForIndex,
   type ProductForIndex,
 } from "@apt/search";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 function slugify(text: string) {
   return text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
@@ -50,7 +50,7 @@ async function syncToSearch(id: string): Promise<void> {
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("products:edit");
   if (deny) return deny;
   try {
     await connectDB();
@@ -129,7 +129,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("products:delete");
   if (deny) return deny;
   try {
     await connectDB();

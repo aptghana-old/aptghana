@@ -5,7 +5,7 @@ import {
   DEFAULT_SETTINGS_BY_INDEX,
   applySettingsToIndex,
 } from "@apt/search";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 import { auth } from "@/lib/auth";
 import type { MeiliSettings } from "@apt/types";
 
@@ -13,7 +13,7 @@ type Params = { params: Promise<{ index: string }> };
 
 /** GET /api/search/settings/[index] — active DB config + live Meilisearch state */
 export async function GET(_req: NextRequest, { params }: Params) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("search:view");
   if (deny) return deny;
 
   const { index } = await params;
@@ -37,7 +37,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
  * Creates a new version (draft or applied).
  */
 export async function POST(req: NextRequest, { params }: Params) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("search:edit");
   if (deny) return deny;
 
   const { index } = await params;
@@ -101,7 +101,7 @@ export async function POST(req: NextRequest, { params }: Params) {
  * Seeds the default config for this index if no versions exist.
  */
 export async function PUT(_req: NextRequest, { params }: Params) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("search:edit");
   if (deny) return deny;
 
   const { index } = await params;

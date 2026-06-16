@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB, HomepageConfigModel, DEFAULT_HOMEPAGE_CONFIG } from "@apt/db";
 import type { HomepageConfigData } from "@apt/db";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 /* ─── GET — load both draft and published configs ─────────────────────────── */
 export async function GET() {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("content:view");
   if (deny) return deny;
   try {
     await connectDB();
@@ -34,7 +34,7 @@ export async function GET() {
 
 /* ─── PUT — upsert the draft config ──────────────────────────────────────── */
 export async function PUT(req: NextRequest) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("content:edit");
   if (deny) return deny;
   try {
     await connectDB();

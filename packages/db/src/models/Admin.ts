@@ -8,8 +8,8 @@ const AdminSchema = new Schema(
     name: { type: String, required: true },
     role: {
       type: String,
-      enum: ["super_admin", "manager", "editor", "viewer", "support"],
-      default: "viewer",
+      enum: ["super_admin", "manager", "sales", "account"],
+      default: "sales",
       index: true,
     },
     permissions: [String],

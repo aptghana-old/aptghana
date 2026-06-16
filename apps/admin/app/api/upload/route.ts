@@ -12,7 +12,7 @@ import {
   MAX_VIDEO_SIZE,
 } from "@apt/storage";
 import type { AssetFolder } from "@apt/storage";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 const MAGIC_BYTES: { mime: string; bytes: number[] }[] = [
   { mime: "image/jpeg",    bytes: [0xFF, 0xD8, 0xFF] },
@@ -75,7 +75,7 @@ const ALLOWED_TYPES_MAP = {
  */
 
 export async function POST(req: Request) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("media:upload");
   if (deny) return deny;
   const url    = new URL(req.url);
   const action = url.searchParams.get("action");
@@ -162,7 +162,7 @@ export async function POST(req: Request) {
 }
 
 export async function DELETE(req: Request) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("media:delete");
   if (deny) return deny;
   try {
     const { key } = await req.json() as { key?: string };

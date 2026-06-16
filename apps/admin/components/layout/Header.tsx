@@ -33,9 +33,8 @@ const ROUTE_LABELS: Record<string, string> = {
 const ROLE_LABELS: Record<AdminRole, string> = {
   super_admin: "Super Admin",
   manager:     "Manager",
-  editor:      "Editor",
-  viewer:      "Viewer",
-  support:     "Support",
+  sales:       "Sales",
+  account:     "Account",
 };
 
 function Breadcrumb() {

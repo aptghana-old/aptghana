@@ -73,7 +73,6 @@ const OrderSchema = new Schema(
   { timestamps: true, collection: "orders_v2" }
 );
 
-OrderSchema.index({ ref: 1 });
 OrderSchema.index({ userId: 1, createdAt: -1 });
 OrderSchema.index({ status: 1, createdAt: -1 });
 

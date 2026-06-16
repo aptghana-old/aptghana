@@ -1,6 +1,7 @@
 import type { DefaultSession } from "next-auth";
+import type { AdminRole } from "@apt/auth";
 
-export type AdminRole = "super_admin" | "manager" | "editor" | "viewer" | "support";
+export type { AdminRole };
 
 declare module "next-auth" {
   interface Session {

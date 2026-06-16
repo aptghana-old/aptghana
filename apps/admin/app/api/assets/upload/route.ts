@@ -16,7 +16,7 @@ import {
   MAX_VIDEO_SIZE,
 } from "@apt/storage";
 import { indexAsset, setupAssetsIndex } from "@apt/search";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 const MAGIC_BYTES: { mime: string; bytes: number[] }[] = [
   { mime: "image/jpeg",    bytes: [0xFF, 0xD8, 0xFF] },
@@ -62,7 +62,7 @@ function buildFolder(rawFolder: string): string {
 }
 
 export async function POST(req: Request) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission('media:upload');
   if (deny) return deny;
   let form: FormData;
   try {

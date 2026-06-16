@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server";
 import { connectDB, SearchConfigModel } from "@apt/db";
 import { INDEXES } from "@apt/search";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 const ALL_INDEXES = Object.values(INDEXES);
 
 /** GET /api/search/settings — summary card for every known index */
 export async function GET() {
-  const deny = await requireAdmin();
+  const deny = await requirePermission('search:view');
   if (deny) return deny;
 
   try {

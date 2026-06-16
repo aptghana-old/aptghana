@@ -14,7 +14,7 @@ import {
 import type { QuoteStatus } from "@apt/types";
 import { emailService } from "@apt/email";
 import { STORE_URL as STORE_URL_DEFAULT } from "@apt/config";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 const STORE_URL = (process.env.STORE_URL ?? STORE_URL_DEFAULT).replace(/\/$/, "");
 
@@ -29,7 +29,7 @@ interface Params { params: Promise<{ id: string }> }
  * Idempotent: re-approving an approved quote returns the existing state.
  */
 export async function POST(req: NextRequest, { params }: Params) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission('quotes:approve');
   if (deny) return deny;
   const { id } = await params;
 

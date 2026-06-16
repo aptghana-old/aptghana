@@ -3,14 +3,14 @@ import { connectDB, AssetModel } from "@apt/db";
 import { deleteFile, copyFile, keyToUrl } from "@apt/storage";
 import { indexAsset, removeAssetFromIndex } from "@apt/search";
 import { randomUUID } from "crypto";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 interface RouteContext {
   params: Promise<{ id: string }>;
 }
 
 export async function GET(_req: Request, { params }: RouteContext) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("media:view");
   if (deny) return deny;
   try {
     const { id } = await params;
@@ -25,7 +25,7 @@ export async function GET(_req: Request, { params }: RouteContext) {
 }
 
 export async function PATCH(req: Request, { params }: RouteContext) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("media:upload");
   if (deny) return deny;
   try {
     const { id } = await params;
@@ -80,7 +80,7 @@ export async function PATCH(req: Request, { params }: RouteContext) {
 }
 
 export async function DELETE(req: Request, { params }: RouteContext) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("media:delete");
   if (deny) return deny;
   try {
     const { id } = await params;
@@ -115,7 +115,7 @@ export async function DELETE(req: Request, { params }: RouteContext) {
 
 // POST /api/assets/[id] — actions: archive, restore, duplicate, increment-view
 export async function POST(req: Request, { params }: RouteContext) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("media:upload");
   if (deny) return deny;
   try {
     const { id } = await params;

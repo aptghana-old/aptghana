@@ -1,8 +1,13 @@
 import type { NextAuthConfig } from "next-auth";
+import {
+  hasPermission,
+  ROUTE_PERMISSION_MAP,
+  type AdminRole,
+  type Permission,
+} from "@apt/auth";
 
 export const ADMIN_PROTECTED_PATHS = ["/dashboard"];
 export const ADMIN_PUBLIC_PATHS = ["/login", "/forgot-password", "/reset-password"];
-// /api/auth is the NextAuth handler itself — must remain public
 const PUBLIC_API_PREFIX = "/api/auth";
 
 // P-17: Idle timeout — 30 minutes without a new token issuance logs out the admin.
@@ -18,9 +23,9 @@ export const authConfig = {
       const isLoggedIn = !!auth?.user;
       const path = nextUrl.pathname;
 
-      // P-17: Idle session check
+      // P-17: Idle session check — token.lastActivityAt is forwarded via the JWT
       if (isLoggedIn) {
-        const lastActivityAt = auth?.user?.lastActivityAt;
+        const lastActivityAt = (auth?.user as { lastActivityAt?: number })?.lastActivityAt;
         if (lastActivityAt && Date.now() - lastActivityAt > IDLE_TIMEOUT_MS) {
           if (path.startsWith("/api") && !path.startsWith(PUBLIC_API_PREFIX)) {
             return Response.json(
@@ -53,6 +58,22 @@ export const authConfig = {
       const isAuthPage = ADMIN_PUBLIC_PATHS.some((p) => path === p);
       if (isLoggedIn && isAuthPage) {
         return Response.redirect(new URL("/dashboard", nextUrl));
+      }
+
+      // RBAC: enforce route-level permissions for authenticated dashboard pages.
+      // Role + permissions come directly from the JWT token (set by the jwt callback
+      // in lib/auth/index.ts and forwarded to auth.user in NextAuth v5 middleware).
+      if (isLoggedIn && isProtected) {
+        const user = auth?.user as { role?: string; permissions?: string[] };
+        const role = user?.role as AdminRole | undefined;
+        const overrides = user?.permissions ?? [];
+
+        if (role) {
+          const entry = ROUTE_PERMISSION_MAP.find((r) => path.startsWith(r.prefix));
+          if (entry && !hasPermission(role, overrides, entry.permission as Permission)) {
+            return Response.redirect(new URL("/dashboard?error=forbidden", nextUrl));
+          }
+        }
       }
 
       return true;

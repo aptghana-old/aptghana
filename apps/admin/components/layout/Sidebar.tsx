@@ -14,6 +14,12 @@ import {
 } from "lucide-react";
 import { createContext, useContext, useState } from "react";
 import { SITE_URL, SITE_DOMAIN } from "@apt/config";
+import {
+  hasPermission,
+  NAV_PERMISSION_MAP,
+  type AdminRole,
+  type Permission,
+} from "@apt/auth";
 
 const SidebarCtx = createContext<{ collapsed: boolean; toggle(): void }>({
   collapsed: false,
@@ -121,9 +127,11 @@ function NavItemLink({ item, active, collapsed }: { item: NavItem; active: boole
 interface SidebarProps {
   mobileOpen: boolean;
   onMobileClose: () => void;
+  role: AdminRole;
+  permissions: string[];
 }
 
-export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
+export default function Sidebar({ mobileOpen, onMobileClose, role, permissions }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false);
   const pathname = usePathname();
 
@@ -131,6 +139,17 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
     href === "/dashboard"
       ? pathname === "/dashboard"
       : pathname === href || pathname.startsWith(href + "/");
+
+  const canView = (href: string): boolean => {
+    const required = NAV_PERMISSION_MAP[href];
+    if (!required) return true; // no restriction → always visible
+    return hasPermission(role, permissions, required as Permission);
+  };
+
+  const visibleSections = NAV.map((section) => ({
+    ...section,
+    items: section.items.filter((item) => canView(item.href)),
+  })).filter((section) => section.items.length > 0);
 
   return (
     <SidebarCtx.Provider value={{ collapsed, toggle: () => setCollapsed((c) => !c) }}>
@@ -146,12 +165,9 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
       <aside
         className={[
           "flex flex-col h-full shrink-0 transition-all duration-200",
-          /* Mobile: fixed overlay — slides in/out */
           "fixed inset-y-0 left-0 z-50",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
-          /* md+: back in layout flow, always visible */
           "md:relative md:translate-x-0 md:z-auto",
-          /* Mobile always full width, md+ width based on collapse */
           "w-[280px]",
           collapsed ? "md:w-14" : "md:w-60",
         ].join(" ")}
@@ -195,7 +211,7 @@ export default function Sidebar({ mobileOpen, onMobileClose }: SidebarProps) {
 
         {/* Nav */}
         <nav className="flex-1 overflow-y-auto overflow-x-hidden py-3 px-2">
-          {NAV.map((section) => (
+          {visibleSections.map((section) => (
             <div key={section.section} className="mb-5">
               {!collapsed && (
                 <div

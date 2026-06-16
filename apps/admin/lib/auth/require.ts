@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { hasPermission, type Permission, type AdminRole } from "@apt/auth";
 
 /** Returns a 401 Response if no valid admin session exists, otherwise null. */
 export async function requireAdmin(): Promise<NextResponse | null> {
@@ -10,13 +11,29 @@ export async function requireAdmin(): Promise<NextResponse | null> {
   return null;
 }
 
+/**
+ * Returns a 403 Response if the admin lacks the required permission.
+ * Respects per-user permission overrides stored on the session.
+ */
+export async function requirePermission(permission: Permission): Promise<NextResponse | null> {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const { role, permissions } = session.user as { role: AdminRole; permissions: string[] };
+  if (!hasPermission(role, permissions ?? [], permission)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+  return null;
+}
+
 /** Returns a 403 Response if the admin lacks the required role. */
 export async function requireRole(...roles: string[]): Promise<NextResponse | null> {
   const session = await auth();
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const { role } = session.user;
+  const { role } = session.user as { role: AdminRole };
   if (role !== "super_admin" && !roles.includes(role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
@@ -33,7 +50,6 @@ export async function requireFreshSession(maxAgeSeconds = 1800): Promise<NextRes
   if (!session?.user?.id) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  // iat is in the raw JWT but not in the session object; fall back to lastActivityAt
   const issuedAt = (session as unknown as { iat?: number }).iat ?? 0;
   if (issuedAt && Date.now() / 1000 - issuedAt > maxAgeSeconds) {
     return NextResponse.json(

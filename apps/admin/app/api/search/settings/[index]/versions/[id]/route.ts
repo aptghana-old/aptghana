@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB, SearchConfigModel } from "@apt/db";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 type Params = { params: Promise<{ index: string; id: string }> };
 
 /** GET /api/search/settings/[index]/versions/[id] — full version including settings */
 export async function GET(_req: NextRequest, { params }: Params) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("search:view");
   if (deny) return deny;
 
   const { index, id } = await params;
@@ -23,7 +23,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 
 /** PUT /api/search/settings/[index]/versions/[id] — update note only */
 export async function PUT(req: NextRequest, { params }: Params) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("search:edit");
   if (deny) return deny;
 
   const { index, id } = await params;
@@ -51,7 +51,7 @@ export async function PUT(req: NextRequest, { params }: Params) {
 
 /** DELETE /api/search/settings/[index]/versions/[id] — cannot delete active version */
 export async function DELETE(_req: NextRequest, { params }: Params) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("search:edit");
   if (deny) return deny;
 
   const { index, id } = await params;

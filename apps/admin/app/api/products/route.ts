@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB, ProductModel, BrandModel, CategoryModel } from "@apt/db";
 import { buildProductRecord, upsertProductRecord, type CategoryForIndex } from "@apt/search";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 function slugify(text: string) {
   return text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
 }
 
 export async function POST(req: NextRequest) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission('products:create');
   if (deny) return deny;
   try {
     await connectDB();

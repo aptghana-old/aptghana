@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { connectDB, AssetModel } from "@apt/db";
 import { getMediaType } from "@apt/search";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 const PAGE_SIZE = 50;
 
 export async function GET(req: Request) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission('media:view');
   if (deny) return deny;
   try {
     const url        = new URL(req.url);

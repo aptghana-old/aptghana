@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB, CompanyStatModel } from "@apt/db";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission('content:edit');
   if (deny) return deny;
   try {
     await connectDB();
@@ -28,7 +28,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 }
 
 export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission('content:edit');
   if (deny) return deny;
   try {
     await connectDB();

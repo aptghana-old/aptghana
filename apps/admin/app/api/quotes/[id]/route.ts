@@ -8,7 +8,7 @@ import {
   canTransition,
 } from "@apt/db";
 import type { QuoteStatus } from "@apt/types";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 interface Params { params: Promise<{ id: string }> }
 
@@ -22,7 +22,7 @@ function str(v: unknown, max = 1000): string {
 }
 
 export async function GET(_req: NextRequest, { params }: Params) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("quotes:view");
   if (deny) return deny;
   const { id } = await params;
   try {
@@ -52,7 +52,7 @@ interface PatchItem {
  * shipping, validity, notes. Rejected once pricing is locked (post-approval).
  */
 export async function PATCH(req: NextRequest, { params }: Params) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("quotes:edit");
   if (deny) return deny;
   const { id } = await params;
 

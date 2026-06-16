@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { connectDB, AssetModel } from "@apt/db";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 export interface FolderNode {
   path:     string;
@@ -11,7 +11,7 @@ export interface FolderNode {
 }
 
 export async function GET() {
-  const deny = await requireAdmin();
+  const deny = await requirePermission('media:view');
   if (deny) return deny;
   try {
     await connectDB();

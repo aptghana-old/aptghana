@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
 import { searchAssets, getMediaType } from "@apt/search";
 import { connectDB, AssetModel } from "@apt/db";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 export async function GET(req: Request) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission('media:view');
   if (deny) return deny;
   try {
     const url       = new URL(req.url);

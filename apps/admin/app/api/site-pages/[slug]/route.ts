@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB, SitePageModel } from "@apt/db";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 type Params = { params: Promise<{ slug: string }> };
 
 export async function GET(_req: NextRequest, { params }: Params) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("content:view");
   if (deny) return deny;
   try {
     await connectDB();
@@ -20,7 +20,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 }
 
 export async function PATCH(req: NextRequest, { params }: Params) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission("content:edit");
   if (deny) return deny;
   try {
     await connectDB();

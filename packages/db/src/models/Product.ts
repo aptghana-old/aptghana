@@ -152,6 +152,7 @@ const ProductSchema = new Schema(
   {
     timestamps: true,
     collection: "products_v2",
+    suppressReservedKeysWarning: true,
   }
 );
 

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB, OrderModel, QuoteModel, recordAudit, canTransition } from "@apt/db";
 import { QUOTE_STATUS_LABELS, type QuoteStatus } from "@apt/types";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 /** Quote workflow statuses → linked Order statuses (Order has a narrower enum). */
 const ORDER_STATUS_SYNC: Partial<Record<QuoteStatus, string>> = {
@@ -24,7 +24,7 @@ interface Params { params: Promise<{ id: string }> }
 const BLOCKED_TARGETS: QuoteStatus[] = ["approved", "paid"];
 
 export async function POST(req: NextRequest, { params }: Params) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission('quotes:edit');
   if (deny) return deny;
   const { id } = await params;
 

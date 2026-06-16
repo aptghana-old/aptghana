@@ -1,10 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB, ProductModel } from "@apt/db";
-import { requireAdmin } from "@/lib/auth/require";
+import { requirePermission } from "@/lib/auth/require";
 
 /** Lightweight product lookup for the quote editor's add/replace picker. */
 export async function GET(req: NextRequest) {
-  const deny = await requireAdmin();
+  const deny = await requirePermission('quotes:view');
   if (deny) return deny;
   const q = req.nextUrl.searchParams.get("q")?.trim() ?? "";
   if (q.length < 2) return NextResponse.json({ products: [] });

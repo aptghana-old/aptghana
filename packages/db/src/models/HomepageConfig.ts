@@ -48,7 +48,7 @@ const SectionSchema = new Schema({
 /* ─── Main config schema ──────────────────────────────────────────────────── */
 const HomepageConfigSchema = new Schema(
   {
-    status:      { type: String, enum: ["draft", "published"], required: true, index: true },
+    status:      { type: String, enum: ["draft", "published"], required: true },
     version:     { type: Number, default: 0 },
     publishedAt: { type: Date,   default: null },
     publishedBy: { type: String, default: null },

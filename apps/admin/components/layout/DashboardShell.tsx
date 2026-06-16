@@ -5,13 +5,16 @@ import { usePathname } from "next/navigation";
 import Sidebar from "@/components/layout/Sidebar";
 import Header, { type SessionUser } from "@/components/layout/Header";
 import CommandPalette from "@/components/layout/CommandPalette";
+import type { AdminRole } from "@apt/auth";
 
 interface DashboardShellProps {
   children: React.ReactNode;
   user: SessionUser;
+  role: AdminRole;
+  permissions: string[];
 }
 
-export default function DashboardShell({ children, user }: DashboardShellProps) {
+export default function DashboardShell({ children, user, role, permissions }: DashboardShellProps) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const pathname = usePathname();
@@ -34,6 +37,8 @@ export default function DashboardShell({ children, user }: DashboardShellProps) 
       <Sidebar
         mobileOpen={mobileNavOpen}
         onMobileClose={() => setMobileNavOpen(false)}
+        role={role}
+        permissions={permissions}
       />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header

@@ -1,7 +1,7 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import { connectDB, AdminModel } from "@apt/db";
-import { verifyPassword, verifyMfaOtp } from "@apt/auth";
+import { verifyPassword, verifyMfaOtp, type AdminRole } from "@apt/auth";
 import { authConfig } from "./config";
 
 const REMEMBER_ME_AGE = 30 * 24 * 60 * 60; // 30 days
@@ -68,7 +68,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           email:       admin.email,
           name:        admin.name,
           image:       admin.avatar ?? null,
-          role:        admin.role as import("@/types/next-auth").AdminRole,
+          role:        admin.role as AdminRole,
           permissions: admin.permissions,
           mfaEnabled:  admin.mfaEnabled,
           rememberMe:  credentials.rememberMe as string,
@@ -82,7 +82,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async jwt({ token, user }) {
       if (user) {
         token.id             = user.id ?? "";
-        token.role           = (user as { role?: string }).role ?? "viewer";
+        token.role           = (user as { role?: string }).role ?? "sales";
         token.permissions    = (user as { permissions?: string[] }).permissions ?? [];
         token.mfaEnabled     = (user as { mfaEnabled?: boolean }).mfaEnabled ?? false;
         token.lastActivityAt = Date.now();
