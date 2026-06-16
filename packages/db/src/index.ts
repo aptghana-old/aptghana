@@ -40,6 +40,7 @@ export { CompanyStatModel } from "./models/CompanyStat";
 export type { CompanyStatDocument } from "./models/CompanyStat";
 export { SitePageModel } from "./models/SitePage";
 export type { SitePageDocument, LegalSection, OfficeHour } from "./models/SitePage";
+export { getSitePageData } from "./sitePages";
 export { HomepageConfigModel, HomepageHistoryModel, DEFAULT_HOMEPAGE_CONFIG } from "./models/HomepageConfig";
 export { AssetModel } from "./models/Asset";
 export type { AssetDocument } from "./models/Asset";

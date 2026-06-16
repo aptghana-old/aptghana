@@ -17,6 +17,7 @@
     "@apt/email": "*",
     "@apt/payment": "*",
     "@apt/search": "*",
+    "@apt/storage": "*",
     "@apt/types": "*",
     "@apt/ui": "*",
     "bcryptjs": "^3.0.3",

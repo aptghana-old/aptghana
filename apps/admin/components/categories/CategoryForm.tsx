@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { Save, CheckCircle2, Plus, X, FolderTree } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea, Select } from "@/components/ui/Input";
+import { slugify } from "@apt/types";
 
 export interface Benefit { title: string; value: string }
 export interface CategoryDocument { type: string; title: string; url: string; language: string }
@@ -47,10 +48,6 @@ interface Props {
   parentContext?: ParentContext;
   onSaved?: (id: string) => void;
   onCancel?: () => void;
-}
-
-export function slugify(t: string) {
-  return t.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
 }
 
 const CHILD_LEVEL: Record<string, string> = { group: "category", category: "subcategory", subcategory: "range", range: "" };

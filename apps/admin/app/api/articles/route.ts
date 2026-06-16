@@ -3,6 +3,7 @@ import { connectDB, ArticleModel, recordAudit } from "@apt/db";
 import { requirePermission } from "@/lib/auth/require";
 import { auth } from "@/lib/auth";
 import { slugify, estimateReadingTime } from "@/lib/articleHelpers";
+import { articleCreateSchema, parseBody } from "@apt/types";
 
 /** POST /api/articles — quick-create a draft (full editing happens on the detail page). */
 export async function POST(req: NextRequest) {
@@ -12,11 +13,9 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const session = await auth();
-    const body = await req.json();
-
-    if (!body.title?.trim()) {
-      return NextResponse.json({ error: "Title is required" }, { status: 400 });
-    }
+    const parsed = parseBody(articleCreateSchema, await req.json());
+    if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: 422 });
+    const body = parsed.data;
 
     const baseSlug = (body.slug?.trim() || slugify(body.title)).toLowerCase() || "untitled";
     let slug = baseSlug;

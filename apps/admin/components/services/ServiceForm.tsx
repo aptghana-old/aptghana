@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Save, CheckCircle2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea, Select } from "@/components/ui/Input";
+import { slugify } from "@apt/types";
 
 export interface ServiceFormData {
   title:        string;
@@ -19,10 +20,6 @@ export interface ServiceFormData {
 interface Props {
   initial?: Partial<ServiceFormData>;
   serviceId?: string;
-}
-
-function slugify(t: string) {
-  return t.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
 }
 
 export const SECTION_OPTIONS = [

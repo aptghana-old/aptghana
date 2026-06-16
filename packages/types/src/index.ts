@@ -747,3 +747,11 @@ export interface PaginatedResponse<T> {
 // ─── Quote workflow (pure, client-safe helpers) ─────────────────────────────
 
 export * from "./quote-workflow";
+
+// ─── Shared utilities ────────────────────────────────────────────────────────
+
+export * from "./slugify";
+
+// ─── Validation (zod schemas for API request bodies) ───────────────────────
+
+export * from "./validation";

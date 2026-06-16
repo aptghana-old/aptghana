@@ -6,8 +6,23 @@ import ActiveFilters from "@/components/search/ActiveFilters";
 import SearchPagination from "@/components/search/SearchPagination";
 import ProductCard, { type ProductCardData } from "@/components/products/ProductCard";
 import ZeroResults from "@/components/search/ZeroResults";
-import type { CatalogPageData } from "@/lib/catalog";
+import type { CatalogPageData, BreadcrumbItem } from "@/lib/catalog";
 import type { ProductSearchHit } from "@apt/search";
+import { STORE_URL } from "@apt/config";
+import { safeJsonLd } from "@apt/auth";
+
+function breadcrumbListLd(breadcrumbs: BreadcrumbItem[]) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: breadcrumbs.map((b, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: b.name,
+      item: `${STORE_URL}${b.href}`,
+    })),
+  };
+}
 
 function hitToCard(hit: ProductSearchHit): ProductCardData {
   return {
@@ -86,6 +101,7 @@ export default function CatalogBrowse({ data }: Props) {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbListLd(breadcrumbs)) }} />
       <CatalogHero
         name={entity.name}
         description={entity.description || entity.shortDescription}

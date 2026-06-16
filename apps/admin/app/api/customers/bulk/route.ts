@@ -2,24 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB, UserModel, AdminModel, recordAudit } from "@apt/db";
 import { requirePermission } from "@/lib/auth/require";
 import { auth } from "@/lib/auth";
-
-const VALID_STATUSES = ["active", "inactive", "suspended", "pending"];
+import { customerBulkActionSchema, parseBody } from "@apt/types";
 
 /** Bulk customer actions from the list view: status change, sales rep assignment, tagging. */
 export async function POST(req: NextRequest) {
   const deny = await requirePermission("customers:edit");
   if (deny) return deny;
 
-  let body: { ids?: string[]; action?: string; status?: string; salesRepId?: string; tag?: string };
+  let raw: unknown;
   try {
-    body = await req.json();
+    raw = await req.json();
   } catch {
     return NextResponse.json({ error: "Invalid request body" }, { status: 400 });
   }
 
-  const ids = Array.isArray(body.ids) ? body.ids.filter(Boolean) : [];
-  if (ids.length === 0) return NextResponse.json({ error: "No customers selected" }, { status: 422 });
-  if (ids.length > 500) return NextResponse.json({ error: "Select at most 500 customers at a time" }, { status: 422 });
+  const parsed = parseBody(customerBulkActionSchema, raw);
+  if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: 422 });
+  const body = parsed.data;
+  const ids = body.ids;
 
   try {
     const session = await auth();
@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
 
     switch (body.action) {
       case "set_status": {
-        if (!body.status || !VALID_STATUSES.includes(body.status)) {
+        if (!body.status) {
           return NextResponse.json({ error: "A valid status is required" }, { status: 400 });
         }
         await UserModel.updateMany({ _id: { $in: ids } }, { $set: { status: body.status } });

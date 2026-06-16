@@ -9,6 +9,7 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea, Select } from "@/components/ui/Input";
 import { STORE_DOMAIN } from "@apt/config";
+import { slugify } from "@apt/types";
 import CategoryPicker from "./CategoryPicker";
 
 type Section = "general" | "media" | "specs" | "pricing" | "seo";
@@ -60,10 +61,6 @@ const CURRENCY_OPTIONS = [
   { value: "USD", label: "USD — US Dollar" },
   { value: "EUR", label: "EUR — Euro" },
 ];
-
-function slugify(text: string) {
-  return text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
-}
 
 function SectionNav({ active, onSelect }: { active: Section; onSelect(s: Section): void }) {
   return (

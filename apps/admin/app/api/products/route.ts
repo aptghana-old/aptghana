@@ -3,10 +3,7 @@ import { connectDB, ProductModel, BrandModel } from "@apt/db";
 import { buildProductRecord, upsertProductRecord, type CategoryForIndex } from "@apt/search";
 import { requirePermission } from "@/lib/auth/require";
 import { resolveCategoryChain, buildEmbeddedCategories } from "@/lib/catalogue";
-
-function slugify(text: string) {
-  return text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
-}
+import { slugify } from "@apt/types";
 
 export async function POST(req: NextRequest) {
   const deny = await requirePermission('products:create');

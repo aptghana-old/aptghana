@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB, ResourceModel } from "@apt/db";
 import { requirePermission } from "@/lib/auth/require";
-
-function slugify(t: string) {
-  return t.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
-}
+import { slugify } from "@apt/types";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const deny = await requirePermission('content:edit');

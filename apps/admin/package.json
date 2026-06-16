@@ -18,6 +18,7 @@
     "@apt/email": "*",
     "@apt/odoo": "*",
     "@apt/search": "*",
+    "@apt/storage": "*",
     "@apt/types": "*",
     "@tiptap/core": "^3.26.1",
     "@tiptap/extension-image": "^3.26.1",

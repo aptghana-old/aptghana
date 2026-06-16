@@ -1,8 +1,6 @@
 import DOMPurify from "isomorphic-dompurify";
 
-export function slugify(text: string): string {
-  return text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
-}
+export { slugify } from "@apt/types";
 
 /**
  * Sanitizes editor-authored HTML before it's persisted. Content is rendered

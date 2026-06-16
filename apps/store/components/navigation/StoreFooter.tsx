@@ -1,6 +1,6 @@
 import { FooterBase } from "@apt/ui";
 import type { FooterConfig } from "@apt/ui";
-import { EMAIL_SALES, SITE_URL } from "@apt/config";
+import { EMAIL_SALES, SITE_URL, CONTACT_PHONE, CONTACT_PHONE_HREF, CONTACT_ADDRESS, CONTACT_MAPS_URL, SOCIAL_LINKS } from "@apt/config";
 
 const STORE_FOOTER_CONFIG: FooterConfig = {
   brand: {
@@ -16,8 +16,8 @@ const STORE_FOOTER_CONFIG: FooterConfig = {
     {
       iconPath:
         "M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z",
-      text: "+233 30 396 4346",
-      href: "tel:+233303964346",
+      text: CONTACT_PHONE,
+      href: CONTACT_PHONE_HREF,
     },
     {
       iconPath:
@@ -28,29 +28,29 @@ const STORE_FOOTER_CONFIG: FooterConfig = {
     {
       iconPath:
         "M15 10.5a3 3 0 11-6 0 3 3 0 016 0zM19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z",
-      text: "North Industrial Area, Accra, Ghana",
-      href: "https://maps.google.com/?q=APT+Ghana+Accra",
+      text: CONTACT_ADDRESS,
+      href: CONTACT_MAPS_URL,
     },
   ],
 
   socials: [
     {
       label: "LinkedIn",
-      href: "https://linkedin.com/company/apt-ghana",
+      href: SOCIAL_LINKS.linkedin,
       iconPath:
         "M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2zM4 6a2 2 0 100-4 2 2 0 000 4z",
       filled: true,
     },
     {
       label: "Twitter / X",
-      href: "https://twitter.com/aptghana",
+      href: SOCIAL_LINKS.twitter,
       iconPath:
         "M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z",
       filled: true,
     },
     {
       label: "YouTube",
-      href: "https://youtube.com/@aptghana",
+      href: SOCIAL_LINKS.youtube,
       iconPath:
         "M21 12a9 9 0 11-18 0 9 9 0 0118 0zM9.75 9.75l4.5 2.25-4.5 2.25V9.75z",
       filled: false,

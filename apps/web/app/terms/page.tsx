@@ -45,29 +45,8 @@ const STATIC: TermsData = {
 };
 
 async function getData(): Promise<TermsData> {
-  try {
-    const { connectDB, SitePageModel } = await import("@apt/db");
-    await connectDB();
-    const doc = await SitePageModel.findOne({ slug: "terms", status: "published" }).lean() as Record<string, unknown> | null;
-    if (!doc) return STATIC;
-    return {
-      title:        ((doc.title        ?? STATIC.title)        as string),
-      tagline:      ((doc.tagline      ?? STATIC.tagline)      as string),
-      lastUpdated:  ((doc.lastUpdated  ?? STATIC.lastUpdated)  as string),
-      intro:        ((doc.intro        ?? STATIC.intro)        as string),
-      sections:     (Array.isArray(doc.sections) && doc.sections.length > 0
-        ? (doc.sections as { heading?: string; body?: string }[]).map((s) => ({ heading: s.heading ?? "", body: s.body ?? "" }))
-        : STATIC.sections),
-      contactBlockName:     ((doc.contactBlockName     ?? STATIC.contactBlockName)     as string),
-      contactBlockEmail:    ((doc.contactBlockEmail    ?? STATIC.contactBlockEmail)    as string),
-      contactBlockAddress:  ((doc.contactBlockAddress  ?? STATIC.contactBlockAddress)  as string),
-      contactBlockFootnote: ((doc.contactBlockFootnote ?? STATIC.contactBlockFootnote) as string),
-      metaTitle:       ((doc.metaTitle       ?? STATIC.metaTitle)       as string),
-      metaDescription: ((doc.metaDescription ?? STATIC.metaDescription) as string),
-    };
-  } catch {
-    return STATIC;
-  }
+  const { getSitePageData } = await import("@apt/db");
+  return getSitePageData("terms", STATIC);
 }
 
 export async function generateMetadata(): Promise<Metadata> {

@@ -3,6 +3,7 @@ import { connectDB, ArticleModel, recordAudit } from "@apt/db";
 import { requirePermission } from "@/lib/auth/require";
 import { auth } from "@/lib/auth";
 import { slugify, estimateReadingTime, sanitizeArticleHtml } from "@/lib/articleHelpers";
+import { articleUpdateSchema, parseBody } from "@apt/types";
 
 interface Params { params: Promise<{ id: string }> }
 
@@ -29,7 +30,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     await connectDB();
     const session = await auth();
     const { id } = await params;
-    const body = await req.json();
+    const parsed = parseBody(articleUpdateSchema, await req.json());
+    if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: 422 });
+    const body = parsed.data;
 
     const article = await ArticleModel.findById(id);
     if (!article) return NextResponse.json({ error: "Article not found" }, { status: 404 });

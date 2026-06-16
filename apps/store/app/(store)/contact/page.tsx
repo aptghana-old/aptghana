@@ -1,19 +1,59 @@
 import type { Metadata } from "next";
-import { EMAIL_SALES, EMAIL_SUPPORT } from "@apt/config";
+import { EMAIL_SALES, EMAIL_SUPPORT, CONTACT_PHONE, CONTACT_PHONE_HREF } from "@apt/config";
 
-export const metadata: Metadata = {
-  title: "Contact Us | APT Ghana",
-  description: "Get in touch with APT Ghana. Sales enquiries, technical support, and general contact details for our Accra office.",
+export const revalidate = 3600;
+
+interface OfficeHour { day: string; hours: string }
+
+interface ContactData {
+  title: string;
+  tagline: string;
+  description: string;
+  address: string;
+  phone: string;
+  email: string;
+  officeHours: OfficeHour[];
+  metaTitle: string;
+  metaDescription: string;
+}
+
+const STATIC: ContactData = {
+  title: "Contact APT Ghana",
+  tagline: "Get in Touch",
+  description: "Our sales engineers and technical support team are available Monday–Friday, 8:00 AM – 5:00 PM GMT.",
+  address: "Airport City, Accra, Greater Accra Region, Ghana",
+  phone: CONTACT_PHONE,
+  email: EMAIL_SALES,
+  officeHours: [
+    { day: "Monday – Friday", hours: "8:00 AM – 5:00 PM" },
+    { day: "Saturday", hours: "9:00 AM – 1:00 PM" },
+    { day: "Sunday", hours: "Closed" },
+  ],
+  metaTitle: "Contact Us | APT Ghana",
+  metaDescription: "Get in touch with APT Ghana. Sales enquiries, technical support, and general contact details for our Accra office.",
 };
 
-export default function ContactPage() {
+async function getData(): Promise<ContactData> {
+  const { getSitePageData } = await import("@apt/db");
+  return getSitePageData("contact", STATIC);
+}
+
+export async function generateMetadata(): Promise<Metadata> {
+  const data = await getData();
+  return { title: data.metaTitle, description: data.metaDescription };
+}
+
+export default async function ContactPage() {
+  const data = await getData();
+  const phoneHref = data.phone === CONTACT_PHONE ? CONTACT_PHONE_HREF : `tel:${data.phone.replace(/\s+/g, "")}`;
+
   return (
     <>      <main className="min-h-screen bg-[#f9fafb]">
         <div className="bg-[#0a1628] py-12">
           <div className="container-store">
-            <p className="text-xs font-semibold text-[#ff8c33] uppercase tracking-widest mb-2">Get in Touch</p>
-            <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">Contact APT Ghana</h1>
-            <p className="text-white/50 mt-2">Our sales engineers and technical support team are available Monday–Friday, 8:00 AM – 5:00 PM GMT.</p>
+            <p className="text-xs font-semibold text-[#ff8c33] uppercase tracking-widest mb-2">{data.tagline}</p>
+            <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">{data.title}</h1>
+            <p className="text-white/50 mt-2">{data.description}</p>
           </div>
         </div>
 
@@ -71,8 +111,8 @@ export default function ContactPage() {
               <div className="bg-white rounded-2xl border border-[#e5e7eb] p-6 space-y-5">
                 <h2 className="font-bold text-[#0a1628]">Direct Contact</h2>
                 {[
-                  { dept: "Sales", contact: "+233 30 212 3456", sub: "Mon–Fri, 8 AM–5 PM", href: "tel:+233302123456", icon: "M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" },
-                  { dept: "Sales Email", contact: EMAIL_SALES, sub: "Response within 4 hours", href: `mailto:${EMAIL_SALES}`, icon: "M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" },
+                  { dept: "Sales", contact: data.phone, sub: "Mon–Fri, 8 AM–5 PM", href: phoneHref, icon: "M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" },
+                  { dept: "Sales Email", contact: data.email, sub: "Response within 4 hours", href: `mailto:${data.email}`, icon: "M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75" },
                   { dept: "Technical Support", contact: EMAIL_SUPPORT, sub: "Engineering team", href: `mailto:${EMAIL_SUPPORT}`, icon: "M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z" },
                 ].map((c) => (
                   <div key={c.dept} className="flex items-start gap-3">
@@ -95,14 +135,13 @@ export default function ContactPage() {
                 <h2 className="font-bold text-[#0a1628] mb-4">Showroom & Head Office</h2>
                 <div className="space-y-1 text-sm text-[#374151]">
                   <p className="font-semibold">APT Ghana Limited</p>
-                  <p className="text-[#6b7280]">Airport City, Accra</p>
-                  <p className="text-[#6b7280]">Greater Accra Region, Ghana</p>
+                  <p className="text-[#6b7280]">{data.address}</p>
                 </div>
                 <div className="mt-4 pt-4 border-t border-[#e5e7eb]">
                   <p className="text-xs font-semibold text-[#6b7280] uppercase tracking-wide mb-1">Business Hours</p>
-                  <p className="text-sm text-[#374151]">Monday – Friday: 8:00 AM – 5:00 PM</p>
-                  <p className="text-sm text-[#374151]">Saturday: 9:00 AM – 1:00 PM</p>
-                  <p className="text-sm text-[#9ca3af]">Sunday: Closed</p>
+                  {data.officeHours.map((h) => (
+                    <p key={h.day} className={h.hours === "Closed" ? "text-sm text-[#9ca3af]" : "text-sm text-[#374151]"}>{h.day}: {h.hours}</p>
+                  ))}
                 </div>
               </div>
 

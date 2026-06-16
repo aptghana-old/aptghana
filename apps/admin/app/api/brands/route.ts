@@ -1,10 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB, BrandModel } from "@apt/db";
 import { requirePermission } from "@/lib/auth/require";
-
-function slugify(text: string) {
-  return text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
-}
+import { slugify } from "@apt/types";
 
 export async function POST(req: NextRequest) {
   const deny = await requirePermission('brands:create');

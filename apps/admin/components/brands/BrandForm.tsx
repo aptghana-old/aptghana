@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Save, CheckCircle2, Globe, Image as ImageIcon } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea, Select } from "@/components/ui/Input";
+import { slugify } from "@apt/types";
 
 interface BrandFormData {
   name: string; slug: string; description: string;
@@ -26,10 +27,6 @@ const COUNTRY_OPTIONS = [
   { value: "Sweden", label: "Sweden" },
   { value: "Other", label: "Other" },
 ];
-
-function slugify(t: string) {
-  return t.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
-}
 
 export default function BrandForm({ initial, brandId }: Props) {
   const router = useRouter();

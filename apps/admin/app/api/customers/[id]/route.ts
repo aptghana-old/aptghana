@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB, UserModel, recordAudit } from "@apt/db";
 import { requirePermission } from "@/lib/auth/require";
 import { auth } from "@/lib/auth";
+import { customerUpdateSchema, parseBody } from "@apt/types";
 
 interface Params { params: Promise<{ id: string }> }
 
@@ -12,7 +13,9 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   try {
     const session = await auth();
     const { id } = await params;
-    const body = await req.json();
+    const parsed = parseBody(customerUpdateSchema, await req.json());
+    if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: 422 });
+    const body = parsed.data;
 
     await connectDB();
     const customer = await UserModel.findById(id);

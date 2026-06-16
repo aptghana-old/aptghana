@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { connectDB, ProductModel, BrandModel, CategoryModel, IndustryModel } from "@apt/db";
-import { STORE_URL } from "@apt/config";
+import { STORE_URL, CONTACT_PHONE, SOCIAL_LINKS } from "@apt/config";
+import { safeJsonLd } from "@apt/auth";
 import type {
   HpSlide, HpSidePanel,
   ServicesBarConfig, PromoBannersConfig, CategoriesConfig,
@@ -138,8 +139,24 @@ export default async function StorePage() {
     .filter((s) => s.enabled)
     .sort((a, b) => a.order - b.order);
 
+  const organizationLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "APT Ghana",
+    url: STORE_URL,
+    logo: `${STORE_URL}/logo.png`,
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: CONTACT_PHONE,
+      contactType: "sales",
+      areaServed: "GH",
+    },
+    sameAs: [SOCIAL_LINKS.linkedin, SOCIAL_LINKS.twitter, SOCIAL_LINKS.youtube],
+  };
+
   return (
     <main className="flex-1">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(organizationLd) }} />
       {/* Hero */}
       <section className="bg-theme-surface pt-4 pb-4 sm:pt-5 sm:pb-5">
         <div className="container-store">

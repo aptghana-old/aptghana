@@ -43,29 +43,8 @@ const STATIC: ContactData = {
 };
 
 async function getData(): Promise<ContactData> {
-  try {
-    const { connectDB, SitePageModel } = await import("@apt/db");
-    await connectDB();
-    const doc = await SitePageModel.findOne({ slug: "contact", status: "published" }).lean() as Record<string, unknown> | null;
-    if (!doc) return STATIC;
-    return {
-      title:        ((doc.title        ?? STATIC.title)        as string),
-      tagline:      ((doc.tagline      ?? STATIC.tagline)      as string),
-      description:  ((doc.description  ?? STATIC.description)  as string),
-      address:      ((doc.address      ?? STATIC.address)      as string),
-      phone:        ((doc.phone        ?? STATIC.phone)        as string),
-      email:        ((doc.email        ?? STATIC.email)        as string),
-      mapsUrl:      ((doc.mapsUrl      ?? STATIC.mapsUrl)      as string),
-      responseTime: ((doc.responseTime ?? STATIC.responseTime) as string),
-      officeHours:  (Array.isArray(doc.officeHours) && doc.officeHours.length > 0
-        ? (doc.officeHours as { day?: string; hours?: string }[]).map((h) => ({ day: h.day ?? "", hours: h.hours ?? "" }))
-        : STATIC.officeHours),
-      metaTitle:       ((doc.metaTitle       ?? STATIC.metaTitle)       as string),
-      metaDescription: ((doc.metaDescription ?? STATIC.metaDescription) as string),
-    };
-  } catch {
-    return STATIC;
-  }
+  const { getSitePageData } = await import("@apt/db");
+  return getSitePageData("contact", STATIC);
 }
 
 export async function generateMetadata(): Promise<Metadata> {

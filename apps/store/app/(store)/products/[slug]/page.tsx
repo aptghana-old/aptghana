@@ -4,6 +4,7 @@ import { connectDB, ProductModel, BrandModel } from "@apt/db";
 import ProductDetail, { type ProductFull } from "@/components/products/ProductDetail";
 import { ProductViewTracker } from "@/components/products/ProductViewTracker";
 import { safeJsonLd } from "@apt/auth";
+import { STORE_URL } from "@apt/config";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -125,9 +126,21 @@ export default async function ProductPage({ params }: PageProps) {
     },
   };
 
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: STORE_URL },
+      { "@type": "ListItem", position: 2, name: "Products", item: `${STORE_URL}/products` },
+      { "@type": "ListItem", position: 3, name: brandName, item: `${STORE_URL}/brands/${product.brandSlug}` },
+      { "@type": "ListItem", position: 4, name: product.name, item: `${STORE_URL}/products/${slug}` },
+    ],
+  };
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(ld) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(breadcrumbLd) }} />
       <ProductViewTracker productId={product._id} />
       <main className="container-store py-6 md:py-10 flex-1">
         <ProductDetail product={product} />

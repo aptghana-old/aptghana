@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Save, CheckCircle2, Plus, X, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea, Select } from "@/components/ui/Input";
+import { slugify } from "@apt/types";
 
 interface Section { heading: string; body: string }
 
@@ -25,10 +26,6 @@ export interface CompanyPageFormData {
 interface Props {
   initial?: Partial<CompanyPageFormData>;
   pageId?: string;
-}
-
-function slugify(t: string) {
-  return t.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
 }
 
 export default function CompanyPageForm({ initial, pageId }: Props) {

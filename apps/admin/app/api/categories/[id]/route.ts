@@ -3,10 +3,7 @@ import { connectDB, CategoryModel, recordAudit } from "@apt/db";
 import { requirePermission } from "@/lib/auth/require";
 import { auth } from "@/lib/auth";
 import { resolveHierarchyFields, reparentDescendants, assertDeletable, HierarchyError } from "@/lib/categoryHierarchy";
-
-function slugify(text: string) {
-  return text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
-}
+import { slugify } from "@apt/types";
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const deny = await requirePermission("categories:view");

@@ -6,6 +6,7 @@ import { Save, CheckCircle2, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea, Select } from "@/components/ui/Input";
 import { CDN_DOMAIN } from "@apt/config";
+import { slugify } from "@apt/types";
 
 interface IndustryFormData {
   name: string;
@@ -27,10 +28,6 @@ interface IndustryFormData {
 interface Props {
   initial?: Partial<IndustryFormData>;
   industryId?: string;
-}
-
-function slugify(t: string) {
-  return t.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
 }
 
 export default function IndustryForm({ initial, industryId }: Props) {

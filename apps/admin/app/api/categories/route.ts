@@ -3,10 +3,7 @@ import { connectDB, CategoryModel, recordAudit } from "@apt/db";
 import { requirePermission } from "@/lib/auth/require";
 import { auth } from "@/lib/auth";
 import { resolveHierarchyFields, HierarchyError } from "@/lib/categoryHierarchy";
-
-function slugify(text: string) {
-  return text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
-}
+import { slugify, categoryCreateSchema, parseBody } from "@apt/types";
 
 export async function POST(req: NextRequest) {
   const deny = await requirePermission("categories:create");
@@ -14,11 +11,9 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const session = await auth();
-    const body = await req.json();
-
-    if (!body.name?.trim()) {
-      return NextResponse.json({ error: "Name is required" }, { status: 400 });
-    }
+    const parsed = parseBody(categoryCreateSchema, await req.json());
+    if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: 422 });
+    const body = parsed.data;
 
     const slug = (body.slug?.trim() || slugify(body.name)).toLowerCase();
     const existing = await CategoryModel.findOne({ slug });

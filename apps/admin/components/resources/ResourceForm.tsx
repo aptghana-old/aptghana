@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Save, CheckCircle2, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea, Select } from "@/components/ui/Input";
+import { slugify } from "@apt/types";
 
 interface ResourceItem {
   title: string;
@@ -33,10 +34,6 @@ interface ResourceFormData {
 interface Props {
   initial?: Partial<ResourceFormData & { items: ResourceItem[] }>;
   resourceId?: string;
-}
-
-function slugify(t: string) {
-  return t.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
 }
 
 const TYPE_OPTIONS = [

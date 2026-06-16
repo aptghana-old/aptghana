@@ -4,6 +4,7 @@ import { hashPassword } from "@apt/auth";
 import crypto from "crypto";
 import { requirePermission } from "@/lib/auth/require";
 import { auth } from "@/lib/auth";
+import { customerCreateSchema, parseBody } from "@apt/types";
 
 /** POST /api/customers — admin-created customer record (manager/super_admin only). */
 export async function POST(req: NextRequest) {
@@ -12,12 +13,9 @@ export async function POST(req: NextRequest) {
 
   try {
     const session = await auth();
-    const body = await req.json();
-    const { name, email, phone, accountType, company, jobTitle, industry, website, taxNumber, status } = body;
-
-    if (!name?.trim() || !email?.trim()) {
-      return NextResponse.json({ error: "Name and email are required" }, { status: 422 });
-    }
+    const parsed = parseBody(customerCreateSchema, await req.json());
+    if (!parsed.ok) return NextResponse.json({ error: parsed.error }, { status: 422 });
+    const { name, email, phone, accountType, company, jobTitle, industry, website, taxNumber, status } = parsed.data;
 
     await connectDB();
     const existing = await UserModel.findOne({ email: email.trim().toLowerCase() }).lean();

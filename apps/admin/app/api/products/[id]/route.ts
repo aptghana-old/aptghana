@@ -4,10 +4,7 @@ import { removeProductRecord } from "@apt/search";
 import { requirePermission } from "@/lib/auth/require";
 import { resolveCategoryChain, buildEmbeddedCategories } from "@/lib/catalogue";
 import { syncProductToSearch } from "@/lib/productSearch";
-
-function slugify(text: string) {
-  return text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
-}
+import { slugify } from "@apt/types";
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const deny = await requirePermission("products:edit");
