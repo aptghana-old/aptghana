@@ -39,7 +39,7 @@ export function generatePayToken(): string {
 /* ─── Audit trail ─────────────────────────────────────────────────────────── */
 
 export interface AuditInput {
-  entityType: "quote" | "payment" | "user" | "admin";
+  entityType: "quote" | "payment" | "user" | "admin" | "product";
   entityId: unknown;
   ref?: string;
   action: string;

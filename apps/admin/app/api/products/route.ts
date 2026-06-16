@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectDB, ProductModel, BrandModel, CategoryModel } from "@apt/db";
+import { connectDB, ProductModel, BrandModel } from "@apt/db";
 import { buildProductRecord, upsertProductRecord, type CategoryForIndex } from "@apt/search";
 import { requirePermission } from "@/lib/auth/require";
+import { resolveCategoryChain, buildEmbeddedCategories } from "@/lib/catalogue";
 
 function slugify(text: string) {
   return text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const body = await req.json();
-    const { name, sku, mpn, slug, brandId, categoryIds, shortDescription, description, status,
+    const { name, sku, mpn, slug, brandId, categoryId, shortDescription, description, status,
       specGroups, listPrice, currency, stockQty, metaTitle, metaDescription } = body;
 
     if (!name?.trim() || !sku?.trim()) {
@@ -32,12 +33,11 @@ export async function POST(req: NextRequest) {
       if (brand) { brandName = brand.name; brandSlug = brand.slug; }
     }
 
-    type CatRow = { _id: { toString(): string }; name: string; slug: string; level?: string };
-    const catRows: CatRow[] = categoryIds?.length
-      ? await CategoryModel.find({ _id: { $in: categoryIds } }).select("name slug level").lean() as unknown as CatRow[]
-      : [];
-
-    const categories = catRows.map((c) => ({ id: c._id.toString(), name: c.name, slug: c.slug }));
+    const chain = categoryId ? await resolveCategoryChain(categoryId) : null;
+    if (categoryId && !chain) {
+      return NextResponse.json({ error: "Selected catalogue location was not found" }, { status: 422 });
+    }
+    const categories = chain ? buildEmbeddedCategories(chain.chain) : [];
 
     const specs = (specGroups ?? []).map((g: { name: string; specs: { key: string; value: string }[] }) => ({
       groupName: g.name,
@@ -56,6 +56,8 @@ export async function POST(req: NextRequest) {
       brandName,
       brandSlug,
       categories,
+      primaryCategoryId: chain?.chain[chain.chain.length - 1]?.id,
+      catalogue: chain ? { path: chain.path, url: chain.url } : undefined,
       shortDescription: shortDescription?.trim() ?? undefined,
       description:      description?.trim()      ?? undefined,
       status: finalStatus,
@@ -76,11 +78,8 @@ export async function POST(req: NextRequest) {
 
     // Index in Meilisearch if active
     if (finalStatus === "active") {
-      const indexCats = catRows.map((c) => ({
-        _id:   c._id,
-        name:  c.name,
-        slug:  c.slug,
-        level: c.level as CategoryForIndex["level"],
+      const indexCats: CategoryForIndex[] = (chain?.chain ?? []).map((c) => ({
+        _id: c.id, name: c.name, slug: c.slug, level: c.level,
       }));
       const record = buildProductRecord(
         {

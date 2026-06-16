@@ -55,6 +55,30 @@ const LoginEventSchema = new Schema(
   { _id: false }
 );
 
+// Internal CRM note — staff-only, never exposed to the customer portal
+const CustomerNoteSchema = new Schema(
+  {
+    body: { type: String, required: true },
+    authorId: { type: Schema.Types.ObjectId, ref: "Admin" },
+    authorName: String,
+    createdAt: { type: Date, default: Date.now },
+  },
+  { _id: true }
+);
+
+const CustomerDocumentSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    url: { type: String, required: true },
+    category: { type: String, enum: ["contract", "certificate", "tax", "other"], default: "other" },
+    size: { type: Number, default: 0 },
+    contentType: String,
+    uploadedAt: { type: Date, default: Date.now },
+    uploadedBy: String,
+  },
+  { _id: true }
+);
+
 const UserSchema = new Schema(
   {
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
@@ -86,6 +110,16 @@ const UserSchema = new Schema(
     },
     avatar: String,
 
+    // CRM enrichment — admin-managed, not set by the customer portal
+    industry: { type: String, trim: true },
+    taxNumber: { type: String, trim: true },
+    website: { type: String, trim: true },
+    tags: { type: [String], default: [], index: true },
+    assignedSalesRep: { type: Schema.Types.ObjectId, ref: "Admin", index: true, sparse: true },
+    assignedSalesRepName: String,
+    notes: { type: [CustomerNoteSchema], default: [] },
+    documents: { type: [CustomerDocumentSchema], default: [] },
+
     addresses: [AddressSchema],
     paymentMethods: [PaymentMethodSchema],
     favorites: [{ type: Schema.Types.ObjectId, ref: "Product" }],
@@ -94,12 +128,15 @@ const UserSchema = new Schema(
     orderIds: [{ type: Schema.Types.ObjectId, ref: "Order" }],
     quoteIds: [{ type: Schema.Types.ObjectId, ref: "Quote" }],
 
-    status: { type: String, enum: ["active", "suspended", "pending"], default: "pending", index: true },
+    status: { type: String, enum: ["active", "inactive", "suspended", "pending"], default: "pending", index: true },
     odooPartnerId: { type: Number, index: true, sparse: true },
     lastLoginAt: Date,
   },
   { timestamps: true, collection: "users_v2" }
 );
+
+UserSchema.index({ "addresses.country": 1 });
+UserSchema.index({ createdAt: -1 });
 
 UserSchema.methods.createPasswordResetToken = function () {
   const token = crypto.randomBytes(32).toString("hex");

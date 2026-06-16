@@ -9,12 +9,12 @@ import {
 import { Button } from "@/components/ui/Button";
 import { Input, Textarea, Select } from "@/components/ui/Input";
 import { STORE_DOMAIN } from "@apt/config";
+import CategoryPicker from "./CategoryPicker";
 
 type Section = "general" | "media" | "specs" | "pricing" | "seo";
 
 interface Props {
   brands: { value: string; label: string; slug: string }[];
-  categories: { value: string; label: string; slug: string; depth: number }[];
   initial?: Partial<ProductFormData>;
   productId?: string;
 }
@@ -28,7 +28,7 @@ interface ProductFormData {
   mpn: string;
   slug: string;
   brandId: string;
-  categoryIds: string[];
+  categoryId: string;
   shortDescription: string;
   description: string;
   status: string;
@@ -100,7 +100,7 @@ function SectionTitle({ label, description }: { label: string; description?: str
   );
 }
 
-export default function ProductForm({ brands, categories, initial, productId }: Props) {
+export default function ProductForm({ brands, initial, productId }: Props) {
   const router = useRouter();
   const [, startTransition] = useTransition();
   const [activeSection, setActiveSection] = useState<Section>("general");
@@ -114,7 +114,7 @@ export default function ProductForm({ brands, categories, initial, productId }: 
     mpn: initial?.mpn ?? "",
     slug: initial?.slug ?? "",
     brandId: initial?.brandId ?? "",
-    categoryIds: initial?.categoryIds ?? [],
+    categoryId: initial?.categoryId ?? "",
     shortDescription: initial?.shortDescription ?? "",
     description: initial?.description ?? "",
     status: initial?.status ?? "draft",
@@ -248,40 +248,22 @@ export default function ProductForm({ brands, categories, initial, productId }: 
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <Select
-                label="Brand"
-                value={form.brandId}
-                onChange={(e) => set("brandId", e.target.value)}
-                options={brands}
-                placeholder="Select brand…"
+            <Select
+              label="Brand"
+              value={form.brandId}
+              onChange={(e) => set("brandId", e.target.value)}
+              options={brands}
+              placeholder="Select brand…"
+            />
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[12px] font-medium" style={{ color: "var(--apt-text-primary)" }}>
+                Catalogue Assignment
+              </label>
+              <CategoryPicker
+                value={form.categoryId || null}
+                onChange={(leafId) => set("categoryId", leafId ?? "")}
               />
-              <div className="flex flex-col gap-1.5">
-                <label className="text-[12px] font-medium" style={{ color: "var(--apt-text-primary)" }}>
-                  Categories
-                </label>
-                <select
-                  multiple
-                  value={form.categoryIds}
-                  onChange={(e) => set("categoryIds", [...e.target.selectedOptions].map((o) => o.value))}
-                  className="rounded-md text-[13px] px-3 py-2 border"
-                  style={{
-                    background: "var(--apt-bg)",
-                    border: "1px solid var(--apt-border)",
-                    color: "var(--apt-text-primary)",
-                    height: 100,
-                  }}
-                >
-                  {categories.map((c) => (
-                    <option key={c.value} value={c.value}>
-                      {"  ".repeat(c.depth)}{c.label}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-[11px]" style={{ color: "var(--apt-text-muted)" }}>
-                  Hold ⌘ to select multiple
-                </p>
-              </div>
             </div>
 
             <Textarea

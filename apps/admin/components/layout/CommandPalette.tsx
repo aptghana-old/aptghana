@@ -41,6 +41,7 @@ const COMMANDS: CommandItem[] = [
   { id: "new-product",   group: "Create", label: "New Product",   icon: <Plus size={15} />, href: "/dashboard/products/new",  description: "Add a product to the catalogue" },
   { id: "new-brand",     group: "Create", label: "New Brand",     icon: <Plus size={15} />, href: "/dashboard/brands/new",    description: "Register a brand" },
   { id: "new-article",   group: "Create", label: "New Article",   icon: <Plus size={15} />, href: "/dashboard/articles/new",  description: "Write a blog post or guide" },
+  { id: "new-customer",  group: "Create", label: "New Customer",  icon: <Plus size={15} />, href: "/dashboard/customers/new", description: "Add a customer account" },
 ];
 
 function score(item: CommandItem, query: string): number {

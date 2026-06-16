@@ -1,43 +1,189 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connectDB, UserModel } from "@apt/db";
-import { Users, Mail, Phone, MapPin, Plus } from "lucide-react";
-import { Badge, statusVariant } from "@/components/ui/Badge";
-import { Button } from "@/components/ui/Button";
+import { hasPermission, type AdminRole } from "@apt/auth";
+import { Users, Plus, ChevronLeft, ChevronRight, ArrowUp, ArrowDown } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { Button } from "@/components/ui/Button";
 import ExportMenu from "@/components/exports/ExportMenu";
+import { auth } from "@/lib/auth";
+import { getSalesReps } from "@/lib/customers";
+import CustomerFilters from "@/components/customers/CustomerFilters";
+import CustomerTable, { type CustomerRow } from "@/components/customers/CustomerTable";
 
 export const metadata: Metadata = { title: "Customers" };
-export const revalidate = 60;
+
+const PAGE_SIZE = 40;
 
 interface Props {
-  searchParams: Promise<{ q?: string; page?: string }>;
+  searchParams: Promise<{
+    q?: string; type?: string; status?: string; industry?: string; country?: string;
+    rep?: string; from?: string; to?: string; sort?: string; dir?: string; page?: string;
+  }>;
 }
 
-async function getCustomers(q?: string, page = 1) {
-  try {
-    await connectDB();
-    const query: Record<string, unknown> = {};
-    if (q) query.$or = [
-      { name: { $regex: q, $options: "i" } },
-      { email: { $regex: q, $options: "i" } },
-      { "company.name": { $regex: q, $options: "i" } },
+const SORT_FIELDS: Record<string, string> = {
+  name: "name",
+  createdAt: "createdAt",
+  ltv: "ltv",
+  totalOrders: "totalOrders",
+  lastOrderDate: "lastOrderDate",
+};
+
+async function getCustomers(sp: Awaited<Props["searchParams"]>) {
+  await connectDB();
+
+  const match: Record<string, unknown> = {};
+  if (sp.q) {
+    const safe = sp.q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    match.$or = [
+      { name: { $regex: safe, $options: "i" } },
+      { email: { $regex: safe, $options: "i" } },
+      { company: { $regex: safe, $options: "i" } },
     ];
-    const [users, total] = await Promise.all([
-      UserModel.find(query).sort({ createdAt: -1 }).skip((page - 1) * 40).limit(40).lean(),
-      UserModel.countDocuments(query),
-    ]);
-    return { users, total };
-  } catch {
-    return { users: [], total: 0 };
+  }
+  if (sp.type) match.accountType = sp.type;
+  if (sp.status) match.status = sp.status;
+  if (sp.industry) match.industry = sp.industry;
+  if (sp.country) match["addresses.country"] = sp.country;
+  if (sp.rep) match.assignedSalesRep = sp.rep;
+  if (sp.from || sp.to) {
+    match.createdAt = {
+      ...(sp.from ? { $gte: new Date(`${sp.from}T00:00:00`) } : {}),
+      ...(sp.to ? { $lte: new Date(`${sp.to}T23:59:59.999`) } : {}),
+    };
+  }
+
+  const page = Math.max(1, parseInt(sp.page ?? "1", 10));
+  const sortField = SORT_FIELDS[sp.sort ?? ""] ?? "createdAt";
+  const sortDir = sp.dir === "asc" ? 1 : -1;
+
+  const pipeline = [
+    { $match: match },
+    { $lookup: { from: "orders_v2", localField: "_id", foreignField: "userId", as: "orders" } },
+    { $lookup: { from: "quotes_v2", localField: "_id", foreignField: "userId", as: "quotes" } },
+    {
+      $addFields: {
+        totalOrders: { $size: "$orders" },
+        ltv: { $sum: "$orders.total" },
+        lastOrderDate: { $max: "$orders.createdAt" },
+        totalQuotes: {
+          $size: { $filter: { input: "$quotes", as: "q", cond: { $eq: ["$$q.kind", "approval_request"] } } },
+        },
+        totalRfqs: {
+          $size: { $filter: { input: "$quotes", as: "q", cond: { $ne: ["$$q.kind", "approval_request"] } } },
+        },
+      },
+    },
+    {
+      $project: {
+        name: 1, email: 1, phone: 1, company: 1, accountType: 1, status: 1, industry: 1,
+        tags: 1, assignedSalesRepName: 1, createdAt: 1, lastLoginAt: 1, addresses: 1,
+        totalOrders: 1, totalQuotes: 1, totalRfqs: 1, ltv: 1, lastOrderDate: 1,
+      },
+    },
+    { $sort: { [sortField]: sortDir } },
+    {
+      $facet: {
+        data: [{ $skip: (page - 1) * PAGE_SIZE }, { $limit: PAGE_SIZE }],
+        totalCount: [{ $count: "count" }],
+      },
+    },
+  ];
+
+  try {
+    const [result] = await UserModel.aggregate(pipeline as Parameters<typeof UserModel.aggregate>[0]);
+    const total = result?.totalCount?.[0]?.count ?? 0;
+    return { rows: result?.data ?? [], total, page };
+  } catch (err) {
+    console.error("[customers list]", err);
+    return { rows: [], total: 0, page };
   }
 }
 
+async function getFilterOptions() {
+  try {
+    await connectDB();
+    const [industries, countries, salesReps] = await Promise.all([
+      UserModel.distinct("industry", { industry: { $nin: [null, ""] } }),
+      UserModel.distinct("addresses.country", { "addresses.country": { $nin: [null, ""] } }),
+      getSalesReps(),
+    ]);
+    return {
+      industries: (industries as string[]).sort().map((v) => ({ value: v, label: v })),
+      countries: (countries as string[]).sort().map((v) => ({ value: v, label: v })),
+      salesReps,
+    };
+  } catch {
+    return { industries: [], countries: [], salesReps: [] };
+  }
+}
+
+function sortLink(base: URLSearchParams, field: string, current?: string, dir?: string) {
+  const next = new URLSearchParams(base.toString());
+  const nextDir = current === field && dir !== "asc" ? "asc" : "desc";
+  next.set("sort", field);
+  next.set("dir", nextDir);
+  next.delete("page");
+  return `?${next.toString()}`;
+}
+
 export default async function CustomersPage({ searchParams }: Props) {
-  const { q, page: pageStr } = await searchParams;
-  const page = Math.max(1, parseInt(pageStr ?? "1", 10));
-  const { users, total } = await getCustomers(q, page);
+  const sp = await searchParams;
+  const session = await auth();
+  const role = (session?.user as { role?: AdminRole } | undefined)?.role ?? "sales";
+  const overrides = (session?.user as { permissions?: string[] } | undefined)?.permissions ?? [];
+  const canEdit = hasPermission(role, overrides, "customers:edit");
+  const canExport = hasPermission(role, overrides, "exports:run");
+
+  const [{ rows: rawRows, total, page }, filterOptions] = await Promise.all([
+    getCustomers(sp),
+    getFilterOptions(),
+  ]);
+
+  const rows: CustomerRow[] = (rawRows as unknown as Array<{
+    _id: { toString(): string };
+    name: string; email: string; phone?: string; company?: string; accountType: string; status: string;
+    industry?: string; tags?: string[]; assignedSalesRepName?: string; createdAt: Date; lastLoginAt?: Date;
+    addresses?: { country?: string; isDefaultBilling?: boolean }[];
+    totalOrders: number; totalQuotes: number; totalRfqs: number; ltv: number; lastOrderDate?: Date;
+  }>).map((u) => {
+    const address = u.addresses?.find((a) => a.isDefaultBilling) ?? u.addresses?.[0];
+    return {
+      id: u._id.toString(),
+      name: u.name,
+      email: u.email,
+      phone: u.phone,
+      company: u.company,
+      accountType: u.accountType,
+      status: u.status,
+      industry: u.industry,
+      country: address?.country,
+      tags: u.tags ?? [],
+      assignedSalesRepName: u.assignedSalesRepName,
+      createdAt: u.createdAt instanceof Date ? u.createdAt.toISOString() : String(u.createdAt),
+      lastLoginAt: u.lastLoginAt ? new Date(u.lastLoginAt).toISOString() : undefined,
+      totalOrders: u.totalOrders ?? 0,
+      totalQuotes: u.totalQuotes ?? 0,
+      totalRfqs: u.totalRfqs ?? 0,
+      ltv: u.ltv ?? 0,
+      lastOrderDate: u.lastOrderDate ? new Date(u.lastOrderDate).toISOString() : undefined,
+    };
+  });
+
+  const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const baseParams = new URLSearchParams(
+    Object.entries(sp).filter(([k, v]) => k !== "page" && v) as [string, string][]
+  );
+
+  const SORT_COLS: { key: string; label: string }[] = [
+    { key: "name", label: "Name" },
+    { key: "createdAt", label: "Joined" },
+    { key: "ltv", label: "LTV" },
+    { key: "totalOrders", label: "Orders" },
+    { key: "lastOrderDate", label: "Last Order" },
+  ];
 
   return (
     <div>
@@ -46,114 +192,73 @@ export default async function CustomersPage({ searchParams }: Props) {
         description={`${total.toLocaleString()} registered customer${total !== 1 ? "s" : ""}`}
         actions={
           <div className="flex items-center gap-2">
-            <ExportMenu datasets={[{ key: "customers", label: "Customers" }]} />
-            <Button variant="primary" size="sm" icon={<Plus size={13} />}>
-              Add Customer
-            </Button>
+            {canExport && <ExportMenu datasets={[{ key: "customers", label: "Customers" }]} inheritParams={["status", "q", "type"]} />}
+            {canEdit && (
+              <Link href="/dashboard/customers/new">
+                <Button variant="primary" size="sm" icon={<Plus size={13} />}>Add Customer</Button>
+              </Link>
+            )}
           </div>
         }
       />
 
-      <div
-        className="flex items-center gap-3 px-6 py-3"
-        style={{ borderBottom: "1px solid var(--apt-border)", background: "var(--apt-bg)" }}
-      >
-        <input
-          defaultValue={q}
-          placeholder="Search by name, email, or company…"
-          className="flex-1 max-w-xs h-8 px-3 rounded-md text-[13px] border focus:outline-none focus:ring-2"
-          style={{ background: "var(--apt-bg-subtle)", border: "1px solid var(--apt-border)", color: "var(--apt-text-primary)" }}
-        />
-      </div>
+      <CustomerFilters {...filterOptions} />
 
-      <div className="p-6">
-        {users.length === 0 ? (
+      {rows.length > 0 && (
+        <div className="flex items-center gap-1 px-4 sm:px-6 pt-3 overflow-x-auto" style={{ background: "var(--apt-bg)" }}>
+          <span className="text-[11px] uppercase tracking-wide font-semibold mr-2" style={{ color: "var(--apt-text-muted)" }}>Sort:</span>
+          {SORT_COLS.map((s) => (
+            <Link
+              key={s.key}
+              href={sortLink(baseParams, s.key, sp.sort, sp.dir)}
+              className="flex items-center gap-1 px-2.5 py-1 rounded-md text-[12px] font-medium whitespace-nowrap transition-colors"
+              style={{
+                background: sp.sort === s.key ? "var(--apt-bg-raised)" : "transparent",
+                color: sp.sort === s.key ? "var(--apt-text-primary)" : "var(--apt-text-muted)",
+              }}
+            >
+              {s.label}
+              {sp.sort === s.key && (sp.dir === "asc" ? <ArrowUp size={11} /> : <ArrowDown size={11} />)}
+            </Link>
+          ))}
+        </div>
+      )}
+
+      <div className="p-4 sm:p-6">
+        {rows.length === 0 ? (
           <div className="card">
             <EmptyState
               icon={<Users size={22} />}
-              title="No customers yet"
+              title={sp.q || sp.status || sp.type ? "No customers match your filters" : "No customers yet"}
               description="Customers who register on the store or are added manually appear here."
+              action={canEdit ? (
+                <Link href="/dashboard/customers/new">
+                  <Button variant="primary" size="sm" icon={<Plus size={13} />}>Add Customer</Button>
+                </Link>
+              ) : undefined}
             />
           </div>
         ) : (
-          <div className="card overflow-hidden">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Customer</th>
-                  <th>Company</th>
-                  <th>Contact</th>
-                  <th>Location</th>
-                  <th>Status</th>
-                  <th>Joined</th>
-                  <th className="w-px" />
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((u) => {
-                  const user = u as unknown as {
-                    _id: { toString(): string };
-                    name: string;
-                    email: string;
-                    phone?: string;
-                    company?: { name?: string };
-                    address?: { city?: string; country?: string };
-                    status: string;
-                    createdAt: Date;
-                  };
-                  return (
-                    <tr key={user._id.toString()}>
-                      <td>
-                        <div className="flex items-center gap-3">
-                          <div
-                            className="w-8 h-8 rounded-full flex items-center justify-center text-[12px] font-bold text-white shrink-0"
-                            style={{ background: "#1e4278" }}
-                          >
-                            {user.name.charAt(0).toUpperCase()}
-                          </div>
-                          <div>
-                            <div className="text-[13px] font-medium" style={{ color: "var(--apt-text-primary)" }}>{user.name}</div>
-                            <div className="flex items-center gap-1 text-[11px]" style={{ color: "var(--apt-text-muted)" }}>
-                              <Mail size={10} />{user.email}
-                            </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td>
-                        <span className="text-[13px]" style={{ color: "var(--apt-text-secondary)" }}>
-                          {user.company?.name ?? "—"}
-                        </span>
-                      </td>
-                      <td>
-                        {user.phone ? (
-                          <div className="flex items-center gap-1 text-[12px]" style={{ color: "var(--apt-text-muted)" }}>
-                            <Phone size={11} />{user.phone}
-                          </div>
-                        ) : <span style={{ color: "var(--apt-text-disabled)" }}>—</span>}
-                      </td>
-                      <td>
-                        {(user.address?.city || user.address?.country) ? (
-                          <div className="flex items-center gap-1 text-[12px]" style={{ color: "var(--apt-text-muted)" }}>
-                            <MapPin size={11} />
-                            {[user.address?.city, user.address?.country].filter(Boolean).join(", ")}
-                          </div>
-                        ) : <span style={{ color: "var(--apt-text-disabled)" }}>—</span>}
-                      </td>
-                      <td><Badge variant={statusVariant(user.status)} dot>{user.status}</Badge></td>
-                      <td>
-                        <span className="text-[12px]" style={{ color: "var(--apt-text-muted)" }}>
-                          {new Date(user.createdAt).toLocaleDateString("en-GH", { month: "short", year: "numeric" })}
-                        </span>
-                      </td>
-                      <td>
-                        <Button variant="ghost" size="xs">View</Button>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
+          <>
+            <CustomerTable rows={rows} canEdit={canEdit} canExport={canExport} salesReps={filterOptions.salesReps} />
+
+            {pages > 1 && (
+              <div className="flex items-center justify-between mt-4 px-1">
+                <span className="text-[12px]" style={{ color: "var(--apt-text-muted)" }}>
+                  {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, total)} of {total.toLocaleString()}
+                </span>
+                <div className="flex items-center gap-2">
+                  <Link href={`?${new URLSearchParams({ ...Object.fromEntries(baseParams), page: String(Math.max(1, page - 1)) }).toString()}`}>
+                    <Button variant="outline" size="xs" icon={<ChevronLeft size={12} />} disabled={page <= 1}>Prev</Button>
+                  </Link>
+                  <span className="text-[12px]" style={{ color: "var(--apt-text-muted)" }}>Page {page} of {pages}</span>
+                  <Link href={`?${new URLSearchParams({ ...Object.fromEntries(baseParams), page: String(Math.min(pages, page + 1)) }).toString()}`}>
+                    <Button variant="outline" size="xs" iconRight={<ChevronRight size={12} />} disabled={page >= pages}>Next</Button>
+                  </Link>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>

@@ -53,6 +53,19 @@ const CrossRefSchema = new Schema(
   { _id: false }
 );
 
+// Denormalized snapshot of a Group/Category/Subcategory/Range node — avoids a
+// Category lookup on every product read. `level` drives catalogue assignment
+// display and Meilisearch's hierarchicalCategories facets.
+const CategoryRefSchema = new Schema(
+  {
+    id: { type: String, required: true },
+    name: { type: String, required: true },
+    slug: { type: String, required: true },
+    level: { type: String, enum: ["group", "category", "subcategory", "range"], required: true },
+  },
+  { _id: false }
+);
+
 const PricingSchema = new Schema(
   {
     currency: { type: String, default: "USD" },
@@ -97,8 +110,14 @@ const ProductSchema = new Schema(
     brandId: { type: Schema.Types.ObjectId, ref: "Brand", required: true, index: true },
     brandSlug: { type: String, required: true, index: true },
     manufacturerId: { type: Schema.Types.ObjectId, ref: "Manufacturer" },
-    categories: [{ type: Schema.Types.ObjectId, ref: "Category", index: true }],
-    primaryCategoryId: { type: Schema.Types.ObjectId, ref: "Category", index: true },
+    // Full chain (Group..deepest assigned level), each entry tagged with its level.
+    categories: { type: [CategoryRefSchema], default: [] },
+    // The deepest node in the chain — Range if assigned, else Subcategory, else Category, else Group.
+    primaryCategoryId: { type: String, index: true },
+    catalogue: {
+      path: String,        // "electrical-solutions/circuit-breakers/acti9-circuit-protection/acti9-ic60"
+      url: String,         // "/catalog/<path>"
+    },
     tags: [{ type: String, index: true }],
     nodeType: String,
 
@@ -161,7 +180,8 @@ ProductSchema.index({ brandSlug: 1, status: 1 });
 ProductSchema.index({ "pricing.listPrice": 1, status: 1 });
 ProductSchema.index({ isFeatured: 1, status: 1 });
 ProductSchema.index({ isClearance: 1, status: 1 });
-ProductSchema.index({ categories: 1, status: 1 });
+ProductSchema.index({ "categories.id": 1, status: 1 });
+ProductSchema.index({ "categories.slug": 1, status: 1 });
 ProductSchema.index({ views: -1 });
 ProductSchema.index({ salesCount: -1 });
 ProductSchema.index({ createdAt: -1, status: 1 });

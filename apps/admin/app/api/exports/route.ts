@@ -101,7 +101,7 @@ export async function GET(req: NextRequest) {
           ];
         }
         docs = await UserModel.find(query).sort({ createdAt: -1 }).limit(MAX_ROWS)
-          .select("name email phone company accountType status orderIds quoteIds createdAt lastLoginAt")
+          .select("name email phone company industry accountType status assignedSalesRepName orderIds quoteIds createdAt lastLoginAt")
           .lean();
         break;
 

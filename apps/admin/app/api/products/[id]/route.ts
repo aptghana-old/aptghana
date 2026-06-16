@@ -1,52 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { connectDB, ProductModel, BrandModel, CategoryModel } from "@apt/db";
-import {
-  buildProductRecord,
-  upsertProductRecord,
-  removeProductRecord,
-  extractCategoryIds,
-  type CategoryForIndex,
-  type ProductForIndex,
-} from "@apt/search";
+import { connectDB, ProductModel, BrandModel } from "@apt/db";
+import { removeProductRecord } from "@apt/search";
 import { requirePermission } from "@/lib/auth/require";
+import { resolveCategoryChain, buildEmbeddedCategories } from "@/lib/catalogue";
+import { syncProductToSearch } from "@/lib/productSearch";
 
 function slugify(text: string) {
   return text.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim();
-}
-
-async function syncToSearch(id: string): Promise<void> {
-  type ProductRow = ProductForIndex & {
-    brandId?: { toString(): string };
-    status?: string;
-    categories?: unknown[];
-  };
-  const product = await ProductModel.findById(id).lean() as unknown as ProductRow | null;
-  if (!product) return;
-
-  if (product.status !== "active") {
-    await removeProductRecord(id);
-    return;
-  }
-
-  const brandName = product.brandId
-    ? ((await BrandModel.findById(product.brandId).select("name").lean()) as { name?: string } | null)?.name ?? ""
-    : "";
-
-  const catIds = extractCategoryIds(product.categories ?? []);
-  type CatRow = { _id: unknown; name: string; slug: string; level?: string };
-  const cats: CatRow[] = catIds.length
-    ? await CategoryModel.find({ _id: { $in: catIds } }).select("_id name slug level").lean() as unknown as CatRow[]
-    : [];
-
-  const indexCats: CategoryForIndex[] = cats.map((c) => ({
-    _id:   c._id,
-    name:  c.name,
-    slug:  c.slug,
-    level: c.level as CategoryForIndex["level"],
-  }));
-
-  const record = buildProductRecord(product, brandName, indexCats);
-  await upsertProductRecord(record);
 }
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -85,10 +45,18 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       }
     }
 
-    if (body.categoryIds !== undefined) {
-      type CatRow = { _id: { toString(): string }; name: string; slug: string };
-      const cats = await CategoryModel.find({ _id: { $in: body.categoryIds } }).select("name slug").lean() as unknown as CatRow[];
-      updates.categories = cats.map((c) => ({ id: c._id.toString(), name: c.name, slug: c.slug }));
+    if (body.categoryId !== undefined) {
+      if (body.categoryId) {
+        const chain = await resolveCategoryChain(body.categoryId);
+        if (!chain) return NextResponse.json({ error: "Selected catalogue location was not found" }, { status: 422 });
+        updates.categories = buildEmbeddedCategories(chain.chain);
+        updates.primaryCategoryId = chain.chain[chain.chain.length - 1]?.id;
+        updates.catalogue = { path: chain.path, url: chain.url };
+      } else {
+        updates.categories = [];
+        updates.primaryCategoryId = undefined;
+        updates.catalogue = undefined;
+      }
     }
 
     if (body.specGroups !== undefined) {
@@ -117,7 +85,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     await ProductModel.updateOne({ _id: id }, { $set: updates });
 
     // Fire-and-forget: sync updated product to search index
-    syncToSearch(id).catch((err) =>
+    syncProductToSearch(id).catch((err) =>
       console.error("[search] index-on-update failed:", err),
     );
 

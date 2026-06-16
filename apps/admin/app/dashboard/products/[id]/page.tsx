@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connectDB, ProductModel } from "@apt/db";
-import { ChevronLeft, Edit, Package, Tag, FolderTree, DollarSign, BarChart2, Globe, Copy } from "lucide-react";
+import { hasPermission, type AdminRole } from "@apt/auth";
+import { ChevronLeft, Edit, Package, Tag, FolderTree, DollarSign, Globe, ChevronRight, ExternalLink } from "lucide-react";
 import { Badge, statusVariant } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { auth } from "@/lib/auth";
+import ProductMoveButton from "@/components/products/ProductMoveButton";
 
 export const metadata: Metadata = { title: "Product Detail" };
 
@@ -25,11 +28,18 @@ export default async function ProductDetailPage({ params }: Props) {
   const raw = await getProduct(id);
   if (!raw) notFound();
 
+  const session = await auth();
+  const role = (session?.user as { role?: AdminRole } | undefined)?.role ?? "sales";
+  const overrides = (session?.user as { permissions?: string[] } | undefined)?.permissions ?? [];
+  const canEdit = hasPermission(role, overrides, "products:edit");
+
   const p = raw as unknown as {
     _id: { toString(): string };
     name: string; sku: string; mpn?: string; slug: string;
     brandName?: string; brandSlug?: string;
-    categories?: { name: string; slug: string }[];
+    categories?: { id: string; name: string; slug: string; level: "group" | "category" | "subcategory" | "range" }[];
+    primaryCategoryId?: string;
+    catalogue?: { path?: string; url?: string };
     shortDescription?: string; description?: string;
     status: string;
     specifications?: SpecGroup[];
@@ -184,23 +194,67 @@ export default async function ProductDetailPage({ params }: Props) {
             ))}
           </div>
 
-          {/* Brand & Categories */}
-          <div className="card p-5 space-y-3">
-            <p className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--apt-text-muted)" }}>Classification</p>
-            {p.brandName && (
+          {/* Brand */}
+          {p.brandName && (
+            <div className="card p-5 space-y-3">
+              <p className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--apt-text-muted)" }}>Brand</p>
               <div className="flex items-center gap-2.5">
                 <Tag size={13} style={{ color: "var(--apt-text-muted)" }} />
                 <Link href={`/dashboard/brands?slug=${p.brandSlug}`} className="text-[13px] hover:underline" style={{ color: "var(--apt-text-brand)" }}>
                   {p.brandName}
                 </Link>
               </div>
-            )}
-            {p.categories?.map((c) => (
-              <div key={c.slug} className="flex items-center gap-2.5">
-                <FolderTree size={13} style={{ color: "var(--apt-text-muted)" }} />
-                <span className="text-[13px]" style={{ color: "var(--apt-text-secondary)" }}>{c.name}</span>
+            </div>
+          )}
+
+          {/* Catalogue Assignment */}
+          <div className="card p-5 space-y-3">
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--apt-text-muted)" }}>Catalogue Assignment</p>
+              {canEdit && <ProductMoveButton productId={p._id.toString()} currentCategoryId={p.primaryCategoryId} />}
+            </div>
+
+            {(["group", "category", "subcategory", "range"] as const).map((level) => {
+              const node = p.categories?.find((c) => c.level === level);
+              return (
+                <div key={level} className="flex items-center gap-2.5">
+                  <FolderTree size={13} style={{ color: node ? "var(--apt-text-muted)" : "var(--apt-text-disabled)" }} />
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wider font-semibold" style={{ color: "var(--apt-text-muted)" }}>
+                      {level}
+                    </div>
+                    <div className="text-[13px]" style={{ color: node ? "var(--apt-text-primary)" : "var(--apt-text-disabled)" }}>
+                      {node?.name ?? "—"}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+
+            {p.catalogue?.url ? (
+              <div className="pt-2" style={{ borderTop: "1px solid var(--apt-border)" }}>
+                <div className="text-[10px] uppercase tracking-wider font-semibold mb-1" style={{ color: "var(--apt-text-muted)" }}>Catalogue URL</div>
+                <a
+                  href={p.catalogue.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 font-mono text-[12px] hover:underline break-all"
+                  style={{ color: "var(--apt-text-brand)" }}
+                >
+                  {p.catalogue.url} <ExternalLink size={10} className="shrink-0" />
+                </a>
+                <div className="flex items-center gap-1 mt-2 flex-wrap text-[11px]" style={{ color: "var(--apt-text-muted)" }}>
+                  {p.categories?.map((c, i) => (
+                    <span key={c.id} className="flex items-center gap-1">
+                      {i > 0 && <ChevronRight size={9} />}
+                      {c.name}
+                    </span>
+                  ))}
+                </div>
               </div>
-            ))}
+            ) : (
+              <p className="text-[12px] pt-1" style={{ color: "var(--apt-text-muted)" }}>Not assigned to a catalogue location yet.</p>
+            )}
           </div>
 
           {/* Pricing */}

@@ -21,6 +21,7 @@ export type Permission =
   | "media:delete"
   | "customers:view"
   | "customers:edit"
+  | "customers:notes"
   | "rfqs:view"
   | "rfqs:create"
   | "rfqs:edit"
@@ -75,6 +76,7 @@ const ALL_PERMISSIONS: Permission[] = [
   "media:delete",
   "customers:view",
   "customers:edit",
+  "customers:notes",
   "rfqs:view",
   "rfqs:create",
   "rfqs:edit",
@@ -133,6 +135,7 @@ export const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
     "media:delete",
     "customers:view",
     "customers:edit",
+    "customers:notes",
     "rfqs:view",
     "rfqs:create",
     "rfqs:edit",
@@ -164,6 +167,7 @@ export const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
     "categories:view",
     "media:view",
     "customers:view",
+    "customers:notes",
     "rfqs:view",
     "rfqs:create",
     "rfqs:edit",
