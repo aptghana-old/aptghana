@@ -171,7 +171,7 @@ export async function finalizePayment(reference: string): Promise<FinalizeResult
   if (quote.orderId) {
     await OrderModel.updateOne(
       { _id: quote.orderId, status: "pending" },
-      { $set: { status: "confirmed", paymentRef: reference, paymentMethod: charge.channel } },
+      { $set: { status: "confirmed", paymentStatus: "paid", paymentRef: reference, paymentMethod: charge.channel } },
     );
   }
 

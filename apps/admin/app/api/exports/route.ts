@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
-  connectDB, OrderModel, PaymentModel, QuoteModel, UserModel,
+  connectDB, PaymentModel, UserModel,
 } from "@apt/db";
 import {
   DATASETS,
@@ -12,6 +12,7 @@ import {
 } from "@apt/documents";
 import { requirePermission } from "@/lib/auth/require";
 import { getTopSearches } from "@/lib/searchAnalyticsService";
+import { getDealList, parseDealParams, type DealFilterParams } from "@/lib/dealFilters";
 
 const MAX_ROWS = 5000;
 const SALES_STATUSES = ["confirmed", "processing", "shipped", "delivered"];
@@ -63,35 +64,38 @@ export async function GET(req: NextRequest) {
     let docs: any[] = [];
 
     switch (dataset) {
-      case "quotes":
-        if (safe) {
-          query.$or = [
-            { "client.name": { $regex: safe, $options: "i" } },
-            { "client.email": { $regex: safe, $options: "i" } },
-            { "client.company": { $regex: safe, $options: "i" } },
-            { ref: { $regex: safe, $options: "i" } },
-            { quoteNumber: { $regex: safe, $options: "i" } },
-          ];
-        }
-        docs = await QuoteModel.find(query).sort({ createdAt: -1 }).limit(MAX_ROWS).lean();
+      case "quotes": {
+        const dealParams: DealFilterParams = {
+          ...parseDealParams(Object.fromEntries(sp.entries())),
+          preset: from || to ? "custom" : (parseDealParams(Object.fromEntries(sp.entries())).preset ?? "all"),
+          from: from ? sp.get("from")! : undefined,
+          to: to ? sp.get("to")! : undefined,
+          customer: q || undefined,
+        };
+        const { rows } = await getDealList("quote", dealParams, 1, MAX_ROWS);
+        docs = rows;
         break;
+      }
 
       case "orders":
-      case "sales":
+      case "sales": {
+        const dealParams: DealFilterParams = {
+          ...parseDealParams(Object.fromEntries(sp.entries())),
+          preset: from || to ? "custom" : (parseDealParams(Object.fromEntries(sp.entries())).preset ?? "all"),
+          from: from ? sp.get("from")! : undefined,
+          to: to ? sp.get("to")! : undefined,
+          customer: q || undefined,
+        };
         if (dataset === "sales" && !status) {
-          query.status = { $in: SALES_STATUSES };
           filters.push("Paid & fulfilled orders");
+          const { rows } = await getDealList("order", dealParams, 1, MAX_ROWS);
+          docs = rows.filter((r) => SALES_STATUSES.includes(String((r as { status?: string }).status)));
+        } else {
+          const { rows } = await getDealList("order", dealParams, 1, MAX_ROWS);
+          docs = rows;
         }
-        if (safe) {
-          query.$or = [
-            { "guest.name": { $regex: safe, $options: "i" } },
-            { "guest.email": { $regex: safe, $options: "i" } },
-            { ref: { $regex: safe, $options: "i" } },
-            { quoteNumber: { $regex: safe, $options: "i" } },
-          ];
-        }
-        docs = await OrderModel.find(query).sort({ createdAt: -1 }).limit(MAX_ROWS).lean();
         break;
+      }
 
       case "customers":
         if (safe) {

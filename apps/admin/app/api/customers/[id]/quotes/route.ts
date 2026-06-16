@@ -40,6 +40,7 @@ export async function POST(req: NextRequest, { params }: Params) {
       userId: customer._id,
       kind,
       source: "custom",
+      originChannel: "admin",
       client: {
         name: customer.name,
         email: customer.email,

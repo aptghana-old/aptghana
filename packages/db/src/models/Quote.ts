@@ -115,12 +115,21 @@ const QuoteSchema = new Schema(
       transactionId: { type: Schema.Types.ObjectId, ref: "Transaction" },
     },
     odooQuoteId: { type: Number, index: true, sparse: true },
+    // Creation origin (storefront vs admin-initiated). Absent on quotes
+    // predating this field — treated as "unknown" in filters/analytics.
+    originChannel: { type: String, enum: ["web", "store", "admin", "api"], index: true, sparse: true },
   },
   { timestamps: true, collection: "quotes_v2" }
 );
 
 QuoteSchema.index({ "client.email": 1 });
 QuoteSchema.index({ status: 1, createdAt: -1 });
+QuoteSchema.index({ createdAt: -1 });
+QuoteSchema.index({ expiresAt: 1 });
+QuoteSchema.index({ respondedBy: 1 });
+QuoteSchema.index({ "client.company": 1 });
+QuoteSchema.index({ "items.brand": 1 });
+QuoteSchema.index({ "items.productId": 1 });
 
 export const QuoteModel = models.Quote ?? model("Quote", QuoteSchema, "quotes_v2");
 export type QuoteDocument = InferSchemaType<typeof QuoteSchema>;

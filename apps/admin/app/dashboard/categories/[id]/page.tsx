@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connectDB, CategoryModel, ProductModel } from "@apt/db";
-import { ChevronLeft, Edit, Package, FolderTree } from "lucide-react";
+import { hasPermission, type AdminRole } from "@apt/auth";
+import { ChevronLeft, ChevronRight, Edit, Package, FolderTree, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge, statusVariant } from "@/components/ui/Badge";
+import { auth } from "@/lib/auth";
+import { getBreadcrumb, getLiveProductCount } from "@/lib/categoryHierarchy";
 
 interface CategoryData {
   _id: { toString(): string };
@@ -16,6 +19,7 @@ interface CategoryData {
   status: string;
   isFeatured?: boolean;
   displayOrder?: number;
+  path?: string;
   image?: { url?: string };
   createdAt: Date;
   updatedAt: Date;
@@ -42,38 +46,44 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 async function getData(id: string) {
   await connectDB();
-  const [cat, products, children] = await Promise.all([
+  const [cat, products, children, productCount, breadcrumb] = await Promise.all([
     CategoryModel.findById(id).lean(),
     ProductModel.find({ "categories.id": id, status: { $ne: "archived" } })
       .select("name sku status pricing")
       .sort({ createdAt: -1 })
       .limit(20)
       .lean(),
-    CategoryModel.find({ parentId: id }).select("name slug status level").lean(),
+    CategoryModel.find({ parentId: id }).select("name slug status level").sort({ displayOrder: 1, name: 1 }).lean(),
+    getLiveProductCount(id),
+    getBreadcrumb(id),
   ]);
   return {
     cat: cat as unknown as CategoryData | null,
     products: products as unknown as ProductRow[],
     children: children as unknown as { _id: { toString(): string }; name: string; slug: string; status: string; level: string }[],
+    productCount,
+    breadcrumb,
   };
 }
 
-const LEVEL_LABEL: Record<string, string> = {
-  group: "Group",
-  category: "Category",
-  subcategory: "Subcategory",
-  range: "Range",
-};
+const LEVEL_LABEL: Record<string, string> = { group: "Group", category: "Category", subcategory: "Subcategory", range: "Range" };
 
 export default async function CategoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { cat, products, children } = await getData(id);
+  const { cat, products, children, productCount, breadcrumb } = await getData(id);
   if (!cat) notFound();
+
+  const session = await auth();
+  const role = (session?.user as { role?: AdminRole } | undefined)?.role ?? "sales";
+  const overrides = (session?.user as { permissions?: string[] } | undefined)?.permissions ?? [];
+  const canEdit = hasPermission(role, overrides, "categories:edit");
+
+  const catalogueUrl = `/catalog/${breadcrumb.map((b) => b.slug).join("/")}`;
 
   return (
     <div>
       <div
-        className="flex items-center gap-4 px-6 py-4"
+        className="flex items-center gap-4 px-6 py-4 flex-wrap"
         style={{ borderBottom: "1px solid var(--apt-border)", background: "var(--apt-bg)" }}
       >
         <Link href="/dashboard/categories">
@@ -81,17 +91,36 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
         </Link>
         <div style={{ width: 1, height: 20, background: "var(--apt-border)" }} />
         <h1 className="text-[15px] font-semibold" style={{ color: "var(--apt-text-primary)" }}>{cat.name}</h1>
-        <div className="ml-auto">
-          <Link href={`/dashboard/categories/${id}/edit`}>
-            <Button variant="secondary" size="sm" icon={<Edit size={13} />}>Edit</Button>
-          </Link>
-        </div>
+        {canEdit && (
+          <div className="ml-auto">
+            <Link href={`/dashboard/categories/${id}/edit`}>
+              <Button variant="secondary" size="sm" icon={<Edit size={13} />}>Edit</Button>
+            </Link>
+          </div>
+        )}
+      </div>
+
+      {/* Breadcrumb / catalogue path */}
+      <div className="flex items-center gap-1.5 px-6 py-2.5 flex-wrap text-[12px]" style={{ borderBottom: "1px solid var(--apt-border)", color: "var(--apt-text-muted)" }}>
+        <FolderTree size={12} />
+        {breadcrumb.map((b, i) => (
+          <span key={b.id} className="flex items-center gap-1.5">
+            {i > 0 && <ChevronRight size={10} />}
+            {b.id === id ? (
+              <span style={{ color: "var(--apt-text-primary)", fontWeight: 600 }}>{b.name}</span>
+            ) : (
+              <Link href={`/dashboard/categories/${b.id}`} className="hover:underline">{b.name}</Link>
+            )}
+          </span>
+        ))}
+        <a href={catalogueUrl} target="_blank" rel="noopener noreferrer" className="ml-3 flex items-center gap-1 font-mono text-[11px] hover:underline" style={{ color: "var(--apt-text-brand)" }}>
+          {catalogueUrl} <ExternalLink size={9} />
+        </a>
       </div>
 
       <div className="p-6 grid grid-cols-3 gap-5">
         {/* Main */}
         <div className="col-span-2 space-y-5">
-          {/* Subcategories */}
           {children.length > 0 && (
             <div className="card overflow-hidden">
               <div className="card-header">
@@ -121,11 +150,10 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
             </div>
           )}
 
-          {/* Products */}
           <div className="card overflow-hidden">
             <div className="card-header flex items-center justify-between">
               <h2 className="text-[14px] font-semibold" style={{ color: "var(--apt-text-primary)" }}>
-                Products ({products.length})
+                Products ({productCount})
               </h2>
             </div>
             {products.length === 0 ? (
@@ -153,6 +181,11 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
                   ))}
                 </tbody>
               </table>
+            )}
+            {productCount > products.length && (
+              <div className="px-5 py-2.5 text-[12px]" style={{ borderTop: "1px solid var(--apt-border)", color: "var(--apt-text-muted)" }}>
+                Showing {products.length} of {productCount} active products.
+              </div>
             )}
           </div>
         </div>
@@ -185,8 +218,8 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
                 <dd style={{ color: "var(--apt-text-primary)" }}>{LEVEL_LABEL[cat.level] ?? cat.level}</dd>
               </div>
               <div className="flex justify-between text-[12px]">
-                <dt style={{ color: "var(--apt-text-muted)" }}>Products</dt>
-                <dd className="font-medium" style={{ color: "var(--apt-text-primary)" }}>{products.length}</dd>
+                <dt style={{ color: "var(--apt-text-muted)" }}>Products (live)</dt>
+                <dd className="font-medium" style={{ color: "var(--apt-text-primary)" }}>{productCount}</dd>
               </div>
               <div className="flex justify-between text-[12px]">
                 <dt style={{ color: "var(--apt-text-muted)" }}>Children</dt>
@@ -201,6 +234,11 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
                 <dd style={{ color: "var(--apt-text-primary)" }}>{new Date(cat.updatedAt).toLocaleDateString("en-GH", { day: "numeric", month: "short", year: "numeric" })}</dd>
               </div>
             </dl>
+            {canEdit && (
+              <p className="text-[11px] mt-3 pt-3" style={{ borderTop: "1px solid var(--apt-border)", color: "var(--apt-text-muted)" }}>
+                To move this category to a different parent, drag it in the <Link href="/dashboard/categories" className="hover:underline" style={{ color: "var(--apt-text-brand)" }}>hierarchy manager</Link>.
+              </p>
+            )}
           </div>
         </div>
       </div>

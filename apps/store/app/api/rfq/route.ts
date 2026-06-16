@@ -145,6 +145,7 @@ export async function POST(req: NextRequest) {
       userId: session?.user?.id || undefined,
       kind,
       source,
+      originChannel: "store",
       client: {
         name:    `${firstName} ${lastName}`,
         firstName,

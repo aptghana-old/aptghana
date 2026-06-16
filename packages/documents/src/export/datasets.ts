@@ -72,8 +72,8 @@ export const DATASETS: Record<DatasetKey, DatasetDef> = {
     map: (o) => ({
       ref: o.ref ?? "",
       quoteNumber: o.quoteNumber ?? "",
-      customer: o.guest?.name ?? "",
-      email: o.guest?.email ?? "",
+      customer: o.customerName ?? o.guest?.name ?? "",
+      email: o.customerEmail ?? o.guest?.email ?? "",
       items: o.items?.length ?? 0,
       subtotal: num(o.subtotal),
       tax: num(o.tax),
@@ -102,7 +102,7 @@ export const DATASETS: Record<DatasetKey, DatasetDef> = {
     ],
     map: (o) => ({
       ref: o.ref ?? "",
-      customer: o.guest?.name ?? "",
+      customer: o.customerName ?? o.guest?.name ?? "",
       total: num(o.total),
       tax: num(o.tax),
       currency: o.currency ?? "",

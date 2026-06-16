@@ -135,6 +135,8 @@ export async function POST(req: NextRequest, { params }: Params) {
         total: quote.totals.grandTotal,
         currency: quote.totals.currency,
         status: "pending", // Awaiting Payment
+        paymentStatus: "unpaid",
+        originChannel: quote.originChannel,
         quoteId: quote._id,
         quoteNumber: quote.quoteNumber,
         payToken: quote.payToken,

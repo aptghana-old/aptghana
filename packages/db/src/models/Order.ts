@@ -57,6 +57,17 @@ const OrderSchema = new Schema(
       default: "pending",
       index: true,
     },
+    // Set "unpaid" at creation; flipped to "paid" by the payment finalize handler,
+    // independent of fulfillment `status` so the two can be filtered separately.
+    paymentStatus: {
+      type: String,
+      enum: ["unpaid", "paid", "refunded", "failed"],
+      default: "unpaid",
+      index: true,
+    },
+    // Where the originating quote/order was created — copied from the source
+    // Quote at approval time. Absent on orders predating this field.
+    originChannel: { type: String, enum: ["web", "store", "admin", "api"], index: true, sparse: true },
 
     shippingAddress: AddressSchema,
     billingAddress: AddressSchema,
@@ -75,6 +86,10 @@ const OrderSchema = new Schema(
 
 OrderSchema.index({ userId: 1, createdAt: -1 });
 OrderSchema.index({ status: 1, createdAt: -1 });
+OrderSchema.index({ createdAt: -1 });
+OrderSchema.index({ paymentStatus: 1, createdAt: -1 });
+OrderSchema.index({ "items.brandSlug": 1 });
+OrderSchema.index({ "items.productId": 1 });
 
 export const OrderModel = models.Order ?? model("Order", OrderSchema, "orders_v2");
 export type OrderDocument = InferSchemaType<typeof OrderSchema>;

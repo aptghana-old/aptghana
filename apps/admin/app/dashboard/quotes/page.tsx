@@ -1,189 +1,152 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { connectDB, QuoteModel } from "@apt/db";
+import { hasPermission, type AdminRole } from "@apt/auth";
 import { QUOTE_STATUS_LABELS, type QuoteStatus } from "@apt/types";
-import { FileText, Clock, ArrowRight, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Badge, statusVariant } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { EmptyState } from "@/components/ui/EmptyState";
 import ExportMenu from "@/components/exports/ExportMenu";
+import { auth } from "@/lib/auth";
+import { getDealList, getDealKpis, getDealAnalytics, getDealFilterOptions, parseDealParams } from "@/lib/dealFilters";
+import DealListShell from "@/components/deals/DealListShell";
+import type { DealColumn } from "@/components/deals/DealTable";
 
 export const metadata: Metadata = { title: "Quotes & RFQs" };
-export const revalidate = 30;
+export const dynamic = "force-dynamic";
+
+const PAGE_SIZE = 40;
+
+const COLUMNS: DealColumn[] = [
+  { key: "ref", label: "Reference", sortable: false },
+  { key: "customer", label: "Customer" },
+  { key: "company", label: "Company" },
+  { key: "rep", label: "Sales Rep" },
+  { key: "items", label: "Items", align: "right" },
+  { key: "value", label: "Value", align: "right", sortable: true },
+  { key: "status", label: "Status" },
+  { key: "channel", label: "Channel", defaultVisible: false },
+  { key: "expires", label: "Expires", defaultVisible: false },
+  { key: "createdAt", label: "Submitted", sortable: true },
+];
+
+interface QuoteRow {
+  _id: { toString(): string };
+  ref: string;
+  quoteNumber?: string;
+  kind?: string;
+  client: { name: string; company?: string; email?: string };
+  items: unknown[];
+  totals?: { grandTotal?: number; currency?: string };
+  status: string;
+  originChannel?: string;
+  expiresAt?: string;
+  salesRepName?: string;
+  createdAt: string;
+}
 
 interface Props {
-  searchParams: Promise<{ status?: string; page?: string }>;
-}
-
-async function getQuotes(status?: string, page = 1) {
-  try {
-    await connectDB();
-    const query: Record<string, unknown> = {};
-    if (status) query.status = status;
-    const [quotes, total] = await Promise.all([
-      QuoteModel.find(query).sort({ createdAt: -1 }).skip((page - 1) * 40).limit(40).lean(),
-      QuoteModel.countDocuments(query),
-    ]);
-    return { quotes, total };
-  } catch {
-    return { quotes: [], total: 0 };
-  }
-}
-
-async function getStatusCounts() {
-  try {
-    await connectDB();
-    const agg = await QuoteModel.aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }]);
-    return Object.fromEntries(agg.map((a) => [a._id, a.count])) as Record<string, number>;
-  } catch {
-    return {} as Record<string, number>;
-  }
+  searchParams: Promise<Record<string, string | undefined>>;
 }
 
 export default async function QuotesPage({ searchParams }: Props) {
-  const { status, page: pageStr } = await searchParams;
-  const page = Math.max(1, parseInt(pageStr ?? "1", 10));
-  const [{ quotes, total }, counts] = await Promise.all([getQuotes(status, page), getStatusCounts()]);
-  const grandTotal = Object.values(counts).reduce((a, b) => a + b, 0);
+  const sp = await searchParams;
+  const params = parseDealParams(sp);
+  const page = Math.max(1, parseInt(sp.page ?? "1", 10));
+
+  const session = await auth();
+  const role = (session?.user as { role?: AdminRole } | undefined)?.role ?? "sales";
+  const overrides = (session?.user as { permissions?: string[] } | undefined)?.permissions ?? [];
+  const canEdit = hasPermission(role, overrides, "quotes:edit");
+  const canExport = hasPermission(role, overrides, "exports:run");
+
+  const [{ rows, total }, kpis, analytics, options] = await Promise.all([
+    getDealList("quote", params, page, PAGE_SIZE),
+    getDealKpis("quote", params),
+    getDealAnalytics("quote", params),
+    getDealFilterOptions("quote"),
+  ]);
+
+  const typedRows = rows as unknown as QuoteRow[];
+
+  function renderCell(q: QuoteRow, key: string): React.ReactNode {
+    switch (key) {
+      case "ref":
+        return (
+          <div>
+            <Link href={`/dashboard/quotes/${q._id.toString()}`} className="font-mono text-[12px] hover:underline font-semibold" style={{ color: "var(--apt-text-brand)" }}>
+              {q.quoteNumber ?? q.ref}
+            </Link>
+            <div className="text-[10px] uppercase tracking-wide mt-0.5" style={{ color: "var(--apt-text-muted)" }}>
+              {q.kind === "approval_request" ? "Approval Request" : "RFQ"}
+            </div>
+          </div>
+        );
+      case "customer":
+        return (
+          <div>
+            <div className="text-[13px] font-medium" style={{ color: "var(--apt-text-primary)" }}>{q.client.name}</div>
+            {q.client.email && <div className="text-[11px]" style={{ color: "var(--apt-text-muted)" }}>{q.client.email}</div>}
+          </div>
+        );
+      case "company":
+        return <span className="text-[13px]" style={{ color: "var(--apt-text-secondary)" }}>{q.client.company ?? "—"}</span>;
+      case "rep":
+        return <span className="text-[12px]" style={{ color: "var(--apt-text-secondary)" }}>{q.salesRepName ?? "—"}</span>;
+      case "items":
+        return <span className="text-[12px]" style={{ color: "var(--apt-text-muted)" }}>{q.items.length}</span>;
+      case "value":
+        return q.totals?.grandTotal ? (
+          <span className="text-[13px] font-semibold tabular-nums" style={{ color: "var(--apt-text-primary)" }}>{q.totals.currency ?? "GHS"} {q.totals.grandTotal.toLocaleString()}</span>
+        ) : <span style={{ color: "var(--apt-text-disabled)" }}>—</span>;
+      case "status":
+        return <Badge variant={statusVariant(q.status)} dot>{QUOTE_STATUS_LABELS[q.status as QuoteStatus] ?? q.status}</Badge>;
+      case "channel":
+        return <span className="text-[12px] capitalize" style={{ color: "var(--apt-text-muted)" }}>{q.originChannel ?? "—"}</span>;
+      case "expires":
+        return <span className="text-[12px]" style={{ color: "var(--apt-text-muted)" }}>{q.expiresAt ? new Date(q.expiresAt).toLocaleDateString("en-GH") : "—"}</span>;
+      case "createdAt":
+        return <span className="text-[12px]" style={{ color: "var(--apt-text-muted)" }}>{new Date(q.createdAt).toLocaleDateString("en-GH", { day: "numeric", month: "short", year: "2-digit" })}</span>;
+      default:
+        return null;
+    }
+  }
 
   return (
     <div>
       <PageHeader
         title="Quotes & RFQs"
-        description={`${total.toLocaleString()} quote${total !== 1 ? "s" : ""}`}
+        description={`${total.toLocaleString()} quote${total !== 1 ? "s" : ""} matching your filters`}
         actions={
           <div className="flex items-center gap-2">
-            <ExportMenu datasets={[{ key: "quotes", label: "Quotes & RFQs" }]} />
-            <Button variant="primary" size="sm" icon={<Plus size={13} />}>
-              Create Quote
-            </Button>
+            {canExport && <ExportMenu datasets={[{ key: "quotes", label: "Quotes & RFQs" }]} inheritParams={["status", "preset", "salesRep", "currency"]} />}
+            {canEdit && (
+              <Link href="/dashboard/customers">
+                <Button variant="primary" size="sm" icon={<Plus size={13} />}>Create Quote</Button>
+              </Link>
+            )}
           </div>
         }
       />
 
-      <div
-        className="flex items-center gap-1 px-6 py-3 overflow-x-auto"
-        style={{ borderBottom: "1px solid var(--apt-border)", background: "var(--apt-bg)" }}
-      >
-        {[
-          ["", "All", grandTotal],
-          ["pending", "Pending Review", counts.pending],
-          ["reviewing", "Under Review", counts.reviewing],
-          ["waiting_customer", "Waiting for Customer", counts.waiting_customer],
-          ["approved", "Awaiting Payment", counts.approved],
-          ["paid", "Paid", counts.paid],
-          ["processing", "Processing", counts.processing],
-          ["shipped", "Shipped", counts.shipped],
-          ["completed", "Completed", counts.completed],
-          ["cancelled", "Cancelled", counts.cancelled],
-          ["expired", "Expired", counts.expired],
-        ].map(([val, label, count]) => (
-          <Link
-            key={String(val)}
-            href={val ? `/dashboard/quotes?status=${val}` : "/dashboard/quotes"}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[12px] font-medium whitespace-nowrap transition-colors"
-            style={{
-              background: status === val || (!status && !val) ? "var(--apt-bg-raised)" : "transparent",
-              color: status === val || (!status && !val) ? "var(--apt-text-primary)" : "var(--apt-text-muted)",
-            }}
-          >
-            {label}
-            {count ? <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full" style={{ background: "var(--apt-border)", color: "var(--apt-text-muted)" }}>{count}</span> : null}
-          </Link>
-        ))}
-      </div>
-
-      <div className="p-6">
-        {quotes.length === 0 ? (
-          <div className="card">
-            <EmptyState
-              icon={<FileText size={22} />}
-              title="No quotes yet"
-              description="Customer RFQ submissions and manually created quotes appear here."
-            />
-          </div>
-        ) : (
-          <div className="card overflow-hidden">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Reference</th>
-                  <th>Customer</th>
-                  <th>Company</th>
-                  <th>Items</th>
-                  <th>Status</th>
-                  <th>Submitted</th>
-                  <th className="w-px" />
-                </tr>
-              </thead>
-              <tbody>
-                {quotes.map((q) => {
-                  const quote = q as unknown as {
-                    _id: { toString(): string };
-                    ref: string;
-                    kind?: string;
-                    client: { name: string; company?: string; email?: string };
-                    items: unknown[];
-                    status: string;
-                    createdAt: Date;
-                  };
-                  return (
-                    <tr key={quote._id.toString()}>
-                      <td>
-                        <Link
-                          href={`/dashboard/quotes/${quote._id.toString()}`}
-                          className="font-mono text-[12px] hover:underline font-semibold"
-                          style={{ color: "var(--apt-text-brand)" }}
-                        >
-                          {quote.ref}
-                        </Link>
-                        <div className="text-[10px] uppercase tracking-wide mt-0.5" style={{ color: "var(--apt-text-muted)" }}>
-                          {quote.kind === "approval_request" ? "Approval Request" : "RFQ"}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="text-[13px] font-medium" style={{ color: "var(--apt-text-primary)" }}>{quote.client.name}</div>
-                        {quote.client.email && <div className="text-[11px]" style={{ color: "var(--apt-text-muted)" }}>{quote.client.email}</div>}
-                      </td>
-                      <td>
-                        <span className="text-[13px]" style={{ color: "var(--apt-text-secondary)" }}>
-                          {quote.client.company ?? "—"}
-                        </span>
-                      </td>
-                      <td>
-                        <span className="text-[12px]" style={{ color: "var(--apt-text-muted)" }}>
-                          {quote.items.length} item{quote.items.length !== 1 ? "s" : ""}
-                        </span>
-                      </td>
-                      <td>
-                        <Badge variant={statusVariant(quote.status)} dot>
-                          {QUOTE_STATUS_LABELS[quote.status as QuoteStatus] ?? quote.status}
-                        </Badge>
-                      </td>
-                      <td>
-                        <span className="flex items-center gap-1 text-[12px]" style={{ color: "var(--apt-text-muted)" }}>
-                          <Clock size={11} />
-                          {new Date(quote.createdAt).toLocaleDateString("en-GH", { day: "numeric", month: "short", year: "2-digit" })}
-                        </span>
-                      </td>
-                      <td>
-                        <Link
-                          href={`/dashboard/quotes/${quote._id.toString()}`}
-                          className="inline-flex items-center gap-1 text-[12px] px-2 py-1 rounded hover:bg-[var(--apt-bg-raised)]"
-                          style={{ color: "var(--apt-text-muted)" }}
-                        >
-                          View <ArrowRight size={11} />
-                        </Link>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
+      <DealListShell
+        kind="quote"
+        options={options}
+        current={sp}
+        storageNamespace="quotes"
+        kpis={kpis}
+        currency={options.currencies[0] ?? "GHS"}
+        analytics={analytics}
+        columns={COLUMNS}
+        rows={typedRows}
+        rowKey={(q) => q._id.toString()}
+        renderCell={renderCell}
+        total={total}
+        page={page}
+        pageSize={PAGE_SIZE}
+        bulkEndpoint={canEdit ? "/api/quotes/bulk" : undefined}
+        bulkStatusOptions={canEdit ? [{ value: "cancelled", label: "Cancelled" }, { value: "expired", label: "Expired" }] : undefined}
+      />
     </div>
   );
 }

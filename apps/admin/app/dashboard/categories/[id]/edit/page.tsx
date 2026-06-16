@@ -22,11 +22,14 @@ async function getCategory(id: string) {
     isFeatured?: boolean;
     displayOrder?: number;
     image?: { url?: string };
+    icon?: string;
+    documents?: { type: string; title: string; url: string; language: string }[];
     benefits?: { title: string; value: string }[];
     bulletPoints?: string[];
     products?: string[];
     brands?: string[];
     applications?: string[];
+    seo?: { title?: string; description?: string };
   } | null;
 }
 
@@ -45,11 +48,15 @@ export default async function EditCategoryPage({ params }: { params: Promise<{ i
     isFeatured:       cat.isFeatured        ?? false,
     displayOrder:     cat.displayOrder       ?? 0,
     imageUrl:         cat.image?.url         ?? "",
+    icon:             cat.icon               ?? "",
+    documents:        cat.documents          ?? [],
     benefits:         cat.benefits           ?? [],
     bulletPoints:     cat.bulletPoints       ?? [],
     products:         cat.products           ?? [],
     brands:           cat.brands             ?? [],
     applications:     cat.applications       ?? [],
+    seoTitle:         cat.seo?.title         ?? "",
+    seoDescription:   cat.seo?.description   ?? "",
   };
 
   return (

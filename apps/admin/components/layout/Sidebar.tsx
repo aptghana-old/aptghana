@@ -71,7 +71,6 @@ const NAV: NavSection[] = [
     section: "Search",
     items: [
       { label: "Configuration", href: "/dashboard/search", icon: <Search size={16} /> },
-      { label: "Synonyms", href: "/dashboard/search/synonyms", icon: <Replace size={16} /> },
       { label: "Analytics", href: "/dashboard/search/analytics", icon: <TrendingUp size={16} /> },
       { label: "Zero Results", href: "/dashboard/search/gaps", icon: <AlertCircle size={16} /> },
     ],

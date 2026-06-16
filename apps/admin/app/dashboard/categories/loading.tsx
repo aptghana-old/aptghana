@@ -1,19 +1,13 @@
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Button } from "@/components/ui/Button";
-import { TableSkeleton } from "@/components/ui/Skeleton";
-import { Plus } from "lucide-react";
+import { PageHeaderSkeleton, Skeleton, ListItemSkeleton } from "@/components/ui/Skeleton";
 
 export default function CategoriesLoading() {
   return (
     <div>
-      <PageHeader
-        title="Categories"
-        description="Loading taxonomy…"
-        actions={<Button variant="primary" size="sm" icon={<Plus size={13} />} disabled>Add Category</Button>}
-      />
-      <div className="p-4 sm:p-6">
-        <TableSkeleton rows={12} cols={5} />
+      <PageHeaderSkeleton hasAction={false} />
+      <div className="px-4 sm:px-6 py-3" style={{ borderBottom: "1px solid var(--apt-border)" }}>
+        <Skeleton width={260} height={32} rounded="md" />
       </div>
+      <ListItemSkeleton count={8} />
     </div>
   );
 }
