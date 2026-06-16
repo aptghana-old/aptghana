@@ -23,7 +23,7 @@ import {
 
 const SidebarCtx = createContext<{ collapsed: boolean; toggle(): void }>({
   collapsed: false,
-  toggle() {},
+  toggle() { },
 });
 export const useSidebar = () => useContext(SidebarCtx);
 
@@ -34,57 +34,55 @@ const NAV: NavSection[] = [
   {
     section: "Overview",
     items: [
-      { label: "Dashboard",  href: "/dashboard",            icon: <LayoutDashboard size={16} /> },
-      { label: "Analytics",  href: "/dashboard/analytics",  icon: <BarChart2 size={16} /> },
+      { label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard size={16} /> },
+      { label: "Analytics", href: "/dashboard/analytics", icon: <BarChart2 size={16} /> },
     ],
   },
   {
     section: "Catalog",
     items: [
-      { label: "Products",   href: "/dashboard/products",   icon: <Package size={16} /> },
-      { label: "Brands",     href: "/dashboard/brands",     icon: <Tag size={16} /> },
+      { label: "Products", href: "/dashboard/products", icon: <Package size={16} /> },
+      { label: "Brands", href: "/dashboard/brands", icon: <Tag size={16} /> },
       { label: "Categories", href: "/dashboard/categories", icon: <FolderTree size={16} /> },
-      { label: "Media",      href: "/dashboard/media",      icon: <Image size={16} /> },
+      { label: "Media", href: "/dashboard/media", icon: <Image size={16} /> },
     ],
   },
   {
     section: "Commerce",
     items: [
-      { label: "Orders",     href: "/dashboard/orders",     icon: <ShoppingCart size={16} /> },
-      { label: "Quotes/RFQ", href: "/dashboard/quotes",     icon: <FileText size={16} /> },
-      { label: "Customers",  href: "/dashboard/customers",  icon: <Users size={16} /> },
+      { label: "Orders", href: "/dashboard/orders", icon: <ShoppingCart size={16} /> },
+      { label: "Quotes/RFQ", href: "/dashboard/quotes", icon: <FileText size={16} /> },
+      { label: "Customers", href: "/dashboard/customers", icon: <Users size={16} /> },
     ],
   },
   {
     section: "Content",
     items: [
-      { label: "Homepage",   href: "/dashboard/homepage",   icon: <LayoutTemplate size={16} /> },
-      { label: "Solutions",  href: "/dashboard/solutions",  icon: <Zap size={16} /> },
-      { label: "Services",   href: "/dashboard/services",   icon: <Briefcase size={16} /> },
-      { label: "Company",    href: "/dashboard/company",    icon: <Building2 size={16} /> },
+      { label: "Homepage", href: "/dashboard/homepage", icon: <LayoutTemplate size={16} /> },
+      { label: "Solutions", href: "/dashboard/solutions", icon: <Zap size={16} /> },
+      { label: "Services", href: "/dashboard/services", icon: <Briefcase size={16} /> },
+      { label: "Company", href: "/dashboard/company", icon: <Building2 size={16} /> },
       { label: "Industries", href: "/dashboard/industries", icon: <Factory size={16} /> },
-      { label: "Resources",  href: "/dashboard/resources",  icon: <Library size={16} /> },
-      { label: "Pages",      href: "/dashboard/cms",        icon: <Globe size={16} /> },
-      { label: "Articles",   href: "/dashboard/articles",   icon: <BookOpen size={16} /> },
-      { label: "Navigation", href: "/dashboard/navigation", icon: <Navigation size={16} /> },
+      { label: "Resources", href: "/dashboard/resources", icon: <Library size={16} /> },
+      { label: "Articles", href: "/dashboard/articles", icon: <BookOpen size={16} /> },
     ],
   },
   {
     section: "Search",
     items: [
-      { label: "Configuration",  href: "/dashboard/search",          icon: <Search size={16} /> },
-      { label: "Synonyms",       href: "/dashboard/search/synonyms", icon: <Replace size={16} /> },
-      { label: "Analytics",      href: "/dashboard/search/analytics",icon: <TrendingUp size={16} /> },
-      { label: "Zero Results",   href: "/dashboard/search/gaps",     icon: <AlertCircle size={16} /> },
+      { label: "Configuration", href: "/dashboard/search", icon: <Search size={16} /> },
+      { label: "Synonyms", href: "/dashboard/search/synonyms", icon: <Replace size={16} /> },
+      { label: "Analytics", href: "/dashboard/search/analytics", icon: <TrendingUp size={16} /> },
+      { label: "Zero Results", href: "/dashboard/search/gaps", icon: <AlertCircle size={16} /> },
     ],
   },
   {
     section: "System",
     items: [
-      { label: "Users & Roles",  href: "/dashboard/users",          icon: <UserCog size={16} /> },
-      { label: "Audit Log",      href: "/dashboard/audit",          icon: <ScrollText size={16} /> },
-      { label: "Integrations",   href: "/dashboard/integrations",   icon: <Plug size={16} /> },
-      { label: "Settings",       href: "/dashboard/settings",       icon: <Settings size={16} /> },
+      { label: "Users & Roles", href: "/dashboard/users", icon: <UserCog size={16} /> },
+      { label: "Audit Log", href: "/dashboard/audit", icon: <ScrollText size={16} /> },
+      { label: "Integrations", href: "/dashboard/integrations", icon: <Plug size={16} /> },
+      { label: "Settings", href: "/dashboard/settings", icon: <Settings size={16} /> },
     ],
   },
 ];
@@ -132,7 +130,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ mobileOpen, onMobileClose, role, permissions }: SidebarProps) {
-  const [collapsed, setCollapsed] = useState(false);
+  const [ collapsed, setCollapsed ] = useState(false);
   const pathname = usePathname();
 
   const isActive = (href: string) =>
@@ -141,7 +139,7 @@ export default function Sidebar({ mobileOpen, onMobileClose, role, permissions }
       : pathname === href || pathname.startsWith(href + "/");
 
   const canView = (href: string): boolean => {
-    const required = NAV_PERMISSION_MAP[href];
+    const required = NAV_PERMISSION_MAP[ href ];
     if (!required) return true; // no restriction → always visible
     return hasPermission(role, permissions, required as Permission);
   };
@@ -156,7 +154,7 @@ export default function Sidebar({ mobileOpen, onMobileClose, role, permissions }
       {/* Mobile backdrop */}
       {mobileOpen && (
         <div
-          className="fixed inset-0 bg-black/60 z-40 md:hidden"
+          className="fixed inset-0 bg-black/60 z-60 md:hidden"
           onClick={onMobileClose}
           aria-hidden="true"
         />

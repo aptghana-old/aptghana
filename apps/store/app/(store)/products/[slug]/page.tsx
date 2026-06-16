@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { connectDB, ProductModel, BrandModel } from "@apt/db";
 import ProductDetail, { type ProductFull } from "@/components/products/ProductDetail";
+import { ProductViewTracker } from "@/components/products/ProductViewTracker";
 import { safeJsonLd } from "@apt/auth";
 
 interface PageProps {
@@ -127,6 +128,7 @@ export default async function ProductPage({ params }: PageProps) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: safeJsonLd(ld) }} />
+      <ProductViewTracker productId={product._id} />
       <main className="container-store py-6 md:py-10 flex-1">
         <ProductDetail product={product} />
       </main>

@@ -6,7 +6,13 @@ import CategoryForm from "@/components/categories/CategoryForm";
 
 export const metadata: Metadata = { title: "New Category" };
 
-export default function NewCategoryPage() {
+interface Props {
+  searchParams: Promise<{ name?: string }>;
+}
+
+export default async function NewCategoryPage({ searchParams }: Props) {
+  const { name } = await searchParams;
+
   return (
     <div>
       <div
@@ -20,7 +26,7 @@ export default function NewCategoryPage() {
         <h1 className="text-[15px] font-semibold" style={{ color: "var(--apt-text-primary)" }}>New Category</h1>
       </div>
       <div className="p-6 max-w-2xl">
-        <CategoryForm />
+        <CategoryForm initial={name ? { name } : undefined} />
       </div>
     </div>
   );

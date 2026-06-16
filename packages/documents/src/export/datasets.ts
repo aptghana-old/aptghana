@@ -5,7 +5,7 @@ import type { ExportColumn, ExportRow } from "../types";
  * both apps — columns and row mapping live here once.
  */
 
-export type DatasetKey = "quotes" | "orders" | "sales" | "customers" | "payments";
+export type DatasetKey = "quotes" | "orders" | "sales" | "customers" | "payments" | "search_queries";
 
 export interface DatasetDef {
   label: string;
@@ -172,6 +172,26 @@ export const DATASETS: Record<DatasetKey, DatasetDef> = {
       provider: p.provider ?? "",
       paidAt: d(p.paidAt),
       created: d(p.createdAt),
+    }),
+  },
+
+  search_queries: {
+    label: "Search Queries",
+    columns: [
+      { key: "query", header: "Query", width: 28 },
+      { key: "searches", header: "Searches", width: 10, align: "right" },
+      { key: "avgResults", header: "Avg. Results", width: 12, align: "right" },
+      { key: "clicks", header: "Clicks", width: 10, align: "right" },
+      { key: "ctr", header: "CTR", width: 10, align: "right" },
+      { key: "lastSearched", header: "Last Searched", width: 14 },
+    ],
+    map: (q) => ({
+      query: q.query ?? "",
+      searches: q.searches ?? 0,
+      avgResults: q.avgResults != null ? num(q.avgResults) : "",
+      clicks: q.clicks ?? 0,
+      ctr: q.ctr != null ? `${(q.ctr * 100).toFixed(1)}%` : "",
+      lastSearched: d(q.lastSearched),
     }),
   },
 };

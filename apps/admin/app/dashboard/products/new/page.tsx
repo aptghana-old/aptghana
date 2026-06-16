@@ -17,7 +17,12 @@ async function getFormData() {
   }
 }
 
-export default async function NewProductPage() {
+interface Props {
+  searchParams: Promise<{ name?: string }>;
+}
+
+export default async function NewProductPage({ searchParams }: Props) {
+  const { name } = await searchParams;
   const { brands } = await getFormData();
 
   return (
@@ -47,6 +52,7 @@ export default async function NewProductPage() {
           label: b.name,
           slug: b.slug,
         }))}
+        initial={name ? { name } : undefined}
       />
     </div>
   );

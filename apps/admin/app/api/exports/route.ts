@@ -11,6 +11,7 @@ import {
   type ExportData,
 } from "@apt/documents";
 import { requirePermission } from "@/lib/auth/require";
+import { getTopSearches } from "@/lib/searchAnalyticsService";
 
 const MAX_ROWS = 5000;
 const SALES_STATUSES = ["confirmed", "processing", "shipped", "delivered"];
@@ -116,6 +117,17 @@ export async function GET(req: NextRequest) {
         }
         docs = await PaymentModel.find(query).sort({ createdAt: -1 }).limit(MAX_ROWS).lean();
         break;
+
+      case "search_queries": {
+        const source = sp.get("source") ?? undefined;
+        const country = sp.get("country") ?? undefined;
+        const { rows } = await getTopSearches(
+          { from: from ?? new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), to: to ?? new Date(), source, country },
+          { sort: "searches", pageSize: MAX_ROWS }
+        );
+        docs = rows;
+        break;
+      }
     }
 
     const def = DATASETS[dataset];

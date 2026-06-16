@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronRight, Search, X, Loader2, FolderTree, Check } from "lucide-react";
 
 export type CategoryLevel = "group" | "category" | "subcategory" | "range";
@@ -17,12 +17,54 @@ interface SearchResult extends CategoryNode {
   breadcrumb: { name: string; slug: string }[];
 }
 
-const LEVELS: { key: CategoryLevel; label: string }[] = [
+export type Selection = Partial<Record<CategoryLevel, CategoryNode>>;
+
+export const LEVELS: { key: CategoryLevel; label: string }[] = [
   { key: "group", label: "Group" },
   { key: "category", label: "Category" },
   { key: "subcategory", label: "Subcategory" },
   { key: "range", label: "Range" },
 ];
+
+export const LEVEL_INDEX: Record<CategoryLevel, number> = {
+  group: 0,
+  category: 1,
+  subcategory: 2,
+  range: 3,
+};
+
+/**
+ * Returns a copy of `selection` with every level *below* `level` removed.
+ * Ancestors (levels at or above `level`) are always preserved untouched —
+ * this is the single rule that keeps the hierarchy consistent.
+ */
+export function clearDescendants<T>(
+  selection: Partial<Record<CategoryLevel, T>>,
+  level: CategoryLevel
+): Partial<Record<CategoryLevel, T>> {
+  const idx = LEVEL_INDEX[level];
+  const next: Partial<Record<CategoryLevel, T>> = {};
+  for (const l of LEVELS) {
+    if (LEVEL_INDEX[l.key] <= idx && selection[l.key] !== undefined) {
+      next[l.key] = selection[l.key];
+    }
+  }
+  return next;
+}
+
+/** Ordered, gap-free chain of selected nodes (Group..deepest), derived purely from `selection`. */
+export function chainFromSelection(selection: Selection): CategoryNode[] {
+  return LEVELS.map((l) => selection[l.key]).filter(Boolean) as CategoryNode[];
+}
+
+/** Builds a `Selection` map from a resolved Group→Range chain (e.g. the `/chain` API response). */
+export function selectionFromChainResponse(data: Partial<Record<CategoryLevel, CategoryNode>>): Selection {
+  const next: Selection = {};
+  for (const l of LEVELS) {
+    if (data[l.key]) next[l.key] = data[l.key];
+  }
+  return next;
+}
 
 interface Props {
   /** Currently assigned leaf category id, if any. */
@@ -33,10 +75,10 @@ interface Props {
 
 /** Cascading Group → Category → Subcategory → Range picker with typeahead search. */
 export default function CategoryPicker({ value, onChange, disabled }: Props) {
-  const [selection, setSelection] = useState<Partial<Record<CategoryLevel, CategoryNode>>>({});
+  const [selection, setSelection] = useState<Selection>({});
   const [options, setOptions] = useState<Partial<Record<CategoryLevel, CategoryNode[]>>>({});
   const [loadingLevel, setLoadingLevel] = useState<CategoryLevel | null>(null);
-  const [initializing, setInitializing] = useState(Boolean(value));
+  const [resolving, setResolving] = useState(Boolean(value));
   const [query, setQuery] = useState("");
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
@@ -44,44 +86,74 @@ export default function CategoryPicker({ value, onChange, disabled }: Props) {
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
 
+  // Always call the *latest* onChange without re-running effects when the
+  // parent passes a fresh inline arrow function on every render.
+  const onChangeRef = useRef(onChange);
+  useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
+
+  // Monotonic token guarding every async hierarchy-changing operation
+  // (children fetch per level + chain resolution). Any new action — manual
+  // selection, a new search pick, a new `value` to resolve — invalidates
+  // whatever was previously in flight, so a slow/late response can never
+  // clobber a newer selection.
+  const childrenSeq = useRef<Record<CategoryLevel, number>>({ group: 0, category: 0, subcategory: 0, range: 0 });
+  const chainSeq = useRef(0);
+
   const loadChildren = useCallback(async (level: CategoryLevel, parentId?: string) => {
+    const seq = ++childrenSeq.current[level];
     setLoadingLevel(level);
     try {
       const qs = parentId ? `?parentId=${parentId}` : "";
       const res = await fetch(`/api/categories/children${qs}`);
       const json = await res.json();
+      if (childrenSeq.current[level] !== seq) return; // superseded — discard
       setOptions((prev) => ({ ...prev, [level]: json.children ?? [] }));
     } finally {
-      setLoadingLevel(null);
+      if (childrenSeq.current[level] === seq) {
+        setLoadingLevel((cur) => (cur === level ? null : cur));
+      }
     }
   }, []);
 
-  // Load root groups on mount
+  /** Resolves a leaf id into its full chain and replaces the entire selection atomically. */
+  const resolveChain = useCallback(async (leafId: string) => {
+    const seq = ++chainSeq.current;
+    setResolving(true);
+    try {
+      const res = await fetch(`/api/categories/${leafId}/chain`);
+      if (!res.ok) return;
+      const data = await res.json();
+      if (chainSeq.current !== seq) return; // a newer action started — discard this result
+
+      const next = selectionFromChainResponse(data);
+      setSelection(next);
+      // The root Group list is loaded once on mount and is never tied to a
+      // parent selection — only the deeper, parent-dependent lists need to
+      // be dropped and re-fetched for the new chain.
+      setOptions((prev) => ({ group: prev.group }));
+      for (const node of chainFromSelection(next)) {
+        const childLevel = LEVELS[LEVEL_INDEX[node.level] + 1]?.key;
+        if (childLevel) loadChildren(childLevel, node.id);
+      }
+    } finally {
+      if (chainSeq.current === seq) setResolving(false);
+    }
+  }, [loadChildren]);
+
+  // Load root groups once on mount. Legitimate data-fetch-on-mount effect —
+  // loadChildren's loading flag must be set synchronously so the Group
+  // select shows "Loading…" for the very first render frame.
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { loadChildren("group"); }, [loadChildren]);
 
-  // Initialize from an existing assignment
+  // Initialize from an existing assignment (or react to the prop changing).
+  // Same justification as above: resolveChain's loading flag must be set
+  // synchronously, not deferred behind a microtask, to avoid a flash of
+  // unloaded selects.
   useEffect(() => {
-    if (!value) { setInitializing(false); return; }
-    (async () => {
-      try {
-        const res = await fetch(`/api/categories/${value}/chain`);
-        if (!res.ok) return;
-        const data = await res.json();
-        const next: Partial<Record<CategoryLevel, CategoryNode>> = {};
-        if (data.group) next.group = data.group;
-        if (data.category) next.category = data.category;
-        if (data.subcategory) next.subcategory = data.subcategory;
-        if (data.range) next.range = data.range;
-        setSelection(next);
-        if (next.group) loadChildren("category", next.group.id);
-        if (next.category) loadChildren("subcategory", next.category.id);
-        if (next.subcategory) loadChildren("range", next.subcategory.id);
-      } finally {
-        setInitializing(false);
-      }
-    })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (value) resolveChain(value);
+  }, [value, resolveChain]);
 
   useEffect(() => {
     if (!searchOpen) return;
@@ -92,7 +164,10 @@ export default function CategoryPicker({ value, onChange, disabled }: Props) {
 
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (!query.trim()) { setSearchResults([]); return; }
+    // Empty query: leave any stale results in state — the dropdown is only
+    // rendered while `query.trim()` is truthy, so they're never shown.
+    if (!query.trim()) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- legitimate debounced-fetch loading flag
     setSearching(true);
     debounceRef.current = setTimeout(async () => {
       try {
@@ -106,53 +181,38 @@ export default function CategoryPicker({ value, onChange, disabled }: Props) {
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };
   }, [query]);
 
-  function emit(next: Partial<Record<CategoryLevel, CategoryNode>>) {
-    const chain = LEVELS.map((l) => next[l.key]).filter(Boolean) as CategoryNode[];
+  const chain = useMemo(() => chainFromSelection(selection), [selection]);
+
+  // Single emission point: fires whenever the derived chain actually changes,
+  // never while a chain resolution is still in flight.
+  useEffect(() => {
+    if (resolving) return;
     const leaf = chain[chain.length - 1] ?? null;
-    onChange(leaf?.id ?? null, chain);
-  }
+    onChangeRef.current(leaf?.id ?? null, chain);
+  }, [chain, resolving]);
 
-  function selectAt(level: CategoryLevel, node: CategoryNode | null) {
-    const idx = LEVELS.findIndex((l) => l.key === level);
-    const next: Partial<Record<CategoryLevel, CategoryNode>> = {};
-    for (let i = 0; i < idx; i++) next[LEVELS[i].key] = selection[LEVELS[i].key];
-    if (node) next[level] = node;
-    setSelection(next);
-    emit(next);
+  const selectAt = useCallback((level: CategoryLevel, node: CategoryNode | null) => {
+    // A manual pick always wins over any chain resolution still in flight.
+    chainSeq.current++;
 
-    // Clear and lazy-load the next level down
-    setOptions((prev) => {
-      const copy = { ...prev };
-      for (let i = idx + 1; i < LEVELS.length; i++) delete copy[LEVELS[i].key];
-      return copy;
+    setSelection((prev) => {
+      const kept = clearDescendants(prev, level);
+      if (node) kept[level] = node;
+      else delete kept[level];
+      return kept;
     });
-    const childLevel = LEVELS[idx + 1]?.key;
-    if (node && childLevel) loadChildren(childLevel, node.id);
-  }
 
-  async function pickSearchResult(result: SearchResult) {
+    setOptions((prev) => clearDescendants(prev, level));
+
+    const childLevel = LEVELS[LEVEL_INDEX[level] + 1]?.key;
+    if (node && childLevel) loadChildren(childLevel, node.id);
+  }, [loadChildren]);
+
+  const pickSearchResult = useCallback((result: SearchResult) => {
     setQuery("");
     setSearchOpen(false);
-    setInitializing(true);
-    try {
-      const res = await fetch(`/api/categories/${result.id}/chain`);
-      const data = await res.json();
-      const next: Partial<Record<CategoryLevel, CategoryNode>> = {};
-      if (data.group) next.group = data.group;
-      if (data.category) next.category = data.category;
-      if (data.subcategory) next.subcategory = data.subcategory;
-      if (data.range) next.range = data.range;
-      setSelection(next);
-      emit(next);
-      if (next.group) loadChildren("category", next.group.id);
-      if (next.category) loadChildren("subcategory", next.category.id);
-      if (next.subcategory) loadChildren("range", next.subcategory.id);
-    } finally {
-      setInitializing(false);
-    }
-  }
-
-  const chain = LEVELS.map((l) => selection[l.key]).filter(Boolean) as CategoryNode[];
+    resolveChain(result.id);
+  }, [resolveChain]);
 
   return (
     <div ref={rootRef} className="space-y-3">
@@ -160,6 +220,7 @@ export default function CategoryPicker({ value, onChange, disabled }: Props) {
       <div className="relative">
         <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--apt-text-muted)" }} />
         <input
+          aria-label="Search catalogue hierarchy"
           value={query}
           disabled={disabled}
           onChange={(e) => { setQuery(e.target.value); setSearchOpen(true); }}
@@ -211,7 +272,7 @@ export default function CategoryPicker({ value, onChange, disabled }: Props) {
           const parent = idx > 0 ? selection[LEVELS[idx - 1].key] : undefined;
           const locked = idx > 0 && !parent;
           const list = options[level.key] ?? [];
-          const isLoading = loadingLevel === level.key || (idx === 0 && initializing);
+          const isLoading = loadingLevel === level.key || (idx === 0 && resolving);
           if (level.key === "range" && !locked && list.length === 0 && !isLoading && !selection.range) {
             return (
               <div key={level.key} className="flex flex-col gap-1.5">
@@ -227,6 +288,7 @@ export default function CategoryPicker({ value, onChange, disabled }: Props) {
               </label>
               <div className="relative">
                 <select
+                  aria-label={level.label}
                   disabled={disabled || locked || isLoading}
                   value={selection[level.key]?.id ?? ""}
                   onChange={(e) => {
@@ -247,7 +309,7 @@ export default function CategoryPicker({ value, onChange, disabled }: Props) {
       </div>
 
       {/* Breadcrumb preview */}
-      <div className="flex items-center gap-1.5 flex-wrap text-[12px] px-3 py-2 rounded-md" style={{ background: "var(--apt-bg-subtle)" }}>
+      <div data-testid="catalogue-breadcrumb" className="flex items-center gap-1.5 flex-wrap text-[12px] px-3 py-2 rounded-md" style={{ background: "var(--apt-bg-subtle)" }}>
         <FolderTree size={13} style={{ color: "var(--apt-text-muted)" }} />
         {chain.length === 0 ? (
           <span style={{ color: "var(--apt-text-muted)" }}>Not assigned to a catalogue path</span>

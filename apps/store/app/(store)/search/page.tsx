@@ -146,7 +146,14 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
   return (
     <>
-      {q && <SearchTracker query={q} />}
+      {q && results && (
+        <SearchTracker
+          query={q}
+          resultsCount={totalHits}
+          durationMs={results.processingTimeMs}
+          filters={{ brands: filters.brands, categories: filters.categories, inStock: filters.inStock, isClearance: filters.isClearance }}
+        />
+      )}
 
       <main className="container-store py-6 md:py-8 flex-1">
         <Breadcrumb query={q} />
