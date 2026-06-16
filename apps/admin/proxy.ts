@@ -26,7 +26,11 @@ function buildCsp(nonce: string): string {
   return [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${isDev ? " 'unsafe-eval'" : ""}`,
-    `style-src 'self' 'nonce-${nonce}'${isDev ? " 'unsafe-inline'" : ""}`,
+    // style-src must use 'unsafe-inline' without a nonce — when a nonce is present
+    // browsers ignore 'unsafe-inline' per spec, which blocks React's style={{ }} props.
+    // Inline style attributes cannot receive nonces, so nonce-based style enforcement
+    // is not viable here. Script nonce (above) covers the higher-risk injection vector.
+    "style-src 'self' 'unsafe-inline'",
     "img-src 'self' https: blob:",
     "connect-src 'self'",
     "font-src 'self'",
@@ -47,17 +51,38 @@ export async function proxy(request: NextRequest) {
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const csp   = buildCsp(nonce);
 
-  if (authResult instanceof Response) {
-    // Auth redirect or block — attach CSP and return
-    authResult.headers.set("Content-Security-Policy", csp);
+  // NextAuth's `auth()` middleware wrapper always returns a Response instance —
+  // even when the `authorized` callback simply returns `true` to allow the request
+  // through (it wraps that case in a plain NextResponse.next()). So we can't use
+  // `instanceof Response` to distinguish "blocked" from "passed". Instead, check for
+  // the actual signals of a block: a redirect (Location header / 3xx) or an auth
+  // error status (401/403).
+  const isBlocking =
+    authResult instanceof Response &&
+    (authResult.status >= 300 && authResult.status < 400 ||
+      authResult.headers.has("location") ||
+      authResult.status === 401 ||
+      authResult.status === 403);
+
+  if (isBlocking) {
+    authResult!.headers.set("Content-Security-Policy", csp);
     return authResult;
   }
 
-  // Auth passed — forward nonce to pages and set CSP on the response
+  // Auth passed — forward nonce to pages and set CSP on the response.
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-nonce", nonce);
 
   const response = NextResponse.next({ request: { headers: requestHeaders } });
+
+  // Preserve any side-effect headers NextAuth's pass-through response set
+  // (e.g. session cookie rotation) since we're discarding that response object.
+  if (authResult instanceof Response) {
+    authResult.headers.forEach((value, key) => {
+      if (key.toLowerCase() === "set-cookie") response.headers.append(key, value);
+    });
+  }
+
   response.headers.set("Content-Security-Policy", csp);
   // Preserve other security headers that were previously set in next.config.ts
   response.headers.set("X-Frame-Options", "DENY");

@@ -4,7 +4,7 @@ import {
   Package, Tag, FolderTree, FileText,
   ShoppingCart, Users, TrendingUp, TrendingDown,
   ArrowRight, Clock, AlertTriangle, CheckCircle2,
-  BarChart3, Zap,
+  BarChart3, Zap, ShieldAlert,
 } from "lucide-react";
 import { connectDB, ProductModel, BrandModel, CategoryModel, QuoteModel, OrderModel, UserModel } from "@apt/db";
 import { Badge, statusVariant } from "@/components/ui/Badge";
@@ -120,11 +120,16 @@ const QUICK_ACTIONS = [
 ];
 
 /* ─── Page ────────────────────────────────────────────────────────────────── */
-export default async function DashboardPage() {
-  const [metrics, quotes, topProducts] = await Promise.all([
+export default async function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const [metrics, quotes, topProducts, params] = await Promise.all([
     getMetrics(),
     getRecentQuotes(),
     getTopProducts(),
+    searchParams,
   ]);
 
   const now = new Date();
@@ -132,6 +137,15 @@ export default async function DashboardPage() {
 
   return (
     <div>
+      {params.error === "forbidden" && (
+        <div
+          className="flex items-center gap-2.5 px-4 sm:px-6 py-3 text-[13px]"
+          style={{ background: "rgba(220,38,38,0.08)", color: "#dc2626", borderBottom: "1px solid var(--apt-border)" }}
+        >
+          <ShieldAlert size={15} />
+          You don&apos;t have permission to access that page. Contact a super admin if you believe this is a mistake.
+        </div>
+      )}
       <PageHeader
         title={`${greeting}, Admin`}
         description={now.toLocaleDateString("en-GH", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}

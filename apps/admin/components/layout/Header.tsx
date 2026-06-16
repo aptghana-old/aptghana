@@ -244,6 +244,9 @@ export default function Header({ user, onCommandPalette, onMobileMenuToggle }: H
     const next = !darkMode;
     setDarkMode(next);
     document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
+    try {
+      localStorage.setItem("apt-theme", next ? "dark" : "light");
+    } catch {}
   };
 
   return (
