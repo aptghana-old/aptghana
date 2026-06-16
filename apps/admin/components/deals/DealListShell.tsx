@@ -1,17 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import type { ReactNode } from "react";
 import { Tabs, TabList, Tab, TabPanel } from "@/components/ui/Tabs";
 import type { DealFilterOptions, DealKind, DealKpis, DealAnalytics } from "@/lib/dealFilters";
 import FilterChips from "./FilterChips";
 import FilterDrawer from "./FilterDrawer";
 import DealKpiRow from "./DealKpiRow";
 import DealAnalyticsPanels from "./DealAnalyticsPanels";
-import DealTable, { type DealColumn } from "./DealTable";
+import DealTable, { type DealColumn, type DealTableRow } from "./DealTable";
 import DealBulkBar from "./DealBulkBar";
 
-interface Props<T> {
+interface Props {
   kind: DealKind;
   options: DealFilterOptions;
   current: Record<string, string | undefined>;
@@ -20,9 +19,7 @@ interface Props<T> {
   currency: string;
   analytics: DealAnalytics;
   columns: DealColumn[];
-  rows: T[];
-  rowKey(row: T): string;
-  renderCell(row: T, columnKey: string): ReactNode;
+  rows: DealTableRow[];
   total: number;
   page: number;
   pageSize: number;
@@ -30,10 +27,10 @@ interface Props<T> {
   bulkStatusOptions?: { value: string; label: string }[];
 }
 
-export default function DealListShell<T>({
+export default function DealListShell({
   kind, options, current, storageNamespace, kpis, currency, analytics,
-  columns, rows, rowKey, renderCell, total, page, pageSize, bulkEndpoint, bulkStatusOptions,
-}: Props<T>) {
+  columns, rows, total, page, pageSize, bulkEndpoint, bulkStatusOptions,
+}: Props) {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
 
@@ -41,7 +38,7 @@ export default function DealListShell<T>({
     setSelected((prev) => { const next = new Set(prev); if (next.has(id)) next.delete(id); else next.add(id); return next; });
   }
   function toggleAll() {
-    setSelected((prev) => (prev.size === rows.length ? new Set() : new Set(rows.map(rowKey))));
+    setSelected((prev) => (prev.size === rows.length ? new Set() : new Set(rows.map((r) => r.id))));
   }
 
   const canBulk = Boolean(bulkEndpoint && bulkStatusOptions);
@@ -64,8 +61,6 @@ export default function DealListShell<T>({
             <DealTable
               columns={columns}
               rows={rows}
-              rowKey={rowKey}
-              renderCell={renderCell}
               total={total}
               page={page}
               pageSize={pageSize}

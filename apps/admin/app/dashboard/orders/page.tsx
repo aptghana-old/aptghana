@@ -7,7 +7,7 @@ import ExportMenu from "@/components/exports/ExportMenu";
 import { auth } from "@/lib/auth";
 import { getDealList, getDealKpis, getDealAnalytics, getDealFilterOptions, parseDealParams } from "@/lib/dealFilters";
 import DealListShell from "@/components/deals/DealListShell";
-import type { DealColumn } from "@/components/deals/DealTable";
+import type { DealColumn, DealTableRow } from "@/components/deals/DealTable";
 
 export const metadata: Metadata = { title: "Orders" };
 export const dynamic = "force-dynamic";
@@ -101,6 +101,11 @@ export default async function OrdersPage({ searchParams }: Props) {
     }
   }
 
+  const tableRows: DealTableRow[] = typedRows.map((o) => ({
+    id: o._id.toString(),
+    cells: Object.fromEntries(COLUMNS.map((c) => [c.key, renderCell(o, c.key)])),
+  }));
+
   return (
     <div>
       <PageHeader
@@ -118,9 +123,7 @@ export default async function OrdersPage({ searchParams }: Props) {
         currency={options.currencies[0] ?? "GHS"}
         analytics={analytics}
         columns={COLUMNS}
-        rows={typedRows}
-        rowKey={(o) => o._id.toString()}
-        renderCell={renderCell}
+        rows={tableRows}
         total={total}
         page={page}
         pageSize={PAGE_SIZE}

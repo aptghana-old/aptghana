@@ -6,6 +6,8 @@ export { IndustryModel } from "./models/Industry";
 export type { IndustryDocument } from "./models/Industry";
 export { ResourceModel } from "./models/Resource";
 export type { ResourceDocument } from "./models/Resource";
+export { ArticleModel, ARTICLE_STATUSES } from "./models/Article";
+export type { ArticleDocument } from "./models/Article";
 export { UserModel } from "./models/User";
 export { OrderModel } from "./models/Order";
 export { QuoteModel, QUOTE_STATUSES } from "./models/Quote";

@@ -10,7 +10,7 @@ import ExportMenu from "@/components/exports/ExportMenu";
 import { auth } from "@/lib/auth";
 import { getDealList, getDealKpis, getDealAnalytics, getDealFilterOptions, parseDealParams } from "@/lib/dealFilters";
 import DealListShell from "@/components/deals/DealListShell";
-import type { DealColumn } from "@/components/deals/DealTable";
+import type { DealColumn, DealTableRow } from "@/components/deals/DealTable";
 
 export const metadata: Metadata = { title: "Quotes & RFQs" };
 export const dynamic = "force-dynamic";
@@ -112,6 +112,11 @@ export default async function QuotesPage({ searchParams }: Props) {
     }
   }
 
+  const tableRows: DealTableRow[] = typedRows.map((q) => ({
+    id: q._id.toString(),
+    cells: Object.fromEntries(COLUMNS.map((c) => [c.key, renderCell(q, c.key)])),
+  }));
+
   return (
     <div>
       <PageHeader
@@ -138,9 +143,7 @@ export default async function QuotesPage({ searchParams }: Props) {
         currency={options.currencies[0] ?? "GHS"}
         analytics={analytics}
         columns={COLUMNS}
-        rows={typedRows}
-        rowKey={(q) => q._id.toString()}
-        renderCell={renderCell}
+        rows={tableRows}
         total={total}
         page={page}
         pageSize={PAGE_SIZE}

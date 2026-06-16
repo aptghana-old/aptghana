@@ -1,47 +1,86 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ChevronLeft, Edit, BookOpen } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { ComingSoon } from "@/components/ui/ComingSoon";
+import { notFound } from "next/navigation";
+import { connectDB, ArticleModel } from "@apt/db";
+import { hasPermission, type AdminRole } from "@apt/auth";
+import { auth } from "@/lib/auth";
+import { getArticleAnalytics } from "@/lib/articleAnalytics";
+import ArticleEditorShell, { type ArticleFormData } from "@/components/articles/ArticleEditorShell";
 
-export const metadata: Metadata = { title: "Article" };
+interface ArticleDoc {
+  _id: { toString(): string };
+  title: string;
+  slug: string;
+  excerpt?: string;
+  content?: string;
+  status: string;
+  publishDate?: Date;
+  category?: string;
+  tags?: string[];
+  featured?: boolean;
+  authorName?: string;
+  readingTimeMinutes?: number;
+  canonicalUrl?: string;
+  featuredImage?: { url?: string; alt?: string };
+  gallery?: { url?: string; alt?: string }[];
+  videos?: { url?: string; title?: string }[];
+  attachments?: { name?: string; url?: string }[];
+  seo?: { title?: string; description?: string; keywords?: string[]; ogImage?: string };
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
+  const { id } = await params;
+  try {
+    await connectDB();
+    const a = await ArticleModel.findById(id).select("title").lean<{ title: string }>();
+    return { title: a ? a.title : "Article" };
+  } catch {
+    return { title: "Article" };
+  }
+}
+
+async function getArticle(id: string): Promise<ArticleDoc | null> {
+  try {
+    await connectDB();
+    return await ArticleModel.findById(id).lean<ArticleDoc>();
+  } catch {
+    return null;
+  }
+}
 
 export default async function ArticleDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const article = await getArticle(id);
+  if (!article) notFound();
 
-  return (
-    <div>
-      <div
-        className="flex items-center gap-4 px-6 py-4"
-        style={{ borderBottom: "1px solid var(--apt-border)", background: "var(--apt-bg)" }}
-      >
-        <Link href="/dashboard/articles">
-          <Button variant="ghost" size="sm" icon={<ChevronLeft size={14} />}>Articles</Button>
-        </Link>
-        <div style={{ width: 1, height: 20, background: "var(--apt-border)" }} />
-        <h1 className="text-[15px] font-semibold" style={{ color: "var(--apt-text-primary)" }}>Article</h1>
-        <div className="ml-auto">
-          <Link href={`/dashboard/articles/${id}/edit`}>
-            <Button variant="secondary" size="sm" icon={<Edit size={13} />}>Edit</Button>
-          </Link>
-        </div>
-      </div>
-      <div className="p-6">
-        <div className="card">
-          <ComingSoon
-            icon={<BookOpen size={24} />}
-            title="Article Editor"
-            description="The full CMS article editor — rich text, media embedding, SEO, tags, and scheduling — is in active development."
-            milestones={[
-              { label: "Rich text editor (Tiptap)", done: false },
-              { label: "Media uploads and embedding", done: false },
-              { label: "SEO fields per article", done: false },
-              { label: "Tags and categories", done: false },
-              { label: "Scheduled publish", done: false },
-            ]}
-          />
-        </div>
-      </div>
-    </div>
-  );
+  const session = await auth();
+  const role = (session?.user as { role?: AdminRole } | undefined)?.role ?? "sales";
+  const overrides = (session?.user as { permissions?: string[] } | undefined)?.permissions ?? [];
+  const canEdit = hasPermission(role, overrides, "content:edit");
+
+  const analytics = await getArticleAnalytics(article.slug);
+
+  const initial: ArticleFormData = {
+    title: article.title,
+    slug: article.slug,
+    excerpt: article.excerpt ?? "",
+    content: article.content ?? "",
+    status: article.status,
+    publishDate: article.publishDate ? new Date(article.publishDate).toISOString().slice(0, 10) : "",
+    category: article.category ?? "",
+    tags: article.tags ?? [],
+    featured: article.featured ?? false,
+    authorName: article.authorName ?? "—",
+    readingTimeMinutes: article.readingTimeMinutes ?? 0,
+    canonicalUrl: article.canonicalUrl ?? "",
+    featuredImage: article.featuredImage?.url ? { url: article.featuredImage.url, alt: article.featuredImage.alt } : null,
+    gallery: (article.gallery ?? []).map((g) => ({ url: g.url ?? "", alt: g.alt })),
+    videos: (article.videos ?? []).map((v) => ({ url: v.url ?? "", title: v.title })),
+    attachments: (article.attachments ?? []).map((a) => ({ name: a.name ?? "", url: a.url ?? "" })),
+    seoTitle: article.seo?.title ?? "",
+    seoDescription: article.seo?.description ?? "",
+    seoKeywords: article.seo?.keywords ?? [],
+    ogImage: article.seo?.ogImage ?? "",
+  };
+
+  return <ArticleEditorShell articleId={id} initial={initial} canEdit={canEdit} analytics={analytics} />;
 }

@@ -178,6 +178,7 @@ export const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
     "orders:view",
     "orders:create",
     "reports:view",
+    "content:view",
   ],
 
   account: [
@@ -194,6 +195,7 @@ export const ROLE_PERMISSIONS: Record<AdminRole, Permission[]> = {
     "reports:view",
     "reports:export",
     "exports:run",
+    "content:view",
   ],
 };
 
@@ -229,7 +231,7 @@ export const ROUTE_PERMISSION_MAP: Array<{ prefix: string; permission: Permissio
   { prefix: "/dashboard/industries",   permission: "content:edit" },
   { prefix: "/dashboard/resources",    permission: "content:edit" },
   { prefix: "/dashboard/cms",          permission: "content:edit" },
-  { prefix: "/dashboard/articles",     permission: "content:edit" },
+  { prefix: "/dashboard/articles",     permission: "content:view" },
   { prefix: "/dashboard/navigation",   permission: "content:edit" },
   { prefix: "/dashboard/products",     permission: "products:view" },
   { prefix: "/dashboard/brands",       permission: "brands:view" },
@@ -257,7 +259,7 @@ export const NAV_PERMISSION_MAP: Partial<Record<string, Permission>> = {
   "/dashboard/industries":         "content:edit",
   "/dashboard/resources":          "content:edit",
   "/dashboard/cms":                "content:edit",
-  "/dashboard/articles":           "content:edit",
+  "/dashboard/articles":           "content:view",
   "/dashboard/navigation":         "content:edit",
   "/dashboard/search":             "search:view",
   "/dashboard/search/synonyms":    "search:edit",

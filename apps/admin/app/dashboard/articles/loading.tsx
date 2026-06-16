@@ -1,26 +1,17 @@
-import { PageHeader } from "@/components/ui/PageHeader";
-import { Button } from "@/components/ui/Button";
-import { Skeleton, TableSkeleton } from "@/components/ui/Skeleton";
-import { Plus } from "lucide-react";
+import { PageHeaderSkeleton, MetricCardSkeleton, Skeleton, ListItemSkeleton } from "@/components/ui/Skeleton";
 
 export default function ArticlesLoading() {
   return (
     <div>
-      <PageHeader
-        title="Articles"
-        description="Loading content library…"
-        actions={<Button variant="primary" size="sm" icon={<Plus size={13} />} disabled>New Article</Button>}
-      />
-      <div
-        className="flex items-center gap-1 px-4 sm:px-6 py-3 overflow-x-auto"
-        style={{ borderBottom: "1px solid var(--apt-border)", background: "var(--apt-bg)" }}
-      >
-        {[60, 80, 90, 80, 70].map((w, i) => (
-          <Skeleton key={i} width={w} height={28} rounded="md" className="shrink-0" />
-        ))}
+      <PageHeaderSkeleton hasAction />
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 p-4 sm:p-6 pb-0">
+        {Array.from({ length: 6 }).map((_, i) => <MetricCardSkeleton key={i} />)}
+      </div>
+      <div className="px-4 sm:px-6 py-3" style={{ borderBottom: "1px solid var(--apt-border)" }}>
+        <Skeleton width={260} height={32} rounded="md" />
       </div>
       <div className="p-4 sm:p-6">
-        <TableSkeleton rows={8} cols={5} hasThumbnail />
+        <ListItemSkeleton count={8} hasAvatar />
       </div>
     </div>
   );

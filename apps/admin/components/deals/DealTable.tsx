@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { ArrowUp, ArrowDown, Columns3, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
@@ -15,11 +16,20 @@ export interface DealColumn {
   defaultVisible?: boolean;
 }
 
-interface Props<T> {
+/**
+ * A row's cells are pre-rendered server-side (plain ReactNode, not a render
+ * callback) — Server Components can pass JSX into Client Components, but
+ * never a function, so the row→cell mapping must happen before this prop
+ * crosses the client boundary.
+ */
+export interface DealTableRow {
+  id: string;
+  cells: Record<string, ReactNode>;
+}
+
+interface Props {
   columns: DealColumn[];
-  rows: T[];
-  rowKey(row: T): string;
-  renderCell(row: T, columnKey: string): React.ReactNode;
+  rows: DealTableRow[];
   total: number;
   page: number;
   pageSize: number;
@@ -28,7 +38,7 @@ interface Props<T> {
   selected?: Set<string>;
   onToggle?(id: string): void;
   onToggleAll?(): void;
-  bulkBar?: React.ReactNode;
+  bulkBar?: ReactNode;
   emptyMessage?: string;
 }
 
@@ -40,10 +50,10 @@ function loadVisible(storageKey: string, columns: DealColumn[]): Set<string> {
   return new Set(columns.filter((c) => c.defaultVisible !== false).map((c) => c.key));
 }
 
-export default function DealTable<T>({
-  columns, rows, rowKey, renderCell, total, page, pageSize, storageKey,
+export default function DealTable({
+  columns, rows, total, page, pageSize, storageKey,
   selectable, selected, onToggle, onToggleAll, bulkBar, emptyMessage,
-}: Props<T>) {
+}: Props) {
   const pathname = usePathname();
   const params = useSearchParams();
   const [visible, setVisible] = useState<Set<string>>(() => loadVisible(storageKey, columns));
@@ -124,12 +134,12 @@ export default function DealTable<T>({
             </thead>
             <tbody>
               {rows.map((row) => (
-                <tr key={rowKey(row)}>
+                <tr key={row.id}>
                   {selectable && (
-                    <td><input type="checkbox" className="rounded" checked={selected?.has(rowKey(row)) ?? false} onChange={() => onToggle?.(rowKey(row))} /></td>
+                    <td><input type="checkbox" className="rounded" checked={selected?.has(row.id) ?? false} onChange={() => onToggle?.(row.id)} /></td>
                   )}
                   {visibleColumns.map((c) => (
-                    <td key={c.key} className={c.align === "right" ? "text-right" : undefined}>{renderCell(row, c.key)}</td>
+                    <td key={c.key} className={c.align === "right" ? "text-right" : undefined}>{row.cells[c.key]}</td>
                   ))}
                 </tr>
               ))}

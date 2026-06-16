@@ -5,7 +5,7 @@ import type { ExportColumn, ExportRow } from "../types";
  * both apps — columns and row mapping live here once.
  */
 
-export type DatasetKey = "quotes" | "orders" | "sales" | "customers" | "payments" | "search_queries";
+export type DatasetKey = "quotes" | "orders" | "sales" | "customers" | "payments" | "search_queries" | "articles";
 
 export interface DatasetDef {
   label: string;
@@ -192,6 +192,30 @@ export const DATASETS: Record<DatasetKey, DatasetDef> = {
       clicks: q.clicks ?? 0,
       ctr: q.ctr != null ? `${(q.ctr * 100).toFixed(1)}%` : "",
       lastSearched: d(q.lastSearched),
+    }),
+  },
+
+  articles: {
+    label: "Articles",
+    columns: [
+      { key: "title", header: "Title", width: 32 },
+      { key: "status", header: "Status", width: 12 },
+      { key: "category", header: "Category", width: 18 },
+      { key: "author", header: "Author", width: 18 },
+      { key: "featured", header: "Featured", width: 10 },
+      { key: "views", header: "Views", width: 10, align: "right" },
+      { key: "publishDate", header: "Publish Date", width: 14 },
+      { key: "updated", header: "Updated", width: 14 },
+    ],
+    map: (a) => ({
+      title: a.title ?? "",
+      status: a.status ?? "",
+      category: a.category ?? "",
+      author: a.authorName ?? "",
+      featured: a.featured ? "Yes" : "No",
+      views: a.viewCount ?? 0,
+      publishDate: d(a.publishDate),
+      updated: d(a.updatedAt),
     }),
   },
 };
