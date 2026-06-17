@@ -18,7 +18,9 @@
     "seed:admin": "tsx scripts/seed-admin.ts",
     "seed:content": "tsx scripts/seed-content.ts",
     "infra:migrate-assets": "tsx scripts/migrate-assets-to-minio.ts",
+    "infra:migrate-media": "tsx scripts/migrate-media-assets.ts",
     "infra:reindex": "tsx scripts/reindex-meilisearch.ts",
+    "infra:reindex-migrated": "tsx scripts/reindex-migrated-assets.ts",
     "infra:validate": "tsx scripts/validate-migration.ts",
     "infra:backup": "bash scripts/ops/backup.sh",
     "infra:health": "bash scripts/ops/health-check.sh"

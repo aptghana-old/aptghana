@@ -21,7 +21,13 @@ export default function FooterBase({ config }: Props) {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#0a1628] text-white/60">
+    <footer
+      className="
+        bg-white text-slate-500
+        dark:bg-[#0a1628] dark:text-white/60
+        transition-colors duration-300
+      "
+    >
 
       {/* ── Main grid ──────────────────────────────────────────────────── */}
       <div className={`${containerClass} pt-14 pb-10`}>
@@ -34,16 +40,34 @@ export default function FooterBase({ config }: Props) {
                 {brand.logoText}
               </div>
               <div>
-                <div className="font-bold text-white leading-none text-sm group-hover:text-[#3DCD58] transition-colors">
+                <div
+                  className="
+                    font-bold leading-none text-sm transition-colors
+                    text-slate-900 group-hover:text-[#3DCD58]
+                    dark:text-white dark:group-hover:text-[#3DCD58]
+                  "
+                >
                   {brand.name}
                 </div>
-                <div className="text-[10px] text-white/35 mt-0.5 uppercase tracking-widest">
+                <div
+                  className="
+                    text-[10px] mt-0.5 uppercase tracking-widest
+                    text-slate-400
+                    dark:text-white/35
+                  "
+                >
                   {brand.tagline}
                 </div>
               </div>
             </Link>
 
-            <p className="text-sm leading-relaxed text-white/45 mb-6 max-w-[280px]">
+            <p
+              className="
+                text-sm leading-relaxed mb-6 max-w-[280px]
+                text-slate-400
+                dark:text-white/45
+              "
+            >
               {brand.description}
             </p>
 
@@ -55,7 +79,11 @@ export default function FooterBase({ config }: Props) {
                     href={item.href}
                     target={item.href.startsWith("http") ? "_blank" : undefined}
                     rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined}
-                    className="flex items-start gap-2.5 text-xs text-white/40 hover:text-white/70 transition-colors"
+                    className="
+                      flex items-start gap-2.5 text-xs transition-colors
+                      text-slate-400 hover:text-slate-600
+                      dark:text-white/40 dark:hover:text-white/70
+                    "
                   >
                     <svg
                       className="w-3.5 h-3.5 shrink-0 mt-0.5"
@@ -81,7 +109,14 @@ export default function FooterBase({ config }: Props) {
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className="w-8 h-8 rounded-lg bg-white/[0.04] border border-white/[0.07] flex items-center justify-center text-white/40 hover:text-white hover:bg-white/[0.08] hover:border-white/15 transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3DCD58]"
+                  className="
+                    w-8 h-8 rounded-lg flex items-center justify-center transition-all
+                    focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3DCD58]
+                    bg-slate-100 border border-slate-200 text-slate-400
+                    hover:text-slate-700 hover:bg-slate-200 hover:border-slate-300
+                    dark:bg-white/[0.04] dark:border-white/[0.07] dark:text-white/40
+                    dark:hover:text-white dark:hover:bg-white/[0.08] dark:hover:border-white/15
+                  "
                 >
                   <svg
                     className="w-3.5 h-3.5"
@@ -99,17 +134,22 @@ export default function FooterBase({ config }: Props) {
 
           {/* Link columns */}
           <div
-            className={`grid grid-cols-2 sm:grid-cols-3 gap-8 ${
-              columns.length >= 5
-                ? "lg:grid-cols-5"
-                : columns.length === 4
+            className={`grid grid-cols-2 sm:grid-cols-3 gap-8 ${columns.length >= 5
+              ? "lg:grid-cols-5"
+              : columns.length === 4
                 ? "lg:grid-cols-4"
                 : "lg:grid-cols-3"
-            }`}
+              }`}
           >
             {columns.map((col) => (
               <div key={col.title}>
-                <h3 className="text-[10px] font-bold text-white uppercase tracking-widest mb-4">
+                <h3
+                  className="
+                    text-[10px] font-bold uppercase tracking-widest mb-4
+                    text-slate-900
+                    dark:text-white
+                  "
+                >
                   {col.title}
                 </h3>
                 <ul className="space-y-2.5">
@@ -119,7 +159,11 @@ export default function FooterBase({ config }: Props) {
                         href={link.href}
                         target={link.external ? "_blank" : undefined}
                         rel={link.external ? "noopener noreferrer" : undefined}
-                        className="text-xs text-white/40 hover:text-white/80 transition-colors leading-relaxed"
+                        className="
+                          text-xs transition-colors leading-relaxed
+                          text-slate-400 hover:text-slate-700
+                          dark:text-white/40 dark:hover:text-white/80
+                        "
                       >
                         {link.label}
                         {link.external && (
@@ -148,8 +192,20 @@ export default function FooterBase({ config }: Props) {
 
         {/* ── Featured brands strip (optional) ──────────────────────────── */}
         {featuredBrands && featuredBrands.length > 0 && (
-          <div className="mt-10 pt-8 border-t border-white/[0.06]">
-            <p className="text-[10px] text-white/30 uppercase tracking-widest mb-4 font-semibold">
+          <div
+            className="
+              mt-10 pt-8
+              border-t border-slate-200
+              dark:border-white/[0.06]
+            "
+          >
+            <p
+              className="
+                text-[10px] uppercase tracking-widest mb-4 font-semibold
+                text-slate-400
+                dark:text-white/30
+              "
+            >
               Featured Brands
             </p>
             <div className="flex flex-wrap gap-2">
@@ -157,7 +213,13 @@ export default function FooterBase({ config }: Props) {
                 <Link
                   key={b.name}
                   href={b.href}
-                  className="px-3 py-1.5 text-xs font-medium text-white/40 border border-white/10 rounded-full hover:text-white/70 hover:border-white/20 transition-all"
+                  className="
+                    px-3 py-1.5 text-xs font-medium rounded-full transition-all
+                    text-slate-400 border border-slate-200
+                    hover:text-slate-700 hover:border-slate-300
+                    dark:text-white/40 dark:border-white/10
+                    dark:hover:text-white/70 dark:hover:border-white/20
+                  "
                 >
                   {b.name}
                 </Link>
@@ -168,11 +230,33 @@ export default function FooterBase({ config }: Props) {
 
         {/* ── Newsletter bar (optional) ──────────────────────────────────── */}
         {newsletter && (
-          <div className="mt-10 pt-8 border-t border-white/[0.06]">
+          <div
+            className="
+              mt-10 pt-8
+              border-t border-slate-200
+              dark:border-white/[0.06]
+            "
+          >
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 justify-between">
               <div>
-                <p className="text-sm font-semibold text-white mb-0.5">{newsletter.heading}</p>
-                <p className="text-xs text-white/35">{newsletter.subheading}</p>
+                <p
+                  className="
+                    text-sm font-semibold mb-0.5
+                    text-slate-900
+                    dark:text-white
+                  "
+                >
+                  {newsletter.heading}
+                </p>
+                <p
+                  className="
+                    text-xs
+                    text-slate-400
+                    dark:text-white/35
+                  "
+                >
+                  {newsletter.subheading}
+                </p>
               </div>
               <form action={newsletter.action} method="post" className="flex w-full sm:w-auto">
                 <input
@@ -180,7 +264,14 @@ export default function FooterBase({ config }: Props) {
                   name="email"
                   placeholder="your@email.com"
                   required
-                  className="flex-1 sm:w-64 h-10 px-4 bg-white/[0.05] border border-white/10 rounded-l-xl text-sm text-white placeholder-white/25 focus:outline-none focus:border-[#3DCD58]/40 transition-colors"
+                  className="
+                    flex-1 sm:w-64 h-10 px-4 rounded-l-xl text-sm transition-colors
+                    focus:outline-none
+                    bg-slate-100 border border-slate-200 text-slate-800 placeholder-slate-400
+                    focus:border-[#3DCD58]/60
+                    dark:bg-white/[0.05] dark:border-white/10 dark:text-white dark:placeholder-white/25
+                    dark:focus:border-[#3DCD58]/40
+                  "
                 />
                 <button
                   type="submit"
@@ -195,9 +286,23 @@ export default function FooterBase({ config }: Props) {
       </div>
 
       {/* ── Bottom bar ────────────────────────────────────────────────────── */}
-      <div className="border-t border-white/[0.05]">
-        <div className={`${containerClass} py-5 flex flex-col sm:flex-row items-center justify-between gap-4`}>
-          <p className="text-xs text-white/25 text-center sm:text-left">
+      <div
+        className="
+          border-t
+          border-slate-200
+          dark:border-white/[0.05]
+        "
+      >
+        <div
+          className={`${containerClass} py-5 flex flex-col sm:flex-row items-center justify-between gap-4`}
+        >
+          <p
+            className="
+              text-xs text-center sm:text-left
+              text-slate-400
+              dark:text-white/25
+            "
+          >
             © {year} APT Ghana Limited. All rights reserved.
           </p>
 
@@ -206,7 +311,11 @@ export default function FooterBase({ config }: Props) {
               <Link
                 key={l.label}
                 href={l.href}
-                className="text-xs text-white/25 hover:text-white/60 transition-colors whitespace-nowrap"
+                className="
+                  text-xs transition-colors whitespace-nowrap
+                  text-slate-400 hover:text-slate-600
+                  dark:text-white/25 dark:hover:text-white/60
+                "
               >
                 {l.label}
               </Link>
@@ -214,10 +323,25 @@ export default function FooterBase({ config }: Props) {
           </nav>
 
           {certifications && certifications.length > 0 && (
-            <div className="flex items-center gap-3 text-[10px] text-white/20 font-medium uppercase tracking-widest">
+            <div
+              className="
+                flex items-center gap-3 text-[10px] font-medium uppercase tracking-widest
+                text-slate-300
+                dark:text-white/20
+              "
+            >
               {certifications.map((cert, i) => (
                 <span key={cert} className="flex items-center gap-3">
-                  {i > 0 && <span className="w-px h-3 bg-white/10" aria-hidden="true" />}
+                  {i > 0 && (
+                    <span
+                      className="
+                        w-px h-3
+                        bg-slate-200
+                        dark:bg-white/10
+                      "
+                      aria-hidden="true"
+                    />
+                  )}
                   {cert}
                 </span>
               ))}

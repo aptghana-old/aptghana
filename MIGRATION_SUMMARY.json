@@ -1,0 +1,72 @@
+{
+  "completedAt": "2026-06-17T05:47:29.962Z",
+  "durationSeconds": 8,
+  "dryRun": true,
+  "totals": {
+    "scanned": 13697,
+    "attempted": 13697,
+    "uploaded": 13697,
+    "skipped": 0,
+    "updated": 0,
+    "broken": 0,
+    "bytes": 0
+  },
+  "storageMB": 0,
+  "byCollection": {
+    "products_v2": {
+      "scanned": 13240,
+      "attempted": 13240,
+      "uploaded": 13240,
+      "skipped": 0,
+      "updated": 0,
+      "broken": 0,
+      "bytes": 0
+    },
+    "brands_v2": {
+      "scanned": 26,
+      "attempted": 26,
+      "uploaded": 26,
+      "skipped": 0,
+      "updated": 0,
+      "broken": 0,
+      "bytes": 0
+    },
+    "categories_v2": {
+      "scanned": 415,
+      "attempted": 415,
+      "uploaded": 415,
+      "skipped": 0,
+      "updated": 0,
+      "broken": 0,
+      "bytes": 0
+    },
+    "articles_v2": {
+      "scanned": 0,
+      "attempted": 0,
+      "uploaded": 0,
+      "skipped": 0,
+      "updated": 0,
+      "broken": 0,
+      "bytes": 0
+    },
+    "industries": {
+      "scanned": 0,
+      "attempted": 0,
+      "uploaded": 0,
+      "skipped": 0,
+      "updated": 0,
+      "broken": 0,
+      "bytes": 0
+    },
+    "homepage_configs": {
+      "scanned": 16,
+      "attempted": 16,
+      "uploaded": 16,
+      "skipped": 0,
+      "updated": 0,
+      "broken": 0,
+      "bytes": 0
+    }
+  },
+  "updatedCollections": []
+}
