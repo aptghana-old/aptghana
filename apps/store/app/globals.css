@@ -15,33 +15,36 @@
   --color-navy-300: #60a5fa;
   --color-navy-200: #bfdbfe;
   --color-navy-100: #ddeeff;
-  --color-navy-50:  #f0f7ff;
+  --color-navy-50: #f0f7ff;
 
-  --color-se-green:       #3DCD58;
-  --color-se-green-hover: #2AA347;
-  --color-se-green-light: #E8F9ED;
+  --color-se-green: #3dcd58;
+  --color-se-green-hover: #2aa347;
+  --color-se-green-light: #e8f9ed;
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 
   --radius-card: 0.875rem;
-  --radius-btn:  0.625rem;
+  --radius-btn: 0.625rem;
 
-  --shadow-card:       0 1px 3px rgba(0,0,0,.06), 0 4px 16px -2px rgba(0,0,0,.05);
-  --shadow-card-hover: 0 4px 12px -2px rgba(0,0,0,.12), 0 20px 40px -8px rgba(0,0,0,.10);
-  --shadow-float:      0 8px 32px -4px rgba(0,0,0,.14), 0 2px 8px -2px rgba(0,0,0,.08);
+  --shadow-card:
+    0 1px 3px rgba(0, 0, 0, 0.06), 0 4px 16px -2px rgba(0, 0, 0, 0.05);
+  --shadow-card-hover:
+    0 4px 12px -2px rgba(0, 0, 0, 0.12), 0 20px 40px -8px rgba(0, 0, 0, 0.1);
+  --shadow-float:
+    0 8px 32px -4px rgba(0, 0, 0, 0.14), 0 2px 8px -2px rgba(0, 0, 0, 0.08);
 }
 
 /* ─── Semantic theme tokens + base styles ─────────────────────────────────── */
 /* Wrapped in @layer base so Turbopack preserves CSS variable declarations    */
 @layer base {
   :root {
-    --bg-base:    #f9fafb;
+    --bg-base: #f9fafb;
     --bg-surface: #ffffff;
-    --bg-raised:  #f3f4f6;
-    --bg-sunken:  #e5e7eb;
+    --bg-raised: #f3f4f6;
+    --bg-sunken: #e5e7eb;
 
-    --border:    #e5e7eb;
+    --border: #e5e7eb;
     --border-hi: #d1d5db;
 
     --text-1: #0a1628;
@@ -49,18 +52,20 @@
     --text-3: #6b7280;
     --text-4: #9ca3af;
 
-    --shadow-1: 0 1px 3px rgba(0,0,0,.05), 0 1px 2px rgba(0,0,0,.04);
-    --shadow-2: 0 4px 12px -2px rgba(0,0,0,.08), 0 2px 4px -1px rgba(0,0,0,.05);
-    --shadow-3: 0 12px 40px -8px rgba(0,0,0,.12), 0 4px 8px -2px rgba(0,0,0,.06);
+    --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-2:
+      0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+    --shadow-3:
+      0 12px 40px -8px rgba(0, 0, 0, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.06);
   }
 
   [data-theme="dark"] {
-    --bg-base:    #060c18;
+    --bg-base: #060c18;
     --bg-surface: #0c1527;
-    --bg-raised:  #111e33;
-    --bg-sunken:  #08101f;
+    --bg-raised: #111e33;
+    --bg-sunken: #08101f;
 
-    --border:    #162338;
+    --border: #162338;
     --border-hi: #1c3155;
 
     --text-1: #f1f5f9;
@@ -68,14 +73,20 @@
     --text-3: #94a3b8;
     --text-4: #475569;
 
-    --shadow-1: 0 1px 3px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.25);
-    --shadow-2: 0 4px 12px -2px rgba(0,0,0,.50), 0 2px 4px -1px rgba(0,0,0,.30);
-    --shadow-3: 0 12px 40px -8px rgba(0,0,0,.70), 0 4px 8px -2px rgba(0,0,0,.45);
+    --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25);
+    --shadow-2:
+      0 4px 12px -2px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
+    --shadow-3:
+      0 12px 40px -8px rgba(0, 0, 0, 0.7), 0 4px 8px -2px rgba(0, 0, 0, 0.45);
 
     color-scheme: dark;
   }
 
-  *, *::before, *::after { box-sizing: border-box; }
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
 
   html {
     -webkit-font-smoothing: antialiased;
@@ -97,45 +108,94 @@
 
 /* ─── Keyframe animations ─────────────────────────────────────────────────── */
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: .35; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
 }
 @keyframes fade-up {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 @keyframes hero-gradient {
-  0%   { background-position: 0% 50%; }
-  50%  { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 @keyframes mega-enter {
-  from { opacity: 0; transform: translateY(-6px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 @keyframes progress-bar {
-  from { width: 0%; }
-  to   { width: 100%; }
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
 }
 @keyframes slide-in-right {
-  from { opacity: 0; transform: translateX(20px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 @keyframes slide-up-sheet {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0); }
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
 }
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ─── Component classes ─────────────────────────────────────────────────── */
@@ -147,8 +207,33 @@
     padding: 0 1.5rem;
   }
 
+  .container-apt {
+    width: 100%;
+    max-width: 1280px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+
+  @media (min-width: 640px) {
+    .container-apt {
+      padding-left: 2rem;
+      padding-right: 2rem;
+    }
+  }
+
   @media (min-width: 1280px) {
-    .container-store { padding: 0 2.5rem; }
+    .container-apt {
+      padding-left: 2.5rem;
+      padding-right: 2.5rem;
+    }
+  }
+
+  @media (min-width: 1280px) {
+    .container-store {
+      padding: 0 2.5rem;
+    }
   }
 
   .card-product {
@@ -156,7 +241,10 @@
     border-radius: var(--radius-card);
     border: 1px solid var(--border);
     box-shadow: var(--shadow-1);
-    transition: box-shadow 200ms ease, transform 200ms ease, border-color 200ms ease;
+    transition:
+      box-shadow 200ms ease,
+      transform 200ms ease,
+      border-color 200ms ease;
   }
   .card-product:hover {
     box-shadow: var(--shadow-card-hover);
@@ -169,7 +257,10 @@
     border: 1px solid var(--border);
     border-radius: var(--radius-card);
     box-shadow: var(--shadow-1);
-    transition: box-shadow 200ms ease, border-color 200ms ease, transform 200ms ease;
+    transition:
+      box-shadow 200ms ease,
+      border-color 200ms ease,
+      transform 200ms ease;
   }
   .card-action:hover {
     box-shadow: var(--shadow-3);
@@ -191,8 +282,13 @@
     -webkit-backdrop-filter: blur(20px) saturate(180%);
   }
 
-  .scrollbar-hide::-webkit-scrollbar { display: none; }
-  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 
   .line-clamp-1 {
     overflow: hidden;
@@ -213,41 +309,87 @@
 /* Tailwind-generated utilities without conflict.                              */
 @layer utilities {
   /* Theme-aware backgrounds */
-  .bg-theme-base    { background: var(--bg-base); }
-  .bg-theme-surface { background: var(--bg-surface); }
-  .bg-theme-raised  { background: var(--bg-raised); }
+  .bg-theme-base {
+    background: var(--bg-base);
+  }
+  .bg-theme-surface {
+    background: var(--bg-surface);
+  }
+  .bg-theme-raised {
+    background: var(--bg-raised);
+  }
 
   /* Theme-aware borders */
-  .border-theme           { border-color: var(--border); }
-  .divide-theme > * + *   { border-color: var(--border); }
+  .border-theme {
+    border-color: var(--border);
+  }
+  .divide-theme > * + * {
+    border-color: var(--border);
+  }
 
   /* Theme-aware text */
-  .text-theme-1 { color: var(--text-1); }
-  .text-theme-2 { color: var(--text-2); }
-  .text-theme-3 { color: var(--text-3); }
-  .text-theme-4 { color: var(--text-4); }
+  .text-theme-1 {
+    color: var(--text-1);
+  }
+  .text-theme-2 {
+    color: var(--text-2);
+  }
+  .text-theme-3 {
+    color: var(--text-3);
+  }
+  .text-theme-4 {
+    color: var(--text-4);
+  }
 
   /* Hero animated gradient */
   .hero-bg {
-    background: linear-gradient(-45deg, #050d1a, #0a1628, #0a2d5c, #0057b8, #0a1628);
+    background: linear-gradient(
+      -45deg,
+      #050d1a,
+      #0a1628,
+      #0a2d5c,
+      #0057b8,
+      #0a1628
+    );
     background-size: 400% 400%;
     animation: hero-gradient 20s ease infinite;
   }
 
   /* Marquee ticker */
-  .animate-marquee       { animation: marquee 36s linear infinite; }
-  .animate-marquee:hover { animation-play-state: paused; }
+  .animate-marquee {
+    animation: marquee 36s linear infinite;
+  }
+  .animate-marquee:hover {
+    animation-play-state: paused;
+  }
 
   /* General animations */
-  .animate-spin      { animation: spin 0.7s linear infinite; }
-  .animate-pulse-dot { animation: pulse-dot 2s cubic-bezier(.4,0,.6,1) infinite; }
-  .animate-fade-up   { animation: fade-up 0.55s ease forwards; }
-  .animate-fade-in   { animation: fade-in 0.3s ease forwards; }
+  .animate-spin {
+    animation: spin 0.7s linear infinite;
+  }
+  .animate-pulse-dot {
+    animation: pulse-dot 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+  .animate-fade-up {
+    animation: fade-up 0.55s ease forwards;
+  }
+  .animate-fade-in {
+    animation: fade-in 0.3s ease forwards;
+  }
 
   /* Staggered delays (used with animate-fade-up) */
-  .animate-delay-100 { animation-delay: 100ms; opacity: 0; }
-  .animate-delay-200 { animation-delay: 200ms; opacity: 0; }
-  .animate-delay-300 { animation-delay: 300ms; opacity: 0; }
+  .animate-delay-100 {
+    animation-delay: 100ms;
+    opacity: 0;
+  }
+  .animate-delay-200 {
+    animation-delay: 200ms;
+    opacity: 0;
+  }
+  .animate-delay-300 {
+    animation-delay: 300ms;
+    opacity: 0;
+  }
 
   /* Compare table: responsive grid columns via CSS custom property --n-cols   */
   /* Must use @layer so Turbopack picks it up in dev mode                       */
