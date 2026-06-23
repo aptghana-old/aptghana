@@ -59,17 +59,7 @@ async function getHomeData() {
         })
           .sort({ createdAt: -1 })
           .limit(8)
-          .select([
-            "_id",
-            "name",
-            "slug",
-            "sku",
-            "brand",
-            "pricing",
-            "image",
-            "stock",
-            "clearance",
-          ].join(" "))
+          .select("_id name slug sku mpn shortDescription brandSlug images.main pricing inventory.quantity inventory.reservedQuantity isClearance isNew isFeatured discount")
           .lean(),
 
         (IndustryModel as any)
@@ -79,17 +69,28 @@ async function getHomeData() {
           .lean(),
       ]);
 
-    const products = featuredProducts.map((product) => ({
-      _id: product._id,
-      name: product.name,
-      slug: product.slug,
-      sku: product.sku,
-      brand: product.brand,
-      pricing: product.pricing,
-      image: Array.isArray(product.images) ? product.images : [],
-      stock: product.stock ?? 0,
-      clearance: product.clearance ?? false,
-    })) as unknown as ProductCardData[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const products: ProductCardData[] = featuredProducts.map((p: any) => ({
+      id: String(p._id),
+      name: p.name,
+      slug: p.slug,
+      sku: p.sku,
+      mpn: p.mpn,
+      brandSlug: p.brandSlug ?? "",
+      shortDescription: p.shortDescription,
+      image: { url: p.images?.main?.url ?? "", alt: p.images?.main?.alt ?? p.name },
+      pricing: {
+        listPrice:       p.pricing?.listPrice       ?? 0,
+        tradePrice:      p.pricing?.tradePrice,
+        currency:        p.pricing?.currency        ?? "USD",
+        minimumOrderQty: p.pricing?.minimumOrderQty,
+      },
+      inStock: (p.inventory?.quantity ?? 0) > (p.inventory?.reservedQuantity ?? 0),
+      isClearance: p.isClearance ?? false,
+      isNew:       p.isNew       ?? false,
+      isFeatured:  p.isFeatured  ?? false,
+      discount:    p.discount    ?? 0,
+    }));
 
     return {
       products,
