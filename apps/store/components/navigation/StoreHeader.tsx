@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
-import { useTheme } from "./ThemeProvider";
 import UserAccountButton from "./UserAccountButton";
 
 /* ─── Mega menu data ─────────────────────────────────────────────────────── */
@@ -115,93 +114,6 @@ function Icon({ d, size = 20, strokeWidth = 1.75, className = "", style }: { d: 
     <svg className={className} style={style} width={size} height={size} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={strokeWidth}>
       <path strokeLinecap="round" strokeLinejoin="round" d={d} />
     </svg>
-  );
-}
-
-/* ─── Theme dropdown ─────────────────────────────────────────────────────── */
-const THEME_OPTIONS = [
-  {
-    value: "light"  as const,
-    label: "Light",
-    iconD: "M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z",
-  },
-  {
-    value: "dark"   as const,
-    label: "Dark",
-    iconD: "M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z",
-  },
-  {
-    value: "system" as const,
-    label: "System",
-    iconD: "M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25A2.25 2.25 0 0 1 5.25 3h13.5A2.25 2.25 0 0 1 21 5.25Z",
-  },
-] as const;
-
-function ThemeDropdown() {
-  const { theme, setTheme } = useTheme();
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const onDown = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
-    };
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
-    document.addEventListener("mousedown", onDown);
-    document.addEventListener("keydown", onKey);
-    return () => { document.removeEventListener("mousedown", onDown); document.removeEventListener("keydown", onKey); };
-  }, [open]);
-
-  const current = THEME_OPTIONS.find((o) => o.value === theme) ?? THEME_OPTIONS[2];
-
-  return (
-    <div ref={ref} className="relative">
-      <button
-        onClick={() => setOpen((p) => !p)}
-        aria-label={`Theme: ${current.label}`}
-        aria-expanded={open}
-        aria-haspopup="listbox"
-        className="flex items-center gap-1.5 p-2 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition-all"
-      >
-        <Icon d={current.iconD} size={18} strokeWidth={2} />
-        <span className="hidden lg:block text-[11px] font-medium">{current.label}</span>
-        <Icon
-          d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-          size={11}
-          strokeWidth={2.5}
-          className={`transition-transform duration-150 ${open ? "rotate-180" : ""}`}
-        />
-      </button>
-
-      {open && (
-        <div
-          role="listbox"
-          aria-label="Select theme"
-          className="absolute right-0 top-full mt-1.5 w-36 bg-navy-900/97 backdrop-blur-xl border border-white/[0.1] rounded-xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] overflow-hidden z-50 mega-enter"
-        >
-          {THEME_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              role="option"
-              aria-selected={theme === opt.value}
-              onClick={() => { setTheme(opt.value); setOpen(false); }}
-              className={`w-full flex items-center gap-2.5 px-3 py-2.5 text-[13px] font-medium transition-colors ${
-                theme === opt.value
-                  ? "text-white bg-white/[0.07]"
-                  : "text-white/60 hover:text-white hover:bg-white/[0.05]"
-              }`}
-            >
-              <Icon d={opt.iconD} size={15} strokeWidth={2} className={theme === opt.value ? "text-navy-300" : "text-white/30"} />
-              {opt.label}
-              {theme === opt.value && (
-                <Icon d="M4.5 12.75l6 6 9-13.5" size={13} strokeWidth={2.5} className="ml-auto text-navy-300" />
-              )}
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
   );
 }
 
@@ -329,7 +241,6 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
 
               {/* Actions */}
               <div className="flex items-center gap-0.5 shrink-0">
-                <ThemeDropdown />
                 <UserAccountButton />
 
                 <Link

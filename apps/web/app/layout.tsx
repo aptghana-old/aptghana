@@ -11,10 +11,7 @@ const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"]
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a1628" },
-  ],
+  themeColor: "#ffffff",
 };
 
 export const metadata: Metadata = {
@@ -86,22 +83,10 @@ const organizationSchema = {
   sameAs: [STORE_URL],
 };
 
-const themeScript = `
-(function(){
-  try {
-    var stored = localStorage.getItem('apt-theme');
-    var prefer = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    var theme = stored || prefer;
-    if (theme === 'dark') document.documentElement.classList.add('dark');
-  } catch(e){}
-})();
-`;
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} h-full`}>
-      <head suppressHydrationWarning>
-        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full`}>
+      <head>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: safeJsonLd(organizationSchema) }}

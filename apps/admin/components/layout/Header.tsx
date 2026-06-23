@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, Search, ChevronRight, Moon, Sun, Menu, LogOut, Settings, User } from "lucide-react";
+import { Bell, Search, ChevronRight, Menu, LogOut, Settings, User } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { logoutAction } from "@/lib/auth/actions";
@@ -234,21 +234,6 @@ interface HeaderProps {
 }
 
 export default function Header({ user, onCommandPalette, onMobileMenuToggle }: HeaderProps) {
-  const [darkMode, setDarkMode] = useState(false);
-
-  useEffect(() => {
-    setDarkMode(document.documentElement.getAttribute("data-theme") === "dark");
-  }, []);
-
-  const toggleDark = () => {
-    const next = !darkMode;
-    setDarkMode(next);
-    document.documentElement.setAttribute("data-theme", next ? "dark" : "light");
-    try {
-      localStorage.setItem("apt-theme", next ? "dark" : "light");
-    } catch {}
-  };
-
   return (
     <header
       className="flex items-center gap-2 sm:gap-4 px-3 sm:px-5 shrink-0 z-10"
@@ -303,16 +288,6 @@ export default function Header({ user, onCommandPalette, onMobileMenuToggle }: H
           aria-label="Search"
         >
           <Search size={16} />
-        </button>
-
-        {/* Dark mode */}
-        <button
-          onClick={toggleDark}
-          className="w-8 h-8 rounded-md flex items-center justify-center transition-colors hover:bg-[var(--apt-bg-raised)]"
-          style={{ color: "var(--apt-text-muted)" }}
-          aria-label="Toggle dark mode"
-        >
-          {darkMode ? <Sun size={15} /> : <Moon size={15} />}
         </button>
 
         {/* Notifications */}

@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Dark mode disabled — dark: classes never activate */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /* ─── Design tokens ───────────────────────────────────────────────────────── */
 @theme {
   --font-sans: var(--font-geist-sans);
@@ -115,27 +118,6 @@
   --apt-sidebar-border: rgba(255,255,255,0.07);
 }
 
-[data-theme="dark"] {
-  color-scheme: dark;
-
-  --apt-bg:           #0f172a;
-  --apt-bg-subtle:    #1e293b;
-  --apt-bg-raised:    #293548;
-  --apt-bg-overlay:   rgba(0,0,0,0.6);
-
-  --apt-border:       #1e293b;
-  --apt-border-strong:#334155;
-  --apt-border-focus: #3b82f6;
-
-  --apt-text-primary:   #f1f5f9;
-  --apt-text-secondary: #94a3b8;
-  --apt-text-muted:     #475569;
-  --apt-text-disabled:  #334155;
-  --apt-text-brand:     #60a5fa;
-
-  --apt-sidebar-bg:   #060d1a;
-  --apt-sidebar-border: rgba(255,255,255,0.05);
-}
 
 /* ─── Base reset ──────────────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }

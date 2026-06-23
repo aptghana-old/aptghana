@@ -32,7 +32,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
 
         await connectDB();
         const admin = await AdminModel
-          .findOne({ email: (credentials.email as string).toLowerCase().trim() })
+          .findOne({
+            email: (credentials.email as string).toLowerCase().trim(),
+            deletedAt: { $exists: false },
+          })
           .select("+passwordHash +mfaSecret")
           .lean<{
             _id: unknown;
@@ -46,12 +49,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             mfaSecret?: string;
             status: string;
             avatar?: string;
+            failedLoginAttempts?: number;
+            lockedUntil?: Date;
           }>();
 
         if (!admin) return null;
 
+        // Check account lock
+        if (admin.lockedUntil && admin.lockedUntil > new Date()) {
+          throw new Error("ACCOUNT_LOCKED");
+        }
+
         const valid = await verifyPassword(credentials.password as string, admin.passwordHash);
-        if (!valid) return null;
+
+        if (!valid) {
+          // Increment failed attempts; lock after 10
+          const attempts = (admin.failedLoginAttempts ?? 0) + 1;
+          const lock = attempts >= 10 ? { lockedUntil: new Date(Date.now() + 30 * 60 * 1000) } : {};
+          await AdminModel.findByIdAndUpdate(admin._id, {
+            $set: { failedLoginAttempts: attempts, ...lock },
+          });
+          return null;
+        }
 
         if (admin.status === "suspended") throw new Error("ACCOUNT_SUSPENDED");
 
@@ -61,7 +80,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           if (!verifyMfaOtp(otp, admin.mfaSecret!)) throw new Error("INVALID_OTP");
         }
 
-        await AdminModel.findByIdAndUpdate(admin._id, { lastLoginAt: new Date() });
+        await AdminModel.findByIdAndUpdate(admin._id, {
+          $set: { lastLoginAt: new Date(), failedLoginAttempts: 0 },
+          $unset: { lockedUntil: "" },
+        });
 
         return {
           id:          String(admin._id),

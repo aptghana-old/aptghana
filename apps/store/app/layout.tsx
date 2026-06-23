@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
-import { ThemeProvider } from "@/components/navigation/ThemeProvider";
 import { AnalyticsProvider } from "@/components/AnalyticsProvider";
 import { StoreProviders } from "@/lib/store/providers";
 import { STORE_URL } from "@apt/config";
@@ -20,8 +19,6 @@ export const metadata: Metadata = {
     "Shop 6,000+ industrial products online. Electrical, pneumatic, automation, and conveying solutions from top global brands. Fast shipping in Ghana.",
 };
 
-const THEME_SCRIPT = `(function(){try{var t=localStorage.getItem('apt-theme')||'system';if(t==='dark'||(t==='system'&&matchMedia('(prefers-color-scheme:dark)').matches)){document.documentElement.setAttribute('data-theme','dark');}}catch(e){}})();`;
-
 export interface NavSubcategory { name: string; slug: string; href: string; }
 export interface NavCategory {
   name: string; slug: string; href: string;
@@ -36,18 +33,15 @@ export interface NavGroup {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full`} suppressHydrationWarning>
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full`}>
       <body className="flex min-h-full flex-col antialiased">
-        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
-        <ThemeProvider>
-          <SessionProvider>
-            <StoreProviders>
-              <AnalyticsProvider>
-                {children}
-              </AnalyticsProvider>
-            </StoreProviders>
-          </SessionProvider>
-        </ThemeProvider>
+        <SessionProvider>
+          <StoreProviders>
+            <AnalyticsProvider>
+              {children}
+            </AnalyticsProvider>
+          </StoreProviders>
+        </SessionProvider>
       </body>
     </html>
   );

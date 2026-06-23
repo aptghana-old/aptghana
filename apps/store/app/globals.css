@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-/* Data-attribute dark mode — overrides Tailwind's media-query default */
+/* Dark mode disabled — dark: classes never activate */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ─── Brand design tokens ─────────────────────────────────────────────────── */
@@ -57,29 +57,6 @@
       0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
     --shadow-3:
       0 12px 40px -8px rgba(0, 0, 0, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.06);
-  }
-
-  [data-theme="dark"] {
-    --bg-base: #060c18;
-    --bg-surface: #0c1527;
-    --bg-raised: #111e33;
-    --bg-sunken: #08101f;
-
-    --border: #162338;
-    --border-hi: #1c3155;
-
-    --text-1: #f1f5f9;
-    --text-2: #cbd5e1;
-    --text-3: #94a3b8;
-    --text-4: #475569;
-
-    --shadow-1: 0 1px 3px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.25);
-    --shadow-2:
-      0 4px 12px -2px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-    --shadow-3:
-      0 12px 40px -8px rgba(0, 0, 0, 0.7), 0 4px 8px -2px rgba(0, 0, 0, 0.45);
-
-    color-scheme: dark;
   }
 
   *,

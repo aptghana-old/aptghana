@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import ThemeToggle from "@/components/ThemeToggle";
 import { EMAIL_SALES, STORE_URL } from "@apt/config";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -587,14 +586,12 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
 
             {/* Desktop CTAs */}
             <div className="hidden lg:flex items-center gap-2">
-              <ThemeToggle />
               <Link href="/contact" className="px-4 py-2 text-sm font-semibold text-[#0A0F1E] bg-[#84CC16] rounded-lg hover:bg-[#78B800] transition-colors">Request Quote</Link>
               <Link href={STORE_URL} className="px-4 py-2 text-sm font-semibold text-[#475569] dark:text-white border border-[#E2E8F0] dark:border-white/20 rounded-lg hover:bg-[#F1F5F9] dark:hover:bg-white/5 hover:border-[#CBD5E0] dark:hover:border-white/40 transition-all">Shop Online →</Link>
             </div>
 
             {/* Mobile controls */}
             <div className="lg:hidden flex items-center gap-1">
-              <ThemeToggle />
               <button
                 className="p-2 text-[#475569] dark:text-white/80 hover:text-[#0F172A] dark:hover:text-white"
                 onClick={() => setMobileOpen(!mobileOpen)}
