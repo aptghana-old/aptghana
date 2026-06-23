@@ -215,7 +215,7 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
         {industry.stats && industry.stats.length > 0 && (
           <section className="bg-[#1E3A5F] py-10">
             <div className="container-apt">
-              <div className={`grid gap-6 ${industry.stats.length <= 4 ? `grid-cols-${industry.stats.length}` : "grid-cols-2 md:grid-cols-4"}`}>
+              <div className={`grid gap-6 ${industry.stats.length <= 2 ? "grid-cols-2" : industry.stats.length === 3 ? "grid-cols-2 sm:grid-cols-3" : "grid-cols-2 md:grid-cols-4"}`}>
                 {industry.stats.map((stat) => (
                   <div key={stat.label} className="text-center">
                     <div className="text-3xl font-extrabold text-[#84CC16] mb-1" style={{ fontFamily: "var(--font-sora, 'Sora', sans-serif)" }}>

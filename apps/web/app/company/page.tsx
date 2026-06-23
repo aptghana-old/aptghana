@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import Header from "@/components/navigation/Header";
 import Footer from "@/components/navigation/Footer";
 import { SITE_URL } from "@apt/config";
@@ -207,12 +208,14 @@ export default async function CompanyPage() {
                   fast-moving items and can source specialized equipment within 2–6 weeks.
                 </p>
               </div>
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <img
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3]">
+                <Image
                   src="/images/about/about-us.jpg"
                   alt="APT Ghana Team"
-                  className="w-full object-cover"
-                  style={{ minHeight: "420px", maxHeight: "520px" }}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  loading="lazy"
                 />
                 <div className="absolute bottom-0 inset-x-0 h-[3px] bg-[#84CC16]" />
               </div>

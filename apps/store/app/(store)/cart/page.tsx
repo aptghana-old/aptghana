@@ -101,7 +101,7 @@ function CartRow({ item }: { item: CartItem }) {
       <button
         onClick={() => remove(item.productId)}
         aria-label={`Remove ${item.name}`}
-        className="shrink-0 self-start w-8 h-8 rounded-lg flex items-center justify-center text-(--text-4) hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+        className="shrink-0 self-start w-11 h-11 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-(--text-4) hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
       >
         <Ico d={D.trash} size={15} sw={1.75} />
       </button>
@@ -292,8 +292,13 @@ export default function CartPage() {
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-8 items-start">
 
-            {/* Items column */}
-            <div>
+            {/* Summary sidebar — order-1 on mobile (appears at top), order-2 on desktop */}
+            <div className="order-1 lg:order-2">
+              <OrderSummary items={items} count={count} total={total} />
+            </div>
+
+            {/* Items column — order-2 on mobile (below summary), order-1 on desktop */}
+            <div className="order-2 lg:order-1">
               {/* Header row */}
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-base font-bold text-(--text-1)">
@@ -319,9 +324,6 @@ export default function CartPage() {
 
               <HowItWorks />
             </div>
-
-            {/* Summary sidebar */}
-            <OrderSummary items={items} count={count} total={total} />
           </div>
         )}
       </div>

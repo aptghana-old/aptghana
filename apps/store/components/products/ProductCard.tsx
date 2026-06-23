@@ -175,7 +175,7 @@ function WishlistBtn({
 
   const isLoading = status === "syncing";
 
-  const smCls = `absolute top-2.5 right-2.5 w-7 h-7 rounded-full flex items-center justify-center shadow transition-all ${
+  const smCls = `absolute top-2 right-2 w-9 h-9 sm:w-7 sm:h-7 rounded-full flex items-center justify-center shadow transition-all ${
     inWishlist
       ? "bg-red-500 text-white"
       : "bg-(--bg-surface)/80 backdrop-blur-sm text-(--text-3) hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/30"
@@ -226,7 +226,7 @@ function CompareBtn({
     toggle(item);
   }, [product, toggle]);
 
-  const smCls = `w-6 h-6 rounded flex items-center justify-center transition-colors ${
+  const smCls = `w-8 h-8 sm:w-6 sm:h-6 rounded flex items-center justify-center transition-colors ${
     inCompare ? "text-navy-500" : "text-(--text-4) hover:text-navy-500"
   }`;
   const mdCls = `w-8 h-8 rounded-lg flex items-center justify-center border transition-all ${
@@ -284,7 +284,7 @@ function CartBtn({
     return (
       <button
         onClick={handleClick}
-        className={`shrink-0 flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-bold transition-all ${
+        className={`shrink-0 flex items-center gap-1 px-3 py-2.5 sm:px-2.5 sm:py-1.5 rounded-lg text-[11px] font-bold transition-all ${
           added ? "bg-se-green text-white scale-95" : "bg-navy-500 hover:bg-navy-400 text-white"
         }`}
       >
@@ -572,7 +572,7 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
             <div className="flex items-center gap-0.5 shrink-0">
               <CompareBtn product={product} size="sm" />
               <button onClick={handleQV} aria-label="Quick view"
-                className="w-6 h-6 rounded flex items-center justify-center text-(--text-4) hover:text-navy-500 transition-colors">
+                className="w-8 h-8 sm:w-6 sm:h-6 rounded flex items-center justify-center text-(--text-4) hover:text-navy-500 transition-colors">
                 <Ico d={D.eye} size={12} sw={2} />
               </button>
             </div>
@@ -612,7 +612,7 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
 
             <div className="flex items-center gap-1 shrink-0">
               <Link href={rfqHref(product)} title="Request a quote" aria-label={`Request a quote for ${product.name}`}
-                className="flex items-center justify-center w-7 h-7 rounded-lg bg-(--bg-raised) text-(--text-3) hover:bg-navy-50 hover:text-navy-600 dark:hover:bg-navy-900/40 dark:hover:text-navy-300 border border-(--border) transition-colors">
+                className="flex items-center justify-center w-9 h-9 sm:w-7 sm:h-7 rounded-lg bg-(--bg-raised) text-(--text-3) hover:bg-navy-50 hover:text-navy-600 dark:hover:bg-navy-900/40 dark:hover:text-navy-300 border border-(--border) transition-colors">
                 <Ico d={D.rfq} size={12} sw={2} />
               </Link>
               <CartBtn product={product} size="sm" />

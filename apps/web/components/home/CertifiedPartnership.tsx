@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { STORE_URL } from "@apt/config";
 
 export default function CertifiedPartnership() {
@@ -8,13 +9,14 @@ export default function CertifiedPartnership() {
         <div className="grid lg:grid-cols-2 gap-14 lg:gap-20 items-center">
           {/* Left: Certificate visual */}
           <div className="relative order-2 lg:order-1">
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-              <img
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3]">
+              <Image
                 src="/images/APT_SE-general-distributor.-certificate.jpg"
                 alt="Schneider Electric Partnership — APT Ghana Authorized Distributor"
-                className="w-full object-cover"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 loading="lazy"
-                style={{ minHeight: "400px", maxHeight: "500px" }}
               />
               {/* Dark overlay with text */}
               <div

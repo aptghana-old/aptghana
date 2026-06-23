@@ -1,0 +1,35 @@
+/*
+ * APT Ghana — Canonical Shared Semantic Tokens
+ * Imported by both apps/store and apps/web globals.css.
+ * App-level :root definitions (or @layer base definitions) override these defaults.
+ */
+
+@layer base {
+  :root {
+    /* ── Background surfaces ────────────────────────────────────── */
+    --apt-bg:          #ffffff;
+    --apt-bg-subtle:   #F8FAFC;
+    --apt-bg-raised:   #F1F5F9;
+    --apt-bg-sunken:   #E2E8F0;
+    --apt-bg-error:    #FEF2F2;
+    --apt-bg-info:     #EFF6FF;
+    --apt-bg-success:  #F0FDF4;
+    --apt-bg-warning:  #FFFBEB;
+
+    /* ── Borders ────────────────────────────────────────────────── */
+    --apt-border:    #E2E8F0;
+    --apt-border-hi: #CBD5E1;
+
+    /* ── Text ───────────────────────────────────────────────────── */
+    --apt-text:       #0F172A;
+    --apt-text-2:     #374151;
+    --apt-text-3:     #6B7280;
+    --apt-text-muted: #94A3B8;
+
+    /* ── Status icon colors ─────────────────────────────────────── */
+    --apt-color-error:   #DC2626;
+    --apt-color-info:    #0057B8;
+    --apt-color-success: #16A34A;
+    --apt-color-warning: #D97706;
+  }
+}

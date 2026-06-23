@@ -143,7 +143,7 @@ export default function BrandsPageContent({ brands, config }: Props) {
 
               {/* Right: dark stats panel */}
               <div
-                className="flex items-center justify-center p-14"
+                className="flex items-center justify-center p-8 lg:p-14"
                 style={{ background: "#003768" }}
               >
                 <div className="text-center w-full max-w-xs">
@@ -196,7 +196,7 @@ export default function BrandsPageContent({ brands, config }: Props) {
       {/* ── Trust Pillars ── */}
       <section className="py-14" style={{ background: NAVY }}>
         <div className={containerClass}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {[
               {
                 icon: "✓",

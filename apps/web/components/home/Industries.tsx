@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const INDUSTRIES = [
   {
@@ -91,10 +92,12 @@ export default function Industries() {
               className="group relative flex flex-col justify-end overflow-hidden rounded-2xl min-h-[280px] hover:shadow-2xl transition-all duration-300"
             >
               {/* Background image */}
-              <img
+              <Image
                 src={ind.img}
                 alt={ind.name}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 loading="lazy"
               />
               {/* Dark gradient overlay */}

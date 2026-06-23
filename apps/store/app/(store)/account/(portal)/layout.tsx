@@ -113,7 +113,7 @@ function MobileNav() {
           <Link
             key={item.href}
             href={item.href}
-            className="flex flex-col items-center gap-1 px-2 py-1 text-(--text-4) hover:text-navy-500 transition-colors"
+            className="flex flex-col items-center gap-1 px-2 py-2 text-(--text-4) hover:text-navy-500 transition-colors"
           >
             <Icon d={item.icon} size={20} strokeWidth={2} />
             <span className="text-[10px] font-medium">{item.label}</span>

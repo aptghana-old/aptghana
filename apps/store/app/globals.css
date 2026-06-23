@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @source "../../../packages/ui/src";
+@import "../../../packages/ui/src/tokens.css";
 
 /* Dark mode disabled — dark: classes never activate */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -61,6 +62,26 @@
       0 4px 12px -2px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.05);
     --shadow-3:
       0 12px 40px -8px rgba(0, 0, 0, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.06);
+
+    /* ── apt-* aliases for shared packages/ui components ── */
+    --apt-bg:           var(--bg-surface);
+    --apt-bg-subtle:    var(--bg-base);
+    --apt-bg-raised:    var(--bg-raised);
+    --apt-bg-sunken:    var(--bg-sunken);
+    --apt-bg-error:     #FEF2F2;
+    --apt-bg-info:      #EFF6FF;
+    --apt-bg-success:   #F0FDF4;
+    --apt-bg-warning:   #FFFBEB;
+    --apt-border:       var(--border);
+    --apt-border-hi:    var(--border-hi);
+    --apt-text:         var(--text-1);
+    --apt-text-2:       var(--text-2);
+    --apt-text-3:       var(--text-3);
+    --apt-text-muted:   var(--text-4);
+    --apt-color-error:   #DC2626;
+    --apt-color-info:    #0057B8;
+    --apt-color-success: #16A34A;
+    --apt-color-warning: #D97706;
   }
 
   *,
@@ -344,6 +365,23 @@
     animation-play-state: paused;
   }
 
+  @media (prefers-reduced-motion: reduce) {
+    .animate-marquee {
+      animation: none;
+    }
+    .hero-bg {
+      animation: none;
+    }
+    .animate-fade-up,
+    .animate-fade-in {
+      animation: none;
+      opacity: 1;
+    }
+    .mega-enter {
+      animation: none;
+    }
+  }
+
   /* General animations */
   .animate-spin {
     animation: spin 0.7s linear infinite;
@@ -370,6 +408,12 @@
   .animate-delay-300 {
     animation-delay: 300ms;
     opacity: 0;
+  }
+
+  /* WCAG 2.5.5 minimum 44×44px interactive tap area */
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
   }
 
   /* Compare table: responsive grid columns via CSS custom property --n-cols   */

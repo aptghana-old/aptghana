@@ -23,20 +23,20 @@ export function EmptyState({ icon, title, description, action, fill }: EmptyStat
     >
       <div
         className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5"
-        style={{ background: "#F1F5F9", color: "#94A3B8" }}
+        style={{ background: "var(--apt-bg-raised)", color: "var(--apt-text-muted)" }}
       >
         {icon ?? <DefaultIcon />}
       </div>
       <h3
         className="text-[15px] font-semibold mb-2"
-        style={{ color: "#0F172A" }}
+        style={{ color: "var(--apt-text)" }}
       >
         {title}
       </h3>
       {description && (
         <p
           className="text-[13px] max-w-xs leading-relaxed"
-          style={{ color: "#64748B" }}
+          style={{ color: "var(--apt-text-3)" }}
         >
           {description}
         </p>

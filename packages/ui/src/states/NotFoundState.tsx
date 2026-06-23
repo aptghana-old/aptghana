@@ -34,35 +34,35 @@ export function NotFoundState({
       <div className="relative mb-8">
         <div
           className="w-24 h-24 rounded-full flex items-center justify-center"
-          style={{ background: "#EFF6FF", color: "#0057B8" }}
+          style={{ background: "var(--apt-bg-info)", color: "var(--apt-color-info)" }}
         >
           <NotFoundIcon />
         </div>
         <div
           className="absolute inset-0 rounded-full border-2 opacity-20 scale-110"
-          style={{ borderColor: "#0057B8" }}
+          style={{ borderColor: "var(--apt-color-info)" }}
         />
       </div>
 
       {/* Status badge */}
       <div
         className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest mb-5"
-        style={{ background: "#F1F5F9", color: "#64748B" }}
+        style={{ background: "var(--apt-bg-raised)", color: "var(--apt-text-3)" }}
       >
         <span>404</span>
-        <span style={{ color: "#CBD5E1" }}>·</span>
+        <span style={{ color: "var(--apt-border-hi)" }}>·</span>
         <span>Not Found</span>
       </div>
 
       <h1
         className="text-2xl font-bold tracking-tight mb-3"
-        style={{ color: "#0F172A" }}
+        style={{ color: "var(--apt-text)" }}
       >
         {heading}
       </h1>
       <p
         className="text-sm leading-relaxed max-w-md mb-8"
-        style={{ color: "#64748B" }}
+        style={{ color: "var(--apt-text-3)" }}
       >
         {body}
       </p>

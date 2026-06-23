@@ -553,7 +553,7 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
                             <span className="absolute top-3 right-3 w-1.5 h-1.5 rounded-full bg-[#84CC16]" aria-hidden="true" />
                           )}
                           <div className={`size-12 rounded-lg flex items-center justify-center shrink-0 transition-all duration-150 ${sol.bg} ${sol.text} group-hover:scale-110`}>
-                            {sol.img ? <img src={sol.img.url} alt={sol.img.alt} className="size-10 object-contain" /> : sol.icon}
+                            {sol.img ? <Image src={sol.img.url} alt={sol.img.alt} width={40} height={40} className="size-10 object-contain" /> : sol.icon}
                           </div>
                           <div>
                             <div className={`text-[13px] font-semibold leading-tight transition-colors duration-150 ${hoveredSol === sol.slug

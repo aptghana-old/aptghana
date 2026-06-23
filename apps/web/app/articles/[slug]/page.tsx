@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import Header from "@/components/navigation/Header";
 import Footer from "@/components/navigation/Footer";
 import { SITE_URL } from "@apt/config";
@@ -84,8 +85,16 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
         {article.featuredImage?.url && (
           <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] pb-8">
             <div className="container-apt max-w-3xl">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={article.featuredImage.url} alt={article.featuredImage.alt ?? article.title} className="w-full rounded-2xl" />
+              <div className="relative w-full aspect-video rounded-2xl overflow-hidden">
+                <Image
+                  src={article.featuredImage.url}
+                  alt={article.featuredImage.alt ?? article.title}
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 768px"
+                  priority
+                />
+              </div>
             </div>
           </section>
         )}

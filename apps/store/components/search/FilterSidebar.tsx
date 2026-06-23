@@ -85,7 +85,7 @@ function FilterSection({
     <div className="border-b last:border-b-0 pb-4 last:pb-0" style={{ borderColor: "var(--border)" }}>
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between mb-2.5 group"
+        className="w-full flex items-center justify-between mb-2.5 min-h-[44px] sm:min-h-[36px] group"
         aria-expanded={open}
       >
         <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: "var(--text-4)" }}>
@@ -105,7 +105,7 @@ function CheckRow({
   checked, onChange, label, count,
 }: { checked: boolean; onChange: () => void; label: string; count?: number }) {
   return (
-    <label className="flex items-center gap-2.5 cursor-pointer py-0.5 group">
+    <label className="flex items-center gap-2.5 cursor-pointer min-h-[44px] sm:min-h-[36px] group">
       <span
         className={`w-4 h-4 rounded flex items-center justify-center shrink-0 transition-colors border ${
           checked ? "bg-[#3DCD58] border-[#3DCD58]" : "border-current"

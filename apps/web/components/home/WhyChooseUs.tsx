@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 const BENEFITS = [
   {
@@ -104,13 +105,14 @@ export default function WhyChooseUs() {
                   key={award.title}
                   className="bg-white flex sm:flex-col dark:bg-[#111827] rounded-xl border border-[#E2E8F0] dark:border-white/10 overflow-hidden hover:shadow-lg transition-all duration-200"
                 >
-                  <div className="overflow-hidden bg-[#F8FAFC] dark:bg-[#0A0F1E]">
-                    <img
+                  <div className="relative overflow-hidden bg-[#F8FAFC] dark:bg-[#0A0F1E] aspect-square">
+                    <Image
                       src={award.img}
                       alt={award.title}
-                      className="w-full h-full object-contain p-2"
+                      fill
+                      className="object-contain p-2"
+                      sizes="(max-width: 640px) 50vw, 33vw"
                       loading="lazy"
-                      style={{ maxHeight: "150px" }}
                     />
                   </div>
                   <div className="p-3 border-t border-[#E2E8F0] dark:border-white/10">

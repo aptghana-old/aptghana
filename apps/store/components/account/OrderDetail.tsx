@@ -157,7 +157,8 @@ export default function OrderDetail({ order }: { order: OrderView }) {
             This order was {order.status}. Contact sales if you believe this is an error.
           </p>
         ) : (
-          <ol className="flex items-center">
+          <div className="overflow-x-auto -mx-5 px-5">
+          <ol className="flex items-center min-w-[400px]">
             {TIMELINE.map((stage, i) => {
               const reached = stageIndex >= i;
               const isLast = i === TIMELINE.length - 1;
@@ -186,6 +187,7 @@ export default function OrderDetail({ order }: { order: OrderView }) {
               );
             })}
           </ol>
+          </div>
         )}
         {order.trackingNumber && (
           <p className="text-xs text-(--text-3) mt-4">

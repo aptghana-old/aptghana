@@ -135,7 +135,7 @@ export default function FooterBase({ config }: Props) {
                   rel="noopener noreferrer"
                   aria-label={s.label}
                   className="
-                    size-8 rounded-[8px] flex items-center justify-center
+                    size-11 sm:size-8 rounded-[8px] flex items-center justify-center
                     transition-all duration-200
                     focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3DCD58]
                     bg-slate-100 border border-slate-200/80 text-slate-400
@@ -189,7 +189,7 @@ export default function FooterBase({ config }: Props) {
                   />
                   {col.title}
                 </h3>
-                <ul className="space-y-2">
+                <ul className="space-y-0">
                   {col.links.map((link) => (
                     <li key={link.label}>
                       <Link
@@ -198,6 +198,7 @@ export default function FooterBase({ config }: Props) {
                         rel={link.external ? "noopener noreferrer" : undefined}
                         className="
                           inline-flex items-center gap-1 text-xs leading-snug
+                          py-2 sm:py-1
                           transition-colors duration-200
                           text-slate-400 hover:text-slate-700
                           dark:text-white/38 dark:hover:text-white/82
@@ -299,7 +300,7 @@ export default function FooterBase({ config }: Props) {
                   placeholder="your@email.com"
                   required
                   className="
-                    flex-1 sm:w-52 h-9 px-3.5 rounded-l-[9px] text-xs transition-colors
+                    flex-1 sm:w-52 h-11 px-3.5 rounded-l-[9px] text-xs transition-colors
                     focus:outline-none
                     bg-slate-100 border border-slate-200/80 text-slate-800 placeholder-slate-300
                     focus:border-[#3DCD58]/50
@@ -310,7 +311,7 @@ export default function FooterBase({ config }: Props) {
                 <button
                   type="submit"
                   className="
-                    h-9 px-4 bg-[#3DCD58] hover:bg-[#2AA347]
+                    h-11 px-4 bg-[#3DCD58] hover:bg-[#2AA347]
                     text-white text-[11.5px] font-bold tracking-wide
                     rounded-r-[9px] transition-colors shrink-0
                   "
@@ -353,6 +354,7 @@ export default function FooterBase({ config }: Props) {
                 href={l.href}
                 className="
                   text-[11px] transition-colors whitespace-nowrap
+                  py-2 sm:py-0
                   text-slate-400 hover:text-slate-600
                   dark:text-white/22 dark:hover:text-white/55
                 "

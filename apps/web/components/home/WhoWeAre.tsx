@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function WhoWeAre() {
   return (
@@ -69,21 +70,22 @@ export default function WhoWeAre() {
 
           {/* Right: image */}
           <div className="relative">
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-              <img
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3] sm:aspect-[3/2]">
+              <Image
                 src="/images/innovation-center.jpg"
                 alt="APT Ghana - Dedicated team and technical expertise"
-                className="w-full h-full object-cover"
+                fill
+                className="object-cover"
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 loading="lazy"
-                style={{ minHeight: "420px", maxHeight: "520px" }}
               />
               {/* Lime overlay stripe */}
               <div className="absolute bottom-0 inset-x-0 h-[3px] bg-[#84CC16]" />
             </div>
 
-            {/* Floating stat card */}
+            {/* Floating stat card — kept inside bounds on mobile to prevent horizontal scroll */}
             <div
-              className="absolute -bottom-6 -left-6 lg:left-0 p-5 rounded-2xl border border-white/10 shadow-2xl"
+              className="absolute bottom-4 left-4 lg:-bottom-6 lg:left-0 p-5 rounded-2xl border border-white/10 shadow-2xl"
               style={{
                 background: "#0A0F1E",
                 backdropFilter: "blur(16px)",

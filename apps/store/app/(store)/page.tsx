@@ -52,7 +52,7 @@ async function getHomeData() {
   try {
     await connectDB();
 
-    const [ featuredProducts, brands, dbCategories, dbIndustries ] =
+    const [ featuredProducts, dbIndustries ] =
       await Promise.all([
         ProductModel.find({
           status: "active",
@@ -65,24 +65,11 @@ async function getHomeData() {
             "slug",
             "sku",
             "brand",
-            "price",
-            "images",
+            "pricing",
+            "image",
             "stock",
             "clearance",
           ].join(" "))
-          .lean(),
-
-        BrandModel.find({})
-          .sort({ name: 1 })
-          .limit(24)
-          .select("name slug")
-          .lean(),
-
-        (CategoryModel as any)
-          .find({ level: "group", status: "active" })
-          .sort({ displayOrder: 1 })
-          .limit(8)
-          .select("name slug shortDescription")
           .lean(),
 
         (IndustryModel as any)
@@ -98,18 +85,14 @@ async function getHomeData() {
       slug: product.slug,
       sku: product.sku,
       brand: product.brand,
-      price: product.price,
-      images: Array.isArray(product.images) ? product.images : [],
+      pricing: product.pricing,
+      image: Array.isArray(product.images) ? product.images : [],
       stock: product.stock ?? 0,
       clearance: product.clearance ?? false,
     })) as unknown as ProductCardData[];
 
     return {
       products,
-      brands: brands as unknown as Brand[],
-      dbCategories: JSON.parse(
-        JSON.stringify(dbCategories)
-      ) as DBCategory[],
       dbIndustries: JSON.parse(
         JSON.stringify(dbIndustries)
       ) as DBIndustry[],
@@ -117,8 +100,6 @@ async function getHomeData() {
   } catch {
     return {
       products: [],
-      brands: [],
-      dbCategories: [],
       dbIndustries: [],
     };
   }
@@ -126,12 +107,10 @@ async function getHomeData() {
 
 /* ─── Page ────────────────────────────────────────────────────────────────── */
 export default async function StorePage() {
-  const [ { products, brands, dbCategories, dbIndustries }, hpConfig ] = await Promise.all([
+  const [ { products, dbIndustries }, hpConfig ] = await Promise.all([
     getHomeData(),
     getPublishedHomepageConfig(),
   ]);
-
-  const displayBrands = brands;
 
   /* Map carousel data from config */
   const now = new Date();
@@ -277,7 +256,8 @@ function QuickAccessBar() {
   return (
     <div className="bg-theme-base border-b border-theme">
       <div className="container-store py-4">
-        <div className="grid grid-cols-5 gap-2">
+        <div className="overflow-x-auto -mx-4 sm:mx-0">
+        <div className="grid grid-cols-5 gap-2 px-4 sm:px-0 min-w-[320px]">
           {links.map((link) => (
             <Link
               key={link.href + link.label}
@@ -294,6 +274,7 @@ function QuickAccessBar() {
               </span>
             </Link>
           ))}
+        </div>
         </div>
       </div>
     </div>

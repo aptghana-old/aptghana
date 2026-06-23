@@ -455,7 +455,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                 <div className="w-8 h-8 rounded-lg bg-apt-orange flex items-center justify-center text-white font-black text-xs">APT</div>
                 <span className="text-white font-bold text-sm">APT Ghana Store</span>
               </Link>
-              <button onClick={() => setMobileOpen(false)} className="p-1.5 text-white/50 hover:text-white rounded-lg hover:bg-white/10 transition-all">
+              <button onClick={() => setMobileOpen(false)} className="w-9 h-9 flex items-center justify-center text-white/50 hover:text-white rounded-lg hover:bg-white/10 transition-all">
                 <Icon d="M6 18L18 6M6 6l12 12" size={20} strokeWidth={2} />
               </button>
             </div>
@@ -502,7 +502,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                       <div key={grp.id}>
                         <button
                           onClick={() => setMobileGroup(i)}
-                          className="w-full flex items-center gap-2.5 px-3 py-2.5 text-sm text-white/60 hover:text-white rounded-lg hover:bg-white/[0.06] transition-all"
+                          className="w-full flex items-center gap-2.5 px-3 py-3 sm:py-2.5 text-sm text-white/60 hover:text-white rounded-lg hover:bg-white/[0.06] transition-all"
                         >
                           <div className="w-6 h-6 rounded-md flex items-center justify-center shrink-0" style={{ background: grp.color + "25" }}>
                             <Icon d={grp.iconPath} size={13} strokeWidth={1.75} style={{ color: grp.color } as React.CSSProperties} />
@@ -518,7 +518,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                                 key={cat.href}
                                 href={cat.href}
                                 onClick={() => setMobileOpen(false)}
-                                className="block px-2 py-1.5 text-xs text-white/50 hover:text-white transition-colors"
+                                className="block px-2 py-2.5 sm:py-1.5 text-xs text-white/50 hover:text-white transition-colors"
                               >
                                 {cat.name}
                               </Link>

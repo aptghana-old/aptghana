@@ -27,19 +27,19 @@ export function ErrorState({
     >
       <div
         className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5"
-        style={{ background: "#FEF2F2", color: "#DC2626" }}
+        style={{ background: "var(--apt-bg-error)", color: "var(--apt-color-error)" }}
       >
         <ErrorIcon />
       </div>
       <h3
         className="text-[15px] font-semibold mb-2"
-        style={{ color: "#0F172A" }}
+        style={{ color: "var(--apt-text)" }}
       >
         {title}
       </h3>
       <p
         className="text-[13px] max-w-sm leading-relaxed"
-        style={{ color: "#64748B" }}
+        style={{ color: "var(--apt-text-3)" }}
       >
         {description}
       </p>

@@ -132,8 +132,7 @@ export default function HeroCarousel({ slides, sidePanels = [] }: HeroCarouselPr
             <button
               onClick={prev}
               aria-label="Previous slide"
-              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/30 hover:bg-black/55 backdrop-blur-sm flex items-center justify-center text-white transition-all opacity-0 group-focus-visible:opacity-100 hover:opacity-100 focus-visible:opacity-100"
-              style={{ opacity: undefined }}
+              className="absolute left-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 lg:w-8 lg:h-8 rounded-full bg-black/30 hover:bg-black/55 backdrop-blur-sm flex items-center justify-center text-white transition-all opacity-60 hover:opacity-100 focus-visible:opacity-100"
               onFocus={() => setPaused(true)}
               onBlur={() => setPaused(false)}
             >
@@ -144,7 +143,7 @@ export default function HeroCarousel({ slides, sidePanels = [] }: HeroCarouselPr
             <button
               onClick={next}
               aria-label="Next slide"
-              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-8 h-8 rounded-full bg-black/30 hover:bg-black/55 backdrop-blur-sm flex items-center justify-center text-white transition-all"
+              className="absolute right-3 top-1/2 -translate-y-1/2 z-20 w-11 h-11 lg:w-8 lg:h-8 rounded-full bg-black/30 hover:bg-black/55 backdrop-blur-sm flex items-center justify-center text-white transition-all opacity-60 hover:opacity-100 focus-visible:opacity-100"
               onFocus={() => setPaused(true)}
               onBlur={() => setPaused(false)}
             >
@@ -155,17 +154,19 @@ export default function HeroCarousel({ slides, sidePanels = [] }: HeroCarouselPr
           </>
         )}
 
-        {/* Dots */}
+        {/* Dots — min-w/h-[44px] ensures WCAG 2.5.5 tap area; inner span stays visually small */}
         {slides.length > 1 && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex items-center">
             {slides.map((_, i) => (
               <button
                 key={i}
                 onClick={() => { setCurrent(i); setPaused(true); setTimeout(() => setPaused(false), 6000); }}
                 aria-label={`Go to slide ${i + 1}`}
                 aria-current={i === current}
-                className={`rounded-full transition-all duration-300 ${i === current ? "w-5 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/40 hover:bg-white/70"}`}
-              />
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center"
+              >
+                <span className={`rounded-full transition-all duration-300 block ${i === current ? "w-5 h-1.5 bg-white" : "w-1.5 h-1.5 bg-white/40 hover:bg-white/70"}`} />
+              </button>
             ))}
           </div>
         )}
