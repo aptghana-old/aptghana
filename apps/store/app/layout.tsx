@@ -6,8 +6,8 @@ import { StoreProviders } from "@/lib/store/providers";
 import { STORE_URL } from "@apt/config";
 import "./globals.css";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"], display: "swap" });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], display: "swap" });
+const geistSans = Geist({ variable: "--font-geist-sans", subsets: [ "latin" ], display: "swap" });
+const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: [ "latin" ], display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL(STORE_URL),
@@ -22,10 +22,11 @@ export const metadata: Metadata = {
 export interface NavSubcategory { name: string; slug: string; href: string; }
 export interface NavCategory {
   name: string; slug: string; href: string;
-  desc?: string; image?: string; subcategories?: NavSubcategory[];
+  desc?: string; img?: { url: string; alt?: string }; subcategories?: NavSubcategory[];
 }
 export interface NavGroup {
   id: string; label: string; slug: string; href: string;
+  img?: { url: string; alt?: string };
   color: string; iconPath: string; iconImage?: string; description?: string;
   categories: NavCategory[];
   featured: { name: string; tag: string; href: string; desc: string };

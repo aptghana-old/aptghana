@@ -539,7 +539,7 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
                         <Link
                           key={sol.slug}
                           href={`/solutions/${sol.slug}`}
-                          className={`group relative flex flex-col gap-2.5 p-3.5 rounded-xl border transition-all duration-150 cursor-pointer
+                          className={`group relative flex gap-2.5 p-3.5 rounded-xl border transition-all duration-150 cursor-pointer
                             ${hoveredSol === sol.slug
                               ? "bg-[#F8FAFC] dark:bg-white/5 border-[#E2E8F0] dark:border-white/10 shadow-sm"
                               : "bg-transparent border-transparent hover:bg-[#F8FAFC] dark:hover:bg-white/4 hover:border-[#E2E8F0] dark:hover:border-white/7"
@@ -552,8 +552,8 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
                           {hoveredSol === sol.slug && (
                             <span className="absolute top-3 right-3 w-1.5 h-1.5 rounded-full bg-[#84CC16]" aria-hidden="true" />
                           )}
-                          <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-all duration-150 ${sol.bg} ${sol.text} group-hover:scale-110`}>
-                            {sol.img ? <img src={sol.img.url} alt={sol.img.alt} className="w-5 h-5 object-contain" /> : sol.icon}
+                          <div className={`size-12 rounded-lg flex items-center justify-center shrink-0 transition-all duration-150 ${sol.bg} ${sol.text} group-hover:scale-110`}>
+                            {sol.img ? <img src={sol.img.url} alt={sol.img.alt} className="size-10 object-contain" /> : sol.icon}
                           </div>
                           <div>
                             <div className={`text-[13px] font-semibold leading-tight transition-colors duration-150 ${hoveredSol === sol.slug

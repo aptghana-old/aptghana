@@ -32,7 +32,7 @@ export default function FooterBase({ config }: Props) {
       {/* ── Top accent rule — energy/current motif ──────────────────────── */}
       <div
         className="
-          h-[2px] w-full
+          h-1 w-full
           bg-[linear-gradient(90deg,transparent_0%,#3DCD58_30%,#3DCD58_70%,transparent_100%)]
           opacity-60 dark:opacity-90
         "
@@ -135,7 +135,7 @@ export default function FooterBase({ config }: Props) {
                   rel="noopener noreferrer"
                   aria-label={s.label}
                   className="
-                    w-[30px] h-[30px] rounded-[8px] flex items-center justify-center
+                    size-8 rounded-[8px] flex items-center justify-center
                     transition-all duration-200
                     focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3DCD58]
                     bg-slate-100 border border-slate-200/80 text-slate-400
@@ -146,7 +146,7 @@ export default function FooterBase({ config }: Props) {
                   "
                 >
                   <svg
-                    className="w-[13px] h-[13px]"
+                    className="size-3.5 object-contain"
                     viewBox={s.viewBox ?? "0 0 24 24"}
                     fill={s.filled ? "currentColor" : "none"}
                     stroke={s.filled ? "none" : "currentColor"}

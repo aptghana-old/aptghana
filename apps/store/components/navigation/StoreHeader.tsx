@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import UserAccountButton from "./UserAccountButton";
 
 /* ─── Mega menu types ────────────────────────────────────────────────────── */
@@ -11,7 +12,11 @@ interface DisplayGroup {
   color: string;
   href: string;
   iconPath: string;
-  categories: { name: string; desc: string; href: string; subcategories?: { name: string; slug: string; href: string }[] }[];
+  categories: {
+    name: string; desc: string; href: string; img?: {
+      url: string, alt?: string
+    }; subcategories?: { name: string; slug: string; href: string }[]
+  }[];
   featured: { name: string; tag: string; href: string; desc: string };
 }
 
@@ -39,10 +44,12 @@ function adaptNavGroups(navGroups: import("@/app/layout").NavGroup[]): DisplayGr
     color: g.color,
     href: g.href,
     iconPath: g.iconPath,
+    img: g.img,
     categories: g.categories.map((c) => ({
       name: c.name,
       desc: c.desc ?? "",
       href: c.href,
+      img: c.img,
       subcategories: (c.subcategories ?? []).map((s) => ({ name: s.name, slug: s.slug, href: s.href })),
     })),
     featured: g.featured,
@@ -118,17 +125,12 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
         {/* Main header row */}
         <div className="bg-navy-900">
           <div className="container-store">
-            <div className="flex items-center gap-3 h-[60px]">
+            <div className="flex items-center gap-3 h-15">
 
               {/* Logo */}
-              <Link href="/" className="flex items-center gap-2.5 shrink-0 group">
-                <div className="w-9 h-9 rounded-xl bg-apt-orange flex items-center justify-center text-white font-black text-xs tracking-tighter shrink-0 group-hover:bg-apt-orange-hover transition-colors">
-                  APT
-                </div>
-                <div className="hidden sm:block leading-none">
-                  <div className="text-white font-bold text-sm">APT Ghana</div>
-                  <div className="text-white/35 text-[9px] uppercase tracking-widest font-semibold mt-0.5">Industrial Store</div>
-                </div>
+              <Link href="/" className="flex items-center shrink-0">
+                <Image src="/images/logo.png" alt="APT Ghana" width={140} height={69}
+                  className="h-10 w-auto object-contain dark:invert" priority />
               </Link>
 
               {/* Search bar */}
@@ -260,8 +262,8 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                       onMouseEnter={() => setActiveGroup(i)}
                       onClick={() => { window.location.href = grp.href; setMegaOpen(false); }}
                       className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg text-left transition-all ${activeGroup === i
-                          ? "bg-navy-50 dark:bg-navy-900/60 font-semibold text-navy-900 dark:text-white"
-                          : "text-theme-2 hover:bg-[var(--bg-raised)]"
+                        ? "bg-navy-50 dark:bg-navy-900/60 font-semibold text-navy-900 dark:text-white"
+                        : "text-theme-2 hover:bg-[var(--bg-raised)]"
                         }`}
                     >
                       <div
@@ -305,7 +307,12 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                         onClick={() => setMegaOpen(false)}
                         className="flex items-start gap-2.5 px-3 py-2.5 rounded-xl hover:bg-[var(--bg-raised)] transition-colors group"
                       >
-                        <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 transition-all" style={{ background: group.color }} />
+
+                        {cat.img?.url ? (
+                          <img src={cat.img?.url} alt={cat.img?.alt} className="size-10 object-contain" />
+                        ) : (
+                          <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 transition-all" style={{ background: group.color }} />
+                        )}
                         <div>
                           <p className="text-sm font-semibold text-theme-1 group-hover:text-navy-500 transition-colors leading-snug">{cat.name}</p>
                           <p className="text-xs text-theme-3 mt-0.5 leading-relaxed">{cat.desc}</p>
