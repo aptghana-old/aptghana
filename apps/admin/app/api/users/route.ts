@@ -37,10 +37,12 @@ export async function GET(req: NextRequest) {
       query.$or = [{ name: re }, { email: re }, { username: re }];
     }
 
-    const admins = await AdminModel.find(query)
+    const raw = await AdminModel.find(query)
       .sort({ role: 1, name: 1 })
       .select("-passwordHash -mfaSecret -passwordResetToken -passwordResetExpiry")
       .lean();
+
+    const admins = raw.map((a) => ({ ...a, permissions: a.permissions ?? [] }));
 
     return NextResponse.json({ admins });
   } catch (err) {

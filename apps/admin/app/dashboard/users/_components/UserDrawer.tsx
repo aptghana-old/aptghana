@@ -156,6 +156,7 @@ export default function UserDrawer({
   }
 
   const roleMeta = ROLE_META[user.role];
+  const permissions: string[] = user.permissions ?? [];
 
   return (
     <div
@@ -385,14 +386,14 @@ export default function UserDrawer({
                   <p className="text-[12px] mb-3" style={{ color: "var(--apt-text-muted)" }}>
                     Permissions granted by the{" "}
                     <strong style={{ color: "var(--apt-text-primary)" }}>{ROLE_META[user.role]?.label}</strong> role
-                    {user.permissions.length > 0 && (
-                      <>, plus <strong style={{ color: "var(--apt-text-primary)" }}>{user.permissions.length}</strong> custom override{user.permissions.length !== 1 ? "s" : ""}</>
+                    {permissions.length > 0 && (
+                      <>, plus <strong style={{ color: "var(--apt-text-primary)" }}>{permissions.length}</strong> custom override{permissions.length !== 1 ? "s" : ""}</>
                     )}.
                   </p>
                   <div className="space-y-3">
                     {PERMISSION_MODULES.map((mod) => {
                       const visible = mod.permissions.filter(
-                        (p) => hasPermission(user.role, user.permissions, p) || user.permissions.includes(`!${p}`),
+                        (p) => hasPermission(user.role, permissions, p) || permissions.includes(`!${p}`),
                       );
                       if (visible.length === 0) return null;
                       return (
@@ -402,8 +403,8 @@ export default function UserDrawer({
                           </p>
                           <div className="flex flex-wrap gap-1">
                             {visible.map((p) => {
-                              const isOverride = user.permissions.includes(p) && !ROLE_PERMISSIONS[user.role]?.includes(p as never);
-                              const isDenied = user.permissions.includes(`!${p}`);
+                              const isOverride = permissions.includes(p) && !ROLE_PERMISSIONS[user.role]?.includes(p as never);
+                              const isDenied = permissions.includes(`!${p}`);
                               return (
                                 <span
                                   key={p}

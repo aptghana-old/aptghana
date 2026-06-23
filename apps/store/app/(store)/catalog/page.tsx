@@ -67,10 +67,28 @@ export default async function CatalogIndexPage() {
       {/* Group grid */}
       <main className="container-store py-8 flex-1">
         {groups.length === 0 ? (
-          <div className="py-16 text-center">
-            <p className="text-sm" style={{ color: "var(--text-3)" }}>
-              Catalogue is loading. Please try again shortly.
+          <div className="flex flex-col items-center justify-center py-24 text-center px-4">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center mb-5"
+              style={{ background: "var(--bg-raised)" }}
+            >
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" style={{ color: "var(--text-4)" }}>
+                <path d="M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z" />
+                <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+              </svg>
+            </div>
+            <p className="text-[15px] font-semibold mb-2" style={{ color: "var(--text-1)" }}>
+              No catalogue groups configured yet
             </p>
+            <p className="text-[13px] leading-relaxed max-w-xs" style={{ color: "var(--text-3)" }}>
+              Products are being organised. Contact us to enquire about specific items.
+            </p>
+            <a
+              href="/rfq"
+              className="mt-5 inline-flex items-center gap-2 h-10 px-5 bg-apt-orange hover:bg-apt-orange-hover text-white text-sm font-semibold rounded-xl transition-colors"
+            >
+              Request a Quote
+            </a>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

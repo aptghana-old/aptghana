@@ -4,6 +4,7 @@ import Header from "@/components/navigation/Header";
 import Footer from "@/components/navigation/Footer";
 import { connectDB, ResourceModel } from "@apt/db";
 import { SITE_URL } from "@apt/config";
+import { EmptyState, ErrorState } from "@apt/ui";
 
 export const revalidate = 3600;
 
@@ -28,7 +29,6 @@ interface ResourceCard {
   displayOrder: number;
 }
 
-// Icon map keyed by type
 const typeIcons: Record<string, React.ReactNode> = {
   library: (
     <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -68,7 +68,7 @@ const defaultIcon = (
   </svg>
 );
 
-async function getResources(): Promise<ResourceCard[]> {
+async function getResources(): Promise<{ resources: ResourceCard[]; error: boolean }> {
   try {
     await connectDB();
     const docs = await ResourceModel.find({ status: "active" })
@@ -76,42 +76,33 @@ async function getResources(): Promise<ResourceCard[]> {
       .sort({ displayOrder: 1, title: 1 })
       .lean();
 
-    if (!docs.length) return [];
-
     type RawResource = { slug: string; title: string; tagline?: string; badge?: string; type: string; displayOrder?: number };
-    return (docs as unknown as RawResource[]).map((d) => ({
-      slug: d.slug,
-      title: d.title,
-      tagline: d.tagline || "",
-      badge: d.badge || d.type || "",
-      type: d.type,
-      displayOrder: d.displayOrder ?? 0,
-    }));
-  } catch {
-    return [];
+    return {
+      resources: (docs as unknown as RawResource[]).map((d) => ({
+        slug: d.slug,
+        title: d.title,
+        tagline: d.tagline || "",
+        badge: d.badge || d.type || "",
+        type: d.type,
+        displayOrder: d.displayOrder ?? 0,
+      })),
+      error: false,
+    };
+  } catch (err) {
+    console.error("[resources] Failed to load resources:", err);
+    return { resources: [], error: true };
   }
 }
 
-// Static fallback list
-const staticResources: ResourceCard[] = [
-  { slug: "library",        title: "Technical Library",   tagline: "Datasheets, manuals & engineering drawings", badge: "Datasheets & Manuals",      type: "library",        displayOrder: 1 },
-  { slug: "case-studies",   title: "Case Studies",        tagline: "Real projects. Measurable results.",          badge: "Project Outcomes",          type: "case-studies",   displayOrder: 2 },
-  { slug: "news",           title: "News & Insights",     tagline: "Industrial technology news from West Africa", badge: "News & Articles",           type: "news",           displayOrder: 3 },
-  { slug: "training",       title: "Product Training",    tagline: "Manufacturer-certified training in Ghana",    badge: "Webinars & Certifications", type: "training",       displayOrder: 4 },
-  { slug: "cad",            title: "CAD Downloads",       tagline: "Engineering drawings & 3D models",           badge: "2D & 3D Models",            type: "cad",            displayOrder: 5 },
-  { slug: "certifications", title: "Certifications",      tagline: "Our credentials & authorizations",           badge: "Official Documents",        type: "certifications", displayOrder: 6 },
-];
-
 export default async function ResourcesPage() {
-  const dbResources = await getResources();
-  const resources = dbResources.length > 0 ? dbResources : staticResources;
+  const { resources, error } = await getResources();
 
   return (
     <>
       <Header />
       <main>
         {/* Hero */}
-        <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] pt-32 pb-20">
+        <section className="bg-[#F8FAFC] pt-32 pb-20">
           <div className="container-apt">
             <div className="max-w-2xl">
               <div className="flex items-center gap-3 mb-4">
@@ -121,12 +112,12 @@ export default async function ResourcesPage() {
                 </span>
               </div>
               <h1
-                className="text-4xl lg:text-5xl font-extrabold tracking-tight text-[#0F172A] dark:text-white mb-6"
+                className="text-4xl lg:text-5xl font-extrabold tracking-tight text-[#0F172A] mb-6"
                 style={{ fontFamily: "var(--font-sora, 'Sora', sans-serif)" }}
               >
                 Engineering Resources Hub
               </h1>
-              <p className="text-[#64748B] dark:text-[#94A3B8] text-lg leading-relaxed max-w-xl">
+              <p className="text-[#64748B] text-lg leading-relaxed max-w-xl">
                 Everything you need to specify, design, commission, and maintain industrial
                 equipment from APT Ghana&apos;s portfolio — all in one place.
               </p>
@@ -135,41 +126,65 @@ export default async function ResourcesPage() {
         </section>
 
         {/* Resource Cards */}
-        <section className="section-py bg-[#F8FAFC] dark:bg-[#0A0F1E]">
+        <section className="section-py bg-[#F8FAFC]">
           <div className="container-apt">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {resources.map((res) => (
-                <Link
-                  key={res.slug}
-                  href={`/resources/${res.slug}`}
-                  className="group bg-white dark:bg-[#111827] rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-8 flex flex-col gap-5 hover:border-[#84CC16]/40 hover:shadow-lg hover:-translate-y-1 transition-all"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-[#0A0F1E] dark:bg-[#0D1526] text-[#84CC16]">
-                      {typeIcons[res.type] ?? defaultIcon}
+            {error ? (
+              <ErrorState
+                title="Unable to load resources"
+                description="We could not retrieve the resources library at this time. Please refresh the page or contact us."
+                action={
+                  <Link href="/contact" className="inline-flex items-center gap-2 h-10 px-5 bg-[#0057b8] text-white text-sm font-semibold rounded-lg hover:bg-[#1a73e8] transition-colors">
+                    Contact Us
+                  </Link>
+                }
+                fill
+              />
+            ) : resources.length === 0 ? (
+              <EmptyState
+                title="Resources coming soon"
+                description="Our technical resources library is currently being populated. Contact our team for specific documentation or technical support."
+                action={
+                  <Link href="/contact" className="inline-flex items-center gap-2 h-10 px-5 bg-[#0057b8] text-white text-sm font-semibold rounded-lg hover:bg-[#1a73e8] transition-colors">
+                    Request Documentation
+                  </Link>
+                }
+                fill
+              />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {resources.map((res) => (
+                  <Link
+                    key={res.slug}
+                    href={`/resources/${res.slug}`}
+                    className="group bg-white rounded-2xl border border-[#E2E8F0] p-8 flex flex-col gap-5 hover:border-[#84CC16]/40 hover:shadow-lg hover:-translate-y-1 transition-all"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-[#0A0F1E] text-[#84CC16]">
+                        {typeIcons[res.type] ?? defaultIcon}
+                      </div>
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-[#84CC16]/10 text-[10px] font-bold text-[#84CC16] uppercase tracking-wider">
+                        {res.badge}
+                      </span>
                     </div>
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-[#84CC16]/10 text-[10px] font-bold text-[#84CC16] uppercase tracking-wider">
-                      {res.badge}
-                    </span>
-                  </div>
-                  <div className="flex-1">
-                    <h2
-                      className="text-xl font-extrabold text-[#0F172A] dark:text-[#F1F5F9] mb-3 group-hover:text-[#1E3A5F] dark:group-hover:text-[#84CC16] transition-colors"
-                      style={{ fontFamily: "var(--font-sora, 'Sora', sans-serif)" }}
-                    >
-                      {res.title}
-                    </h2>
-                    <p className="text-[#64748B] dark:text-[#94A3B8] text-sm leading-relaxed">{res.tagline}</p>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-sm font-semibold text-[#84CC16] group-hover:gap-3 transition-all">
-                    <span>Access now</span>
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-                    </svg>
-                  </div>
-                </Link>
-              ))}
-            </div>
+                    <div className="flex-1">
+                      <h2
+                        className="text-xl font-extrabold text-[#0F172A] mb-3 group-hover:text-[#1E3A5F] transition-colors"
+                        style={{ fontFamily: "var(--font-sora, 'Sora', sans-serif)" }}
+                      >
+                        {res.title}
+                      </h2>
+                      <p className="text-[#64748B] text-sm leading-relaxed">{res.tagline}</p>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-sm font-semibold text-[#84CC16] group-hover:gap-3 transition-all">
+                      <span>Access now</span>
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                      </svg>
+                    </div>
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 

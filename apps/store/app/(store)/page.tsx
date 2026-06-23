@@ -59,11 +59,7 @@ const STATIC_CATEGORIES = [
   { name: "Hydraulic Solutions", slug: "hydraulic-solutions", shortDescription: "Hydraulic cylinders, pumps, valves and power packs" },
 ];
 
-const STATIC_BRANDS = [
-  "Schneider Electric", "WEG", "Camozzi", "ABB", "Siemens", "Legrand",
-  "Phoenix Contact", "WAGO", "Parker Hannifin", "Festo", "Eaton", "Omron",
-  "NORD", "Robit", "Socomec", "Tramec",
-];
+/* Static brand fallback removed — brands section shows empty when DB has none */
 
 const INDUSTRY_ICONS: Record<string, string> = {
   "mining":         "M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 2.625c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125m16.5 5.625c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125",
@@ -109,9 +105,7 @@ export default async function StorePage() {
     getPublishedHomepageConfig(),
   ]);
 
-  const displayBrands = brands.length > 0
-    ? brands
-    : STATIC_BRANDS.map((name, i) => ({ _id: String(i), name, slug: name.toLowerCase().replace(/\s+/g, "-") }));
+  const displayBrands = brands;
 
   /* Map carousel data from config */
   const now = new Date();
@@ -539,22 +533,13 @@ function BrandsSection({ brands, cfg }: { brands: Brand[]; cfg?: BrandsTickerCon
 
 /* ─── Industries ──────────────────────────────────────────────────────────── */
 function IndustriesSection({ dbIndustries, cfg }: { dbIndustries: DBIndustry[]; cfg?: IndustriesConfig }) {
-  const FALLBACK_INDUSTRIES = [
-    { name: "Mining & Resources", desc: "Explosion-proof enclosures, robust drives, and hazardous area equipment.", href: "/solutions/mining", accent: "#d97706", icon: INDUSTRY_ICONS["mining"] },
-    { name: "Manufacturing", desc: "Motion control, conveyor automation, and production line management.", href: "/solutions/manufacturing", accent: "#0057b8", icon: INDUSTRY_ICONS["manufacturing"] },
-    { name: "Energy & Power", desc: "Power quality, protection relays, and monitoring systems for utilities.", href: "/solutions/energy", accent: "#16a34a", icon: INDUSTRY_ICONS["energy"] },
-    { name: "Water & Utilities", desc: "Pump control, flow measurement, and SCADA-ready automation.", href: "/solutions/water", accent: "#0891b2", icon: INDUSTRY_ICONS["water"] },
-    { name: "Construction", desc: "Site power distribution, portable switchgear, and lighting solutions.", href: "/solutions/construction", accent: "#7c3aed", icon: INDUSTRY_ICONS["construction"] },
-    { name: "Food & Beverage", desc: "IP69-rated hygienic equipment and washdown motors for processing.", href: "/solutions/food-beverage", accent: "#dc2626", icon: INDUSTRY_ICONS["food-beverage"] },
-  ];
+  const displayIndustries = dbIndustries.map((ind) => ({
+    name: ind.name, desc: ind.shortDescription ?? "",
+    href: `/solutions/${ind.slug}`, accent: ind.accentColor ?? "#0057b8",
+    icon: INDUSTRY_ICONS[ind.slug] ?? FALLBACK_ICON,
+  }));
 
-  const displayIndustries = dbIndustries.length > 0
-    ? dbIndustries.map((ind) => ({
-        name: ind.name, desc: ind.shortDescription ?? "",
-        href: `/solutions/${ind.slug}`, accent: ind.accentColor ?? "#0057b8",
-        icon: INDUSTRY_ICONS[ind.slug] ?? FALLBACK_ICON,
-      }))
-    : FALLBACK_INDUSTRIES;
+  if (displayIndustries.length === 0) return null;
 
   return (
     <section className="py-14 sm:py-16 bg-theme-base border-t border-theme">

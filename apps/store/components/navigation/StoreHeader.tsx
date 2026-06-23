@@ -4,102 +4,16 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import UserAccountButton from "./UserAccountButton";
 
-/* ─── Mega menu data ─────────────────────────────────────────────────────── */
-const MEGA_GROUPS = [
-  {
-    id: "electrical",
-    label: "Electrical Solutions",
-    color: "#1d4ed8",
-    href: "/catalog/electrical-solutions",
-    iconPath: "M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z",
-    categories: [
-      { name: "Circuit Breakers", desc: "MCBs, MCCBs & ACBs", href: "/catalog/electrical-solutions/circuit-protection-and-control" },
-      { name: "Contactors & Starters", desc: "Motor contactors & DOL starters", href: "/catalog/electrical-solutions/contactors-and-starters" },
-      { name: "Switchgear & Panels", desc: "Distribution boards & enclosures", href: "/catalog/electrical-solutions/switchgear-and-panels" },
-      { name: "Control & Push Buttons", desc: "Pilot devices & indicators", href: "/catalog/electrical-solutions/control-and-push-buttons" },
-      { name: "Cable & Wiring", desc: "Terminals, ducts & cable trays", href: "/catalog/electrical-solutions/cable-and-wiring" },
-      { name: "Measurement", desc: "Current transformers & meters", href: "/catalog/electrical-solutions/measurement-and-monitoring" },
-    ],
-    featured: { name: "Schneider Electric", tag: "Authorized Partner", href: "/brands/schneider-electric", desc: "Complete electrical infrastructure solutions" },
-  },
-  {
-    id: "automation",
-    label: "Automation & Control",
-    color: "#0369a1",
-    href: "/catalog/automation-and-control",
-    iconPath: "M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z",
-    categories: [
-      { name: "PLCs & Controllers", desc: "Programmable logic controllers", href: "/catalog/automation-and-control/plcs-and-controllers" },
-      { name: "HMI & Displays", desc: "Human-machine interfaces", href: "/catalog/automation-and-control/hmi-and-displays" },
-      { name: "Variable Speed Drives", desc: "AC & DC variable frequency drives", href: "/catalog/automation-and-control/variable-speed-drives" },
-      { name: "Sensors & Detection", desc: "Proximity, photo & level sensors", href: "/catalog/automation-and-control/sensors-and-detection" },
-      { name: "Motors & Gearboxes", desc: "IE3 motors & speed reducers", href: "/catalog/automation-and-control/motors-and-gearboxes" },
-      { name: "Industrial Networks", desc: "Ethernet, PROFIBUS & MODBUS", href: "/catalog/automation-and-control/industrial-networks" },
-    ],
-    featured: { name: "WEG", tag: "Preferred Distributor", href: "/brands/weg", desc: "World-class motors, drives & automation" },
-  },
-  {
-    id: "pneumatics",
-    label: "Pneumatic Systems",
-    color: "#0891b2",
-    href: "/catalog/pneumatic-systems",
-    iconPath: "M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z",
-    categories: [
-      { name: "Cylinders & Actuators", desc: "ISO, mini & compact cylinders", href: "/catalog/pneumatic-systems/cylinders-and-actuators" },
-      { name: "Directional Valves", desc: "5/2, 5/3 & solenoid valves", href: "/catalog/pneumatic-systems/directional-valves" },
-      { name: "FRL Units", desc: "Filters, regulators & lubricators", href: "/catalog/pneumatic-systems/frl-units" },
-      { name: "Fittings & Tubing", desc: "Push-in fittings & flexible tubing", href: "/catalog/pneumatic-systems/fittings-and-tubing" },
-      { name: "Air Treatment", desc: "Dryers, filters & separators", href: "/catalog/pneumatic-systems/air-treatment" },
-      { name: "Vacuum Technology", desc: "Vacuum generators & cups", href: "/catalog/pneumatic-systems/vacuum-technology" },
-    ],
-    featured: { name: "Camozzi", tag: "Exclusive Distributor", href: "/brands/camozzi", desc: "Precision Italian pneumatic engineering" },
-  },
-  {
-    id: "conveying",
-    label: "Conveying Solutions",
-    color: "#7c3aed",
-    href: "/catalog/conveying-solutions",
-    iconPath: "M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5",
-    categories: [
-      { name: "Conveyor Belts", desc: "Rubber & PVC conveyor belting", href: "/catalog/conveying-solutions/conveyor-belts" },
-      { name: "Rollers & Idlers", desc: "Carrying & return idler sets", href: "/catalog/conveying-solutions/rollers-and-idlers" },
-      { name: "Chains & Sprockets", desc: "Roller chains & conveyor chains", href: "/catalog/conveying-solutions/chains-and-sprockets" },
-      { name: "Pulleys & Bearings", desc: "Drive pulleys & self-aligning bearings", href: "/catalog/conveying-solutions/pulleys-and-bearings" },
-      { name: "Drive Components", desc: "Gear motors & belt drives", href: "/catalog/conveying-solutions/drive-components" },
-    ],
-    featured: { name: "ABB", tag: "Authorized Partner", href: "/brands/abb", desc: "Drives & motors for material handling" },
-  },
-  {
-    id: "power",
-    label: "Power & Energy",
-    color: "#d97706",
-    href: "/catalog/power-and-energy",
-    iconPath: "M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z",
-    categories: [
-      { name: "UPS Systems", desc: "Online & offline UPS solutions", href: "/catalog/power-and-energy/ups-systems" },
-      { name: "Transformers", desc: "Dry-type & oil-filled transformers", href: "/catalog/power-and-energy/transformers" },
-      { name: "Power Quality", desc: "Harmonic filters & power factor correction", href: "/catalog/power-and-energy/power-quality" },
-      { name: "Energy Metering", desc: "Smart meters & power analyzers", href: "/catalog/power-and-energy/energy-metering" },
-      { name: "Surge Protection", desc: "SPDs for all applications", href: "/catalog/power-and-energy/surge-protection" },
-    ],
-    featured: { name: "Eaton", tag: "Authorized Partner", href: "/brands/eaton", desc: "Intelligent power management solutions" },
-  },
-  {
-    id: "safety",
-    label: "Safety Systems",
-    color: "#dc2626",
-    href: "/catalog/safety-systems",
-    iconPath: "M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z",
-    categories: [
-      { name: "Emergency Stop Devices", desc: "Push buttons & rope pull switches", href: "/catalog/safety-systems/emergency-stop-devices" },
-      { name: "Safety Relays", desc: "Safety monitoring modules", href: "/catalog/safety-systems/safety-relays" },
-      { name: "Light Curtains", desc: "Type 2 & Type 4 safety light curtains", href: "/catalog/safety-systems/light-curtains" },
-      { name: "Safety Switches", desc: "Interlocking & solenoid switches", href: "/catalog/safety-systems/safety-switches" },
-      { name: "Safety Controllers", desc: "Configurable safety controllers", href: "/catalog/safety-systems/safety-controllers" },
-    ],
-    featured: { name: "Phoenix Contact", tag: "Authorized Partner", href: "/brands/phoenix-contact", desc: "Comprehensive industrial safety systems" },
-  },
-];
+/* ─── Mega menu types ────────────────────────────────────────────────────── */
+interface DisplayGroup {
+  id: string;
+  label: string;
+  color: string;
+  href: string;
+  iconPath: string;
+  categories: { name: string; desc: string; href: string; subcategories?: { name: string; slug: string; href: string }[] }[];
+  featured: { name: string; tag: string; href: string; desc: string };
+}
 
 const NAV_LINKS = [
   { label: "Solutions", href: "/solutions" },
@@ -118,8 +32,6 @@ function Icon({ d, size = 20, strokeWidth = 1.75, className = "", style }: { d: 
 }
 
 /* ─── Header component ───────────────────────────────────────────────────── */
-type DisplayGroup = typeof MEGA_GROUPS[number];
-
 function adaptNavGroups(navGroups: import("@/app/layout").NavGroup[]): DisplayGroup[] {
   return navGroups.map((g) => ({
     id: g.id,
@@ -138,14 +50,15 @@ function adaptNavGroups(navGroups: import("@/app/layout").NavGroup[]): DisplayGr
 }
 
 export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/layout").NavGroup[] }) {
-  const displayGroups: DisplayGroup[] = navGroups?.length ? adaptNavGroups(navGroups) : MEGA_GROUPS;
-  const [megaOpen, setMegaOpen] = useState(false);
-  const [activeGroup, setActiveGroup] = useState(0);
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [mobileGroup, setMobileGroup] = useState<number | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [scrolled, setScrolled] = useState(false);
-  const [cartCount] = useState(0);
+  const displayGroups: DisplayGroup[] = navGroups?.length ? adaptNavGroups(navGroups) : [];
+  const hasCatalog = displayGroups.length > 0;
+  const [ megaOpen, setMegaOpen ] = useState(false);
+  const [ activeGroup, setActiveGroup ] = useState(0);
+  const [ mobileOpen, setMobileOpen ] = useState(false);
+  const [ mobileGroup, setMobileGroup ] = useState<number | null>(null);
+  const [ searchQuery, setSearchQuery ] = useState("");
+  const [ scrolled, setScrolled ] = useState(false);
+  const [ cartCount ] = useState(0);
   const megaCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const headerRef = useRef<HTMLElement>(null);
 
@@ -166,7 +79,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
-  }, [mobileOpen]);
+  }, [ mobileOpen ]);
 
   const openMega = useCallback((index: number) => {
     if (megaCloseTimer.current) clearTimeout(megaCloseTimer.current);
@@ -187,7 +100,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
     if (searchQuery.trim()) window.location.href = `/search?q=${encodeURIComponent(searchQuery.trim())}`;
   };
 
-  const group = displayGroups[activeGroup];
+  const group = displayGroups[ activeGroup ] ?? displayGroups[ 0 ];
 
   return (
     <>
@@ -196,7 +109,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
         className={`sticky top-0 z-50 transition-shadow duration-200 ${scrolled ? "shadow-[0_4px_24px_rgba(0,0,0,0.4)]" : ""}`}
       >
         {/* Announcement bar */}
-        <div className="bg-apt-orange text-white text-center text-[11px] font-medium py-1.5 tracking-wide">
+        <div className="bg-gray-800 text-white text-center text-[11px] font-medium py-1.5 tracking-wide">
           Free technical support with every order &nbsp;·&nbsp;
           <a href="tel:+233303964346" className="underline underline-offset-2 hover:no-underline">+233 30 396 4346</a>
           &nbsp;·&nbsp; Same-day quotation before 3 PM
@@ -288,22 +201,23 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
               onMouseLeave={delayedCloseMega}
             >
               {/* Catalogue trigger */}
-              <button
-                onMouseEnter={() => openMega(0)}
-                onFocus={() => openMega(0)}
-                onClick={() => { setMegaOpen(true); setActiveGroup(0); }}
-                aria-expanded={megaOpen}
-                aria-label="Catalogue menu"
-                className={`group flex items-center gap-1 h-full px-3.5 text-[13px] font-medium rounded-md transition-colors ${megaOpen ? "text-white bg-white/10" : "text-white/60 hover:text-white hover:bg-white/[0.06]"}`}
-              >
-                Catalogue
-                <Icon
-                  d="M19.5 8.25l-7.5 7.5-7.5-7.5"
-                  size={14}
-                  strokeWidth={2.5}
-                  className={`transition-transform duration-200 ${megaOpen ? "rotate-180" : ""}`}
-                />
-              </button>
+              {hasCatalog ? (
+                <button
+                  onMouseEnter={() => openMega(0)}
+                  onFocus={() => openMega(0)}
+                  onClick={() => { setMegaOpen(true); setActiveGroup(0); }}
+                  aria-expanded={megaOpen}
+                  aria-label="Catalogue menu"
+                  className={`group flex items-center gap-1 h-full px-3.5 text-[13px] font-medium rounded-md transition-colors ${megaOpen ? "text-white bg-white/10" : "text-white/60 hover:text-white hover:bg-white/[0.06]"}`}
+                >
+                  Catalogue
+                  <Icon d="M19.5 8.25l-7.5 7.5-7.5-7.5" size={14} strokeWidth={2.5} className={`transition-transform duration-200 ${megaOpen ? "rotate-180" : ""}`} />
+                </button>
+              ) : (
+                <Link href="/catalog" className="h-full px-3.5 flex items-center text-[13px] font-medium text-white/60 hover:text-white hover:bg-white/[0.06] rounded-md transition-colors">
+                  Catalogue
+                </Link>
+              )}
 
               {NAV_LINKS.map((link) => (
                 <Link
@@ -328,7 +242,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
         </div>
 
         {/* Mega menu panel */}
-        {megaOpen && (
+        {megaOpen && hasCatalog && (
           <div
             className="absolute left-0 right-0 top-full z-50 mega-panel"
             onMouseEnter={cancelCloseMega}
@@ -345,11 +259,10 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                       key={grp.id}
                       onMouseEnter={() => setActiveGroup(i)}
                       onClick={() => { window.location.href = grp.href; setMegaOpen(false); }}
-                      className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg text-left transition-all ${
-                        activeGroup === i
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg text-left transition-all ${activeGroup === i
                           ? "bg-navy-50 dark:bg-navy-900/60 font-semibold text-navy-900 dark:text-white"
                           : "text-theme-2 hover:bg-[var(--bg-raised)]"
-                      }`}
+                        }`}
                     >
                       <div
                         className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all"
@@ -494,16 +407,23 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
             <nav className="flex-1 py-3 px-3">
               {/* Catalogue accordion */}
               <div>
-                <button
-                  onClick={() => setMobileGroup(mobileGroup === -1 ? null : -1)}
-                  aria-expanded={mobileGroup === -1}
-                  className="w-full flex items-center justify-between px-3 py-3 text-sm font-semibold text-white/80 hover:text-white rounded-xl hover:bg-white/[0.06] transition-all"
-                >
-                  Catalogue
-                  <Icon d="M19.5 8.25l-7.5 7.5-7.5-7.5" size={16} strokeWidth={2.5} className={`transition-transform ${mobileGroup === -1 ? "rotate-180" : ""}`} />
-                </button>
+                {hasCatalog ? (
+                  <button
+                    onClick={() => setMobileGroup(mobileGroup === -1 ? null : -1)}
+                    aria-expanded={mobileGroup === -1}
+                    className="w-full flex items-center justify-between px-3 py-3 text-sm font-semibold text-white/80 hover:text-white rounded-xl hover:bg-white/[0.06] transition-all"
+                  >
+                    Catalogue
+                    <Icon d="M19.5 8.25l-7.5 7.5-7.5-7.5" size={16} strokeWidth={2.5} className={`transition-transform ${mobileGroup === -1 ? "rotate-180" : ""}`} />
+                  </button>
+                ) : (
+                  <Link href="/catalog" onClick={() => setMobileOpen(false)} className="flex items-center justify-between px-3 py-3 text-sm font-semibold text-white/80 hover:text-white rounded-xl hover:bg-white/[0.06] transition-all">
+                    Catalogue
+                    <Icon d="M8.25 4.5l7.5 7.5-7.5 7.5" size={16} strokeWidth={2.5} />
+                  </Link>
+                )}
 
-                {mobileGroup === -1 && (
+                {mobileGroup === -1 && hasCatalog && (
                   <div className="ml-3 mt-1 space-y-0.5">
                     {displayGroups.map((grp, i) => (
                       <div key={grp.id}>
@@ -546,7 +466,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
               </div>
 
               {/* Other nav links */}
-              {[...NAV_LINKS, { label: "Request a Quote", href: "/rfq" }].map((link) => (
+              {[ ...NAV_LINKS, { label: "Request a Quote", href: "/rfq" } ].map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}

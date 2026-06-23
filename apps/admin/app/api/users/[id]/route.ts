@@ -39,7 +39,7 @@ export async function GET(
 
     if (!admin) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    return NextResponse.json({ admin });
+    return NextResponse.json({ admin: { ...admin, permissions: (admin as { permissions?: string[] }).permissions ?? [] } });
   } catch (err) {
     console.error("GET /api/users/[id]", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

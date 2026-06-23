@@ -14,12 +14,12 @@ export interface SolutionGroup {
   image: { url: string; alt: string };
 }
 
-type MegaMenu    = "solutions" | "industries" | "resources" | null;
+type MegaMenu = "solutions" | "industries" | "resources" | null;
 type MobileSection = "solutions" | "industries" | "resources" | null;
 
 // Passed from the server component (Header.tsx) — DB-driven
 export interface NavIndustry { slug: string; name: string; desc: string; }
-export interface NavResItem  { label: string; desc: string; href: string; type: string; }
+export interface NavResItem { label: string; desc: string; href: string; type: string; }
 
 // ─── SVG helper ───────────────────────────────────────────────────────────────
 
@@ -86,7 +86,7 @@ const IcoShieldCheck = () => (
 const IcoConveyor = () => (
   <Svg>
     <rect x="2" y="8" width="20" height="8" rx="2" />
-    <circle cx="6"  cy="19" r="2" />
+    <circle cx="6" cy="19" r="2" />
     <circle cx="18" cy="19" r="2" />
     <path d="M6 17V8M18 17V8" />
     <path d="M8 12h8" />
@@ -188,7 +188,7 @@ const IcoBarChart = () => (
   <Svg>
     <line x1="18" y1="20" x2="18" y2="10" />
     <line x1="12" y1="20" x2="12" y2="4" />
-    <line x1="6"  y1="20" x2="6"  y2="14" />
+    <line x1="6" y1="20" x2="6" y2="14" />
   </Svg>
 );
 
@@ -248,100 +248,28 @@ const IcoCheck = () => (
 // ─── Solutions data ───────────────────────────────────────────────────────────
 
 interface SolutionCard {
-  slug:  string;
-  name:  string;
-  desc:  string;
-  icon:  React.ReactNode;
-  bg:    string;
-  text:  string;
+  slug: string;
+  name: string;
+  desc: string;
+  icon: React.ReactNode;
+  img?: { url: string; alt: string };
+  bg: string;
+  text: string;
   chips: string[];
 }
 
-const solutionCards: SolutionCard[] = [
-  {
-    slug:  "electrical",
-    name:  "Electrical Distribution",
-    desc:  "LV/MV switchgear, circuit protection, metering & cable systems",
-    icon:  <IcoZap />,
-    bg:    "bg-yellow-50 dark:bg-yellow-950/30",
-    text:  "text-yellow-600 dark:text-yellow-400",
-    chips: ["Switchgear", "MCCBs", "Metering", "Busbars"],
-  },
-  {
-    slug:  "automation",
-    name:  "Automation & Control",
-    desc:  "PLCs, HMIs, SCADA systems, industrial networks & motion control",
-    icon:  <IcoCpu />,
-    bg:    "bg-blue-50 dark:bg-blue-950/30",
-    text:  "text-blue-600 dark:text-blue-400",
-    chips: ["PLCs", "HMIs", "SCADA", "Motion Control"],
-  },
-  {
-    slug:  "drives",
-    name:  "Variable Speed Drives",
-    desc:  "VFDs, soft starters & motor controllers for every load profile",
-    icon:  <IcoGauge />,
-    bg:    "bg-indigo-50 dark:bg-indigo-950/30",
-    text:  "text-indigo-600 dark:text-indigo-400",
-    chips: ["VFDs", "Soft Starters", "Motor Control"],
-  },
-  {
-    slug:  "power",
-    name:  "Power & Energy",
-    desc:  "Distribution transformers, UPS, power quality & energy monitoring",
-    icon:  <IcoTransformer />,
-    bg:    "bg-orange-50 dark:bg-orange-950/30",
-    text:  "text-orange-600 dark:text-orange-400",
-    chips: ["Transformers", "UPS", "Power Quality"],
-  },
-  {
-    slug:  "pneumatics",
-    name:  "Pneumatic Systems",
-    desc:  "Directional valves, cylinders, FRLs & pneumatic accessories",
-    icon:  <IcoAir />,
-    bg:    "bg-sky-50 dark:bg-sky-950/30",
-    text:  "text-sky-600 dark:text-sky-400",
-    chips: ["Valves", "Cylinders", "Air Preparation"],
-  },
-  {
-    slug:  "safety",
-    name:  "Safety Systems",
-    desc:  "Safety relays, light curtains, E-stops & SIL-rated interlocks",
-    icon:  <IcoShieldCheck />,
-    bg:    "bg-red-50 dark:bg-red-950/30",
-    text:  "text-red-500 dark:text-red-400",
-    chips: ["Safety Relays", "Light Curtains", "E-Stops"],
-  },
-  {
-    slug:  "conveying",
-    name:  "Conveying & Handling",
-    desc:  "Conveyor drives, rollers, chain hoists & material transfer systems",
-    icon:  <IcoConveyor />,
-    bg:    "bg-amber-50 dark:bg-amber-950/30",
-    text:  "text-amber-600 dark:text-amber-400",
-    chips: ["Conveyor Drives", "Rollers", "Hoists"],
-  },
-  {
-    slug:  "motors",
-    name:  "Motors & Generators",
-    desc:  "IE2/IE3 efficiency motors, servo motors & generating sets",
-    icon:  <IcoMotor />,
-    bg:    "bg-green-50 dark:bg-green-950/30",
-    text:  "text-green-600 dark:text-green-400",
-    chips: ["IE2/IE3 Motors", "Servos", "Generators"],
-  },
-];
+/* ─── Static solution cards removed — nav now uses DB-only data ─── */
 
 // Meta augmentation for DB groups (keyed by slug)
 const SOLUTION_META: Record<string, Omit<SolutionCard, "slug" | "name" | "desc">> = {
-  electrical: { icon: <IcoZap />,        bg: "bg-yellow-50 dark:bg-yellow-950/30", text: "text-yellow-600 dark:text-yellow-400", chips: ["Switchgear", "MCCBs", "Metering"] },
-  automation: { icon: <IcoCpu />,         bg: "bg-blue-50 dark:bg-blue-950/30",    text: "text-blue-600 dark:text-blue-400",   chips: ["PLCs", "HMIs", "SCADA"] },
-  drives:     { icon: <IcoGauge />,       bg: "bg-indigo-50 dark:bg-indigo-950/30",text: "text-indigo-600 dark:text-indigo-400",chips: ["VFDs", "Soft Starters"] },
-  power:      { icon: <IcoTransformer />, bg: "bg-orange-50 dark:bg-orange-950/30",text: "text-orange-600 dark:text-orange-400",chips: ["Transformers", "UPS"] },
-  pneumatics: { icon: <IcoAir />,         bg: "bg-sky-50 dark:bg-sky-950/30",      text: "text-sky-600 dark:text-sky-400",     chips: ["Valves", "Cylinders"] },
-  safety:     { icon: <IcoShieldCheck />, bg: "bg-red-50 dark:bg-red-950/30",      text: "text-red-500 dark:text-red-400",     chips: ["Safety Relays", "E-Stops"] },
-  conveying:  { icon: <IcoConveyor />,    bg: "bg-amber-50 dark:bg-amber-950/30",  text: "text-amber-600 dark:text-amber-400", chips: ["Conveyor Drives", "Rollers"] },
-  motors:     { icon: <IcoMotor />,       bg: "bg-green-50 dark:bg-green-950/30",  text: "text-green-600 dark:text-green-400", chips: ["IE2/IE3 Motors", "Servos"] },
+  electrical: { icon: <IcoZap />, bg: "bg-yellow-50 dark:bg-yellow-950/30", text: "text-yellow-600 dark:text-yellow-400", chips: [ "Switchgear", "MCCBs", "Metering" ] },
+  automation: { icon: <IcoCpu />, bg: "bg-blue-50 dark:bg-blue-950/30", text: "text-blue-600 dark:text-blue-400", chips: [ "PLCs", "HMIs", "SCADA" ] },
+  drives: { icon: <IcoGauge />, bg: "bg-indigo-50 dark:bg-indigo-950/30", text: "text-indigo-600 dark:text-indigo-400", chips: [ "VFDs", "Soft Starters" ] },
+  power: { icon: <IcoTransformer />, bg: "bg-orange-50 dark:bg-orange-950/30", text: "text-orange-600 dark:text-orange-400", chips: [ "Transformers", "UPS" ] },
+  pneumatics: { icon: <IcoAir />, bg: "bg-sky-50 dark:bg-sky-950/30", text: "text-sky-600 dark:text-sky-400", chips: [ "Valves", "Cylinders" ] },
+  safety: { icon: <IcoShieldCheck />, bg: "bg-red-50 dark:bg-red-950/30", text: "text-red-500 dark:text-red-400", chips: [ "Safety Relays", "E-Stops" ] },
+  conveying: { icon: <IcoConveyor />, bg: "bg-amber-50 dark:bg-amber-950/30", text: "text-amber-600 dark:text-amber-400", chips: [ "Conveyor Drives", "Rollers" ] },
+  motors: { icon: <IcoMotor />, bg: "bg-green-50 dark:bg-green-950/30", text: "text-green-600 dark:text-green-400", chips: [ "IE2/IE3 Motors", "Servos" ] },
 };
 const SOLUTION_META_DEFAULT: Omit<SolutionCard, "slug" | "name" | "desc"> = {
   icon: <IcoZap />, bg: "bg-slate-100 dark:bg-slate-800/40", text: "text-slate-600 dark:text-slate-300", chips: [],
@@ -353,137 +281,101 @@ interface Industry { label: string; desc: string; href: string; bg: string; text
 
 // Icon/color map keyed by slug — Tailwind classes must be statically defined
 const INDUSTRY_META: Record<string, { icon: React.ReactNode; bg: string; text: string }> = {
-  "mining":        { icon: <IcoMining />,       bg: "bg-amber-50 dark:bg-amber-950/30",   text: "text-amber-600 dark:text-amber-400"  },
-  "oil-gas":       { icon: <IcoOilGas />,        bg: "bg-orange-50 dark:bg-orange-950/30", text: "text-orange-600 dark:text-orange-400" },
-  "manufacturing": { icon: <IcoManufacturing />, bg: "bg-blue-50 dark:bg-blue-950/30",     text: "text-blue-600 dark:text-blue-400"    },
-  "energy":        { icon: <IcoPower />,         bg: "bg-yellow-50 dark:bg-yellow-950/30", text: "text-yellow-600 dark:text-yellow-500" },
-  "water":         { icon: <IcoWater />,         bg: "bg-cyan-50 dark:bg-cyan-950/30",     text: "text-cyan-600 dark:text-cyan-400"    },
-  "ports":         { icon: <IcoPorts />,         bg: "bg-indigo-50 dark:bg-indigo-950/30", text: "text-indigo-600 dark:text-indigo-400" },
-  "food-beverage": { icon: <IcoFood />,          bg: "bg-green-50 dark:bg-green-950/30",   text: "text-green-600 dark:text-green-400"  },
-  "construction":  { icon: <IcoConstruction />,  bg: "bg-slate-100 dark:bg-slate-800/40",  text: "text-slate-600 dark:text-slate-300"  },
+  "mining": { icon: <IcoMining />, bg: "bg-amber-50 dark:bg-amber-950/30", text: "text-amber-600 dark:text-amber-400" },
+  "oil-gas": { icon: <IcoOilGas />, bg: "bg-orange-50 dark:bg-orange-950/30", text: "text-orange-600 dark:text-orange-400" },
+  "manufacturing": { icon: <IcoManufacturing />, bg: "bg-blue-50 dark:bg-blue-950/30", text: "text-blue-600 dark:text-blue-400" },
+  "energy": { icon: <IcoPower />, bg: "bg-yellow-50 dark:bg-yellow-950/30", text: "text-yellow-600 dark:text-yellow-500" },
+  "water": { icon: <IcoWater />, bg: "bg-cyan-50 dark:bg-cyan-950/30", text: "text-cyan-600 dark:text-cyan-400" },
+  "ports": { icon: <IcoPorts />, bg: "bg-indigo-50 dark:bg-indigo-950/30", text: "text-indigo-600 dark:text-indigo-400" },
+  "food-beverage": { icon: <IcoFood />, bg: "bg-green-50 dark:bg-green-950/30", text: "text-green-600 dark:text-green-400" },
+  "construction": { icon: <IcoConstruction />, bg: "bg-slate-100 dark:bg-slate-800/40", text: "text-slate-600 dark:text-slate-300" },
 };
 const INDUSTRY_META_DEFAULT = {
   icon: <IcoManufacturing />, bg: "bg-slate-100 dark:bg-slate-800/40", text: "text-slate-600 dark:text-slate-300",
 };
 
-// Static fallback used when DB returns empty
-const STATIC_INDUSTRIES: Industry[] = [
-  { label: "Mining & Minerals",  desc: "Motor control, protection & drives for deep-level operations", href: "/industries/mining",        ...(INDUSTRY_META["mining"]        ?? INDUSTRY_META_DEFAULT) },
-  { label: "Oil & Gas",          desc: "ATEX-rated equipment & process instrumentation",               href: "/industries/oil-gas",        ...(INDUSTRY_META["oil-gas"]       ?? INDUSTRY_META_DEFAULT) },
-  { label: "Manufacturing",      desc: "Assembly automation, quality & production control",            href: "/industries/manufacturing",  ...(INDUSTRY_META["manufacturing"] ?? INDUSTRY_META_DEFAULT) },
-  { label: "Power & Energy",     desc: "HV/MV switchgear, transformers & power quality",              href: "/industries/energy",         ...(INDUSTRY_META["energy"]        ?? INDUSTRY_META_DEFAULT) },
-  { label: "Water & Wastewater", desc: "SCADA, level control & pump protection systems",              href: "/industries/water",          ...(INDUSTRY_META["water"]         ?? INDUSTRY_META_DEFAULT) },
-  { label: "Ports & Logistics",  desc: "Variable speed drives, conveying & crane systems",            href: "/industries/ports",          ...(INDUSTRY_META["ports"]         ?? INDUSTRY_META_DEFAULT) },
-  { label: "Food & Beverage",    desc: "Hygienic motors, process & packaging automation",             href: "/industries/food-beverage",  ...(INDUSTRY_META["food-beverage"] ?? INDUSTRY_META_DEFAULT) },
-  { label: "Construction",       desc: "Temporary power, distribution boards & site electrical",      href: "/industries/construction",   ...(INDUSTRY_META["construction"]  ?? INDUSTRY_META_DEFAULT) },
-];
+/* ─── Static industry fallback removed — nav now uses DB-only data ─── */
 
 // ─── Resource data ────────────────────────────────────────────────────────────
 
-interface ResourceItem  { label: string; desc: string; href: string; icon: React.ReactNode; }
+interface ResourceItem { label: string; desc: string; href: string; icon: React.ReactNode; }
 interface ResourceGroup { heading: string; accent: string; items: ResourceItem[]; }
 
 // Icon map keyed by resource type (code-defined)
 const RESOURCE_ICON_MAP: Record<string, React.ReactNode> = {
-  "library":        <IcoFileText />,
-  "training":       <IcoGraduationCap />,
-  "cad":            <IcoDraftingCompass />,
-  "case-studies":   <IcoBarChart />,
-  "news":           <IcoNewspaper />,
-  "projects":       <IcoImages />,
+  "library": <IcoFileText />,
+  "training": <IcoGraduationCap />,
+  "cad": <IcoDraftingCompass />,
+  "case-studies": <IcoBarChart />,
+  "news": <IcoNewspaper />,
+  "projects": <IcoImages />,
   "certifications": <IcoFileText />,
-  "other":          <IcoFileText />,
+  "other": <IcoFileText />,
 };
 
 // Maps resource types to the two dynamic nav groups
 const RES_GROUP_CONFIG: { heading: string; accent: string; types: string[] }[] = [
-  { heading: "Technical Resources", accent: "text-blue-500",  types: ["library", "training", "cad", "certifications"] },
-  { heading: "Knowledge Hub",       accent: "text-[#84CC16]", types: ["case-studies", "news", "projects", "other"]    },
+  { heading: "Technical Resources", accent: "text-blue-500", types: [ "library", "training", "cad", "certifications" ] },
+  { heading: "Knowledge Hub", accent: "text-[#84CC16]", types: [ "case-studies", "news", "projects", "other" ] },
 ];
 
 // Get Support is always hardcoded — these are contact actions, not DB resource pages
 const SUPPORT_GROUP: ResourceGroup = {
   heading: "Get Support",
-  accent:  "text-purple-500",
+  accent: "text-purple-500",
   items: [
-    { label: "Technical Support", desc: "Speak with a certified product specialist",       href: "/contact?type=technical",    icon: <IcoHeadphones /> },
-    { label: "Request a Quote",   desc: "Formal quotation with pricing & lead times",      href: "/contact?type=quote",         icon: <IcoClipboard /> },
-    { label: "WhatsApp Us",       desc: "+233 30 396 4346 — instant response",             href: "https://wa.me/233303964346", icon: <IcoMessageCircle /> },
+    { label: "Technical Support", desc: "Speak with a certified product specialist", href: "/contact?type=technical", icon: <IcoHeadphones /> },
+    { label: "Request a Quote", desc: "Formal quotation with pricing & lead times", href: "/contact?type=quote", icon: <IcoClipboard /> },
+    { label: "WhatsApp Us", desc: "+233 30 396 4346 — instant response", href: "https://wa.me/233303964346", icon: <IcoMessageCircle /> },
   ],
 };
 
-// Static fallback used when DB returns empty
-const STATIC_RESOURCE_GROUPS: ResourceGroup[] = [
-  {
-    heading: "Technical Resources",
-    accent:  "text-blue-500",
-    items: [
-      { label: "Datasheets & Manuals", desc: "Official specs, installation guides & compliance docs", href: "/resources/library",        icon: <IcoFileText /> },
-      { label: "Product Training",      desc: "Webinars, certification paths & e-learning modules",   href: "/resources/training",       icon: <IcoGraduationCap /> },
-      { label: "Technical Drawings",    desc: "CAD files, wiring diagrams & dimensional drawings",    href: "/resources/cad",            icon: <IcoDraftingCompass /> },
-    ],
-  },
-  {
-    heading: "Knowledge Hub",
-    accent:  "text-[#84CC16]",
-    items: [
-      { label: "Case Studies",    desc: "Proven project outcomes across West Africa",        href: "/resources/case-studies",   icon: <IcoBarChart /> },
-      { label: "News & Insights", desc: "Industry trends, product launches & company news",  href: "/resources/news",           icon: <IcoNewspaper /> },
-      { label: "Project Gallery", desc: "Completed installations from our engineering team", href: "/resources/project-gallery",icon: <IcoImages /> },
-    ],
-  },
-  SUPPORT_GROUP,
-];
+/* ─── Static resource groups removed — nav now uses DB-only data ─── */
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
 interface Props {
-  groups:        SolutionGroup[];
+  groups: SolutionGroup[];
   navIndustries: NavIndustry[];
-  navResItems:   NavResItem[];
+  navResItems: NavResItem[];
 }
 
 export default function HeaderClient({ groups, navIndustries, navResItems }: Props) {
-  const [scrolled,       setScrolled]       = useState(false);
-  const [activeMenu,     setActiveMenu]     = useState<MegaMenu>(null);
-  const [mobileOpen,     setMobileOpen]     = useState(false);
-  const [mobileSection,  setMobileSection]  = useState<MobileSection>(null);
-  const [hoveredSol,     setHoveredSol]     = useState<string | null>(null);
+  const [ scrolled, setScrolled ] = useState(false);
+  const [ activeMenu, setActiveMenu ] = useState<MegaMenu>(null);
+  const [ mobileOpen, setMobileOpen ] = useState(false);
+  const [ mobileSection, setMobileSection ] = useState<MobileSection>(null);
+  const [ hoveredSol, setHoveredSol ] = useState<string | null>(null);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Solutions: DB groups enriched with icon/color meta, or static fallback
-  const displaySolutions: SolutionCard[] = groups.length > 0
-    ? groups.map((g) => {
-        const meta = SOLUTION_META[g.slug] ?? SOLUTION_META_DEFAULT;
-        return { slug: g.slug, name: g.name, desc: g.description, ...meta };
-      })
-    : solutionCards;
+  // Solutions: DB groups enriched with icon/color meta
+  const displaySolutions: SolutionCard[] = groups.map((g) => {
+    const meta = SOLUTION_META[ g.slug ] ?? SOLUTION_META_DEFAULT;
+    return { slug: g.slug, name: g.name, desc: g.description, img: g.image, ...meta };
+  });
 
   // Active featured solution (hovered or first)
-  const activeFeat = displaySolutions.find((s) => s.slug === hoveredSol) ?? displaySolutions[0];
+  const activeFeat = displaySolutions.find((s) => s.slug === hoveredSol) ?? displaySolutions[ 0 ];
 
-  // Industries: DB docs enriched with icon/color, or static fallback
-  const displayIndustries: Industry[] = navIndustries.length > 0
-    ? navIndustries.map((ind) => ({
-        label: ind.name,
-        desc:  ind.desc,
-        href:  `/industries/${ind.slug}`,
-        ...(INDUSTRY_META[ind.slug] ?? INDUSTRY_META_DEFAULT),
-      }))
-    : STATIC_INDUSTRIES;
+  // Industries: DB docs enriched with icon/color
+  const displayIndustries: Industry[] = navIndustries.map((ind) => ({
+    label: ind.name,
+    desc: ind.desc,
+    href: `/industries/${ind.slug}`,
+    ...(INDUSTRY_META[ ind.slug ] ?? INDUSTRY_META_DEFAULT),
+  }));
 
-  // Resources: group DB items by type then append hardcoded Support, or use static fallback
+  // Resources: group DB items by type, always append hardcoded Support group
   const dynamicResGroups: ResourceGroup[] = RES_GROUP_CONFIG
     .map((cfg) => ({
       heading: cfg.heading,
-      accent:  cfg.accent,
+      accent: cfg.accent,
       items: navResItems
         .filter((r) => cfg.types.includes(r.type))
-        .map((r) => ({ label: r.label, desc: r.desc, href: r.href, icon: RESOURCE_ICON_MAP[r.type] ?? <IcoFileText /> })),
+        .map((r) => ({ label: r.label, desc: r.desc, href: r.href, icon: RESOURCE_ICON_MAP[ r.type ] ?? <IcoFileText /> })),
     }))
     .filter((g) => g.items.length > 0);
-  const displayResGroups: ResourceGroup[] =
-    dynamicResGroups.length > 0 ? [...dynamicResGroups, SUPPORT_GROUP] : STATIC_RESOURCE_GROUPS;
+  const displayResGroups: ResourceGroup[] = [ ...dynamicResGroups, SUPPORT_GROUP ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
@@ -508,10 +400,9 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
   };
 
   const navBtn = (menu: MegaMenu) =>
-    `relative flex items-center gap-1 px-3 py-2 text-sm font-medium transition-colors duration-150 rounded-md cursor-pointer select-none ${
-      activeMenu === menu
-        ? "text-[#0F172A] dark:text-white bg-[#F1F5F9] dark:bg-white/10"
-        : "text-[#475569] dark:text-white/80 hover:text-[#0F172A] dark:hover:text-white hover:bg-[#F1F5F9] dark:hover:bg-white/10"
+    `relative flex items-center gap-1 px-3 py-2 text-sm font-medium transition-colors duration-150 rounded-md cursor-pointer select-none ${activeMenu === menu
+      ? "text-[#0F172A] dark:text-white bg-[#F1F5F9] dark:bg-white/10"
+      : "text-[#475569] dark:text-white/80 hover:text-[#0F172A] dark:hover:text-white hover:bg-[#F1F5F9] dark:hover:bg-white/10"
     }`;
 
   const toggleMobile = (s: MobileSection) =>
@@ -530,18 +421,17 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
       )}
 
       <header
-        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${
-          scrolled
-            ? "bg-white/95 dark:bg-[#080f1e]/97 backdrop-blur-md shadow-sm dark:shadow-[0_1px_0_0_rgba(255,255,255,.05)]"
-            : "bg-white dark:bg-[#080f1e]"
-        } border-b border-[#E2E8F0] dark:border-white/6`}
+        className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 ${scrolled
+          ? "bg-white/95 dark:bg-[#080f1e]/97 backdrop-blur-md shadow-sm dark:shadow-[0_1px_0_0_rgba(255,255,255,.05)]"
+          : "bg-white dark:bg-[#080f1e]"
+          } border-b border-[#E2E8F0] dark:border-white/6`}
         onMouseLeave={scheduleClose}
         onMouseEnter={() => { if (closeTimer.current) clearTimeout(closeTimer.current); }}
       >
         {/* Top info bar */}
         <div className="border-b border-[#E2E8F0] dark:border-white/5 bg-[#F8FAFC] dark:bg-[#0a0f1e]">
           <div className="container-apt flex items-center justify-between h-9 text-xs text-[#64748B] dark:text-white/40">
-            <span className="hidden sm:block">West Africa's Leading Industrial Technology Platform</span>
+            <span className="hidden sm:block">West Africa&apos;s Leading Industrial Technology Platform</span>
             <span className="sm:hidden">APT Ghana Industrial Solutions</span>
             <div className="hidden md:flex items-center gap-6">
               <a href="tel:+233303964346" className="hover:text-[#0F172A] dark:hover:text-white/70 transition-colors">+233 30 396 4346</a>
@@ -635,144 +525,60 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
               <div className="flex gap-6">
                 {/* ── Left: 4-col capability card grid ── */}
                 <div className="flex-1 min-w-0">
-                  <div className="grid grid-cols-4 gap-1.5">
-                    {displaySolutions.map((sol) => (
-                      <Link
-                        key={sol.slug}
-                        href={`/solutions/${sol.slug}`}
-                        className={`group relative flex flex-col gap-2.5 p-3.5 rounded-xl border transition-all duration-150 cursor-pointer
-                          ${hoveredSol === sol.slug
-                            ? "bg-[#F8FAFC] dark:bg-white/5 border-[#E2E8F0] dark:border-white/10 shadow-sm"
-                            : "bg-transparent border-transparent hover:bg-[#F8FAFC] dark:hover:bg-white/4 hover:border-[#E2E8F0] dark:hover:border-white/7"
-                          }`}
-                        onMouseEnter={() => setHoveredSol(sol.slug)}
-                        onMouseLeave={() => setHoveredSol(null)}
-                        onClick={() => setActiveMenu(null)}
-                        aria-current={hoveredSol === sol.slug ? "true" : undefined}
-                      >
-                        {/* Active indicator dot */}
-                        {hoveredSol === sol.slug && (
-                          <span className="absolute top-3 right-3 w-1.5 h-1.5 rounded-full bg-[#84CC16]" aria-hidden="true" />
-                        )}
-
-                        {/* Icon */}
-                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-all duration-150 ${sol.bg} ${sol.text} group-hover:scale-110`}>
-                          {sol.icon}
-                        </div>
-
-                        {/* Name + desc */}
-                        <div>
-                          <div className={`text-[13px] font-semibold leading-tight transition-colors duration-150 ${
-                            hoveredSol === sol.slug
+                  {displaySolutions.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-10 text-center">
+                      <p className="text-[13px] font-semibold text-[#0F172A]">Solutions are being configured</p>
+                      <p className="text-[12px] text-[#94A3B8] mt-1">Visit the solutions page or contact us for more information.</p>
+                      <Link href="/solutions" className="mt-3 text-[12px] font-semibold text-[#0057b8] hover:underline" onClick={() => setActiveMenu(null)}>
+                        Browse Solutions →
+                      </Link>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-4 gap-1.5">
+                      {displaySolutions.map((sol) => (
+                        <Link
+                          key={sol.slug}
+                          href={`/solutions/${sol.slug}`}
+                          className={`group relative flex flex-col gap-2.5 p-3.5 rounded-xl border transition-all duration-150 cursor-pointer
+                            ${hoveredSol === sol.slug
+                              ? "bg-[#F8FAFC] dark:bg-white/5 border-[#E2E8F0] dark:border-white/10 shadow-sm"
+                              : "bg-transparent border-transparent hover:bg-[#F8FAFC] dark:hover:bg-white/4 hover:border-[#E2E8F0] dark:hover:border-white/7"
+                            }`}
+                          onMouseEnter={() => setHoveredSol(sol.slug)}
+                          onMouseLeave={() => setHoveredSol(null)}
+                          onClick={() => setActiveMenu(null)}
+                          aria-current={hoveredSol === sol.slug ? "true" : undefined}
+                        >
+                          {hoveredSol === sol.slug && (
+                            <span className="absolute top-3 right-3 w-1.5 h-1.5 rounded-full bg-[#84CC16]" aria-hidden="true" />
+                          )}
+                          <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-all duration-150 ${sol.bg} ${sol.text} group-hover:scale-110`}>
+                            {sol.img ? <img src={sol.img.url} alt={sol.img.alt} className="w-5 h-5 object-contain" /> : sol.icon}
+                          </div>
+                          <div>
+                            <div className={`text-[13px] font-semibold leading-tight transition-colors duration-150 ${hoveredSol === sol.slug
                               ? "text-[#0057b8] dark:text-[#84CC16]"
                               : "text-[#0F172A] dark:text-white/90 group-hover:text-[#0057b8] dark:group-hover:text-[#84CC16]"
-                          }`}>
-                            {sol.name}
+                              }`}>
+                              {sol.name}
+                            </div>
+                            <div className="text-[11px] text-[#94A3B8] dark:text-white/40 mt-0.5 leading-relaxed line-clamp-2">
+                              {sol.desc}
+                            </div>
                           </div>
-                          <div className="text-[11px] text-[#94A3B8] dark:text-white/40 mt-0.5 leading-relaxed line-clamp-2">
-                            {sol.desc}
-                          </div>
-                        </div>
-
-                        {/* Chips */}
-                        {sol.chips.length > 0 && (
-                          <div className="flex flex-wrap gap-1 mt-auto pt-1">
-                            {sol.chips.slice(0, 2).map((chip) => (
-                              <span
-                                key={chip}
-                                className="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#F1F5F9] dark:bg-white/6 text-[#64748B] dark:text-white/40 leading-none"
-                              >
-                                {chip}
-                              </span>
-                            ))}
-                          </div>
-                        )}
-                      </Link>
-                    ))}
-                  </div>
-                </div>
-
-                {/* ── Right: Dynamic featured panel ── */}
-                <div className="w-72 shrink-0">
-                  <div className="h-full rounded-2xl overflow-hidden bg-[#0A0F1E] dark:bg-[#0d1530] border border-white/6 flex flex-col">
-                    {/* Accent bar */}
-                    <div className="h-1 bg-linear-to-r from-[#84CC16] via-[#a3e635] to-[#84CC16] shrink-0" />
-
-                    <div className="p-6 flex flex-col flex-1">
-                      {/* Eyebrow */}
-                      <div className="flex items-center justify-between mb-4">
-                        <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#84CC16]">
-                          {hoveredSol ? "Selected Solution" : "Featured Solution"}
-                        </span>
-                        {activeFeat && (
-                          <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${activeFeat.bg} ${activeFeat.text}`}>
-                            {activeFeat.icon}
-                          </div>
-                        )}
-                      </div>
-
-                      {activeFeat && (
-                        <>
-                          {/* Solution name */}
-                          <h3
-                            className="text-[15px] font-bold text-white leading-snug mb-2"
-                            style={{ fontFamily: "var(--font-sora,'Sora',sans-serif)" }}
-                          >
-                            {activeFeat.name}
-                          </h3>
-                          <p className="text-[12px] text-white/50 leading-relaxed mb-5">
-                            {activeFeat.desc}
-                          </p>
-
-                          {/* All chips */}
-                          {activeFeat.chips.length > 0 && (
-                            <div className="mb-5">
-                              <div className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/30 mb-2">
-                                Product Types
-                              </div>
-                              <div className="space-y-1.5">
-                                {activeFeat.chips.map((chip) => (
-                                  <div key={chip} className="flex items-center gap-2 text-[12px] text-white/60">
-                                    <span className={`${activeFeat.text}`}><IcoCheck /></span>
-                                    {chip}
-                                  </div>
-                                ))}
-                              </div>
+                          {sol.chips.length > 0 && (
+                            <div className="flex flex-wrap gap-1 mt-auto pt-1">
+                              {sol.chips.slice(0, 2).map((chip) => (
+                                <span key={chip} className="inline-block px-1.5 py-0.5 rounded text-[10px] font-medium bg-[#F1F5F9] dark:bg-white/6 text-[#64748B] dark:text-white/40 leading-none">
+                                  {chip}
+                                </span>
+                              ))}
                             </div>
                           )}
-
-                          {/* Related brands badge */}
-                          <div className="flex items-center gap-2 py-3 px-3 rounded-lg bg-white/4 border border-white/7 mb-5 mt-auto">
-                            <span className="text-[11px] text-white/40 leading-relaxed">
-                              Sourced from Schneider Electric, WEG, ABB & 26+ certified brands
-                            </span>
-                          </div>
-                        </>
-                      )}
-
-                      {/* CTAs */}
-                      <div className="space-y-2">
-                        {activeFeat && (
-                          <Link
-                            href={`/solutions/${activeFeat.slug}`}
-                            className="flex items-center justify-between w-full px-4 py-2.5 rounded-lg bg-[#84CC16] hover:bg-[#78B800] text-[#0A0F1E] text-[12px] font-bold transition-colors group"
-                            onClick={() => setActiveMenu(null)}
-                          >
-                            Explore {activeFeat.name}
-                            <span className="group-hover:translate-x-0.5 transition-transform"><IcoArrowRight /></span>
-                          </Link>
-                        )}
-                        <Link
-                          href="/contact?type=quote"
-                          className="flex items-center justify-between w-full px-4 py-2.5 rounded-lg bg-white/7 hover:bg-white/12 border border-white/10 text-white text-[12px] font-semibold transition-all group"
-                          onClick={() => setActiveMenu(null)}
-                        >
-                          Request a Quote
-                          <span className="text-[#84CC16] group-hover:translate-x-0.5 transition-transform"><IcoArrowRight /></span>
                         </Link>
-                      </div>
+                      ))}
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
 
@@ -844,23 +650,33 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
               <div className="flex gap-7">
                 {/* Industry grid */}
                 <div className="flex-1 min-w-0">
-                  <div className="grid grid-cols-2 gap-1">
-                    {displayIndustries.map((ind) => (
-                      <Link
-                        key={ind.href} href={ind.href}
-                        className="group flex items-start gap-3 p-3.5 rounded-xl hover:bg-[#F8FAFC] dark:hover:bg-white/4 transition-all duration-150 border border-transparent hover:border-[#E2E8F0] dark:hover:border-white/7"
-                        onClick={() => setActiveMenu(null)}
-                      >
-                        <div className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center ${ind.bg} ${ind.text} transition-transform duration-150 group-hover:scale-110`}>
-                          {ind.icon}
-                        </div>
-                        <div className="min-w-0 pt-0.5">
-                          <div className="text-[13px] font-semibold text-[#0F172A] dark:text-white/90 group-hover:text-[#0057b8] dark:group-hover:text-[#84CC16] transition-colors leading-tight">{ind.label}</div>
-                          <div className="text-[11px] text-[#94A3B8] dark:text-white/40 mt-0.5 leading-relaxed line-clamp-1">{ind.desc}</div>
-                        </div>
+                  {displayIndustries.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-10 text-center">
+                      <p className="text-[13px] font-semibold text-[#0F172A]">Industry pages are being configured</p>
+                      <p className="text-[12px] text-[#94A3B8] mt-1">Visit the industries page or contact us to discuss your sector.</p>
+                      <Link href="/industries" className="mt-3 text-[12px] font-semibold text-[#0057b8] hover:underline" onClick={() => setActiveMenu(null)}>
+                        Browse Industries →
                       </Link>
-                    ))}
-                  </div>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-2 gap-1">
+                      {displayIndustries.map((ind) => (
+                        <Link
+                          key={ind.href} href={ind.href}
+                          className="group flex items-start gap-3 p-3.5 rounded-xl hover:bg-[#F8FAFC] dark:hover:bg-white/4 transition-all duration-150 border border-transparent hover:border-[#E2E8F0] dark:hover:border-white/7"
+                          onClick={() => setActiveMenu(null)}
+                        >
+                          <div className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center ${ind.bg} ${ind.text} transition-transform duration-150 group-hover:scale-110`}>
+                            {ind.icon}
+                          </div>
+                          <div className="min-w-0 pt-0.5">
+                            <div className="text-[13px] font-semibold text-[#0F172A] dark:text-white/90 group-hover:text-[#0057b8] dark:group-hover:text-[#84CC16] transition-colors leading-tight">{ind.label}</div>
+                            <div className="text-[11px] text-[#94A3B8] dark:text-white/40 mt-0.5 leading-relaxed line-clamp-1">{ind.desc}</div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Sector spotlight */}
@@ -870,7 +686,7 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
                     <div className="p-6">
                       <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-[#84CC16] mb-3">Sector Expertise</div>
                       <h3 className="text-[15px] font-bold text-white leading-snug mb-3" style={{ fontFamily: "var(--font-sora,'Sora',sans-serif)" }}>
-                        Powering West Africa's Most Demanding Industries
+                        Powering West Africa&apos;s Most Demanding Industries
                       </h3>
                       <p className="text-[12px] text-white/50 leading-relaxed mb-5">
                         From deep-level gold mining to offshore oil & gas — APT Ghana delivers certified automation and electrical solutions built for the region.
@@ -878,8 +694,8 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
                       <div className="space-y-2.5 mb-6">
                         {[
                           { label: "Mining & Minerals", value: "35% of clients" },
-                          { label: "Manufacturing",     value: "Fastest growing" },
-                          { label: "Power & Energy",    value: "26+ brand partners" },
+                          { label: "Manufacturing", value: "Fastest growing" },
+                          { label: "Power & Energy", value: "26+ brand partners" },
                         ].map((s) => (
                           <div key={s.label} className="flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -1046,21 +862,23 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
 
               {mobileSection === "solutions" && (
                 <div className="pb-4 space-y-3">
-                  <div className="grid grid-cols-2 gap-1.5">
-                    {displaySolutions.map((sol) => (
-                      <Link
-                        key={sol.slug}
-                        href={`/solutions/${sol.slug}`}
-                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-[#F8FAFC] dark:bg-white/4 hover:bg-[#F1F5F9] dark:hover:bg-white/7 transition-colors"
-                        onClick={() => setMobileOpen(false)}
-                      >
-                        <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center ${sol.bg} ${sol.text}`}>
-                          {sol.icon}
-                        </div>
-                        <span className="text-[12px] font-semibold text-[#0F172A] dark:text-white/80 leading-tight">{sol.name}</span>
-                      </Link>
-                    ))}
-                  </div>
+                  {displaySolutions.length > 0 && (
+                    <div className="grid grid-cols-2 gap-1.5">
+                      {displaySolutions.map((sol) => (
+                        <Link
+                          key={sol.slug}
+                          href={`/solutions/${sol.slug}`}
+                          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-[#F8FAFC] dark:bg-white/4 hover:bg-[#F1F5F9] dark:hover:bg-white/7 transition-colors"
+                          onClick={() => setMobileOpen(false)}
+                        >
+                          <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center ${sol.bg} ${sol.text}`}>
+                            {sol.icon}
+                          </div>
+                          <span className="text-[12px] font-semibold text-[#0F172A] dark:text-white/80 leading-tight">{sol.name}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                   <div className="flex gap-2">
                     <Link
                       href="/solutions"
@@ -1096,18 +914,20 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
 
               {mobileSection === "industries" && (
                 <div className="pb-4 space-y-1.5">
-                  <div className="grid grid-cols-2 gap-1.5 mb-3">
-                    {displayIndustries.map((ind) => (
-                      <Link
-                        key={ind.href} href={ind.href}
-                        className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-[#F8FAFC] dark:bg-white/4 hover:bg-[#F1F5F9] dark:hover:bg-white/7 transition-colors"
-                        onClick={() => setMobileOpen(false)}
-                      >
-                        <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center ${ind.bg} ${ind.text}`}>{ind.icon}</div>
-                        <span className="text-[12px] font-semibold text-[#0F172A] dark:text-white/80 leading-tight">{ind.label}</span>
-                      </Link>
-                    ))}
-                  </div>
+                  {displayIndustries.length > 0 && (
+                    <div className="grid grid-cols-2 gap-1.5 mb-3">
+                      {displayIndustries.map((ind) => (
+                        <Link
+                          key={ind.href} href={ind.href}
+                          className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl bg-[#F8FAFC] dark:bg-white/4 hover:bg-[#F1F5F9] dark:hover:bg-white/7 transition-colors"
+                          onClick={() => setMobileOpen(false)}
+                        >
+                          <div className={`shrink-0 w-7 h-7 rounded-lg flex items-center justify-center ${ind.bg} ${ind.text}`}>{ind.icon}</div>
+                          <span className="text-[12px] font-semibold text-[#0F172A] dark:text-white/80 leading-tight">{ind.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
                   <Link href="/industries" className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#0057b8] text-white text-[13px] font-semibold" onClick={() => setMobileOpen(false)}>
                     All Industries <IcoArrowRight />
                   </Link>
@@ -1116,7 +936,7 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
             </div>
 
             {/* Brands, Services */}
-            {[{ label: "Brands", href: "/brands" }, { label: "Services", href: "/services" }].map((item) => (
+            {[ { label: "Brands", href: "/brands" }, { label: "Services", href: "/services" } ].map((item) => (
               <Link
                 key={item.href} href={item.href}
                 className="flex items-center justify-between py-3.5 border-b border-[#E2E8F0] dark:border-white/7 text-[#0F172A] dark:text-white/90 text-[15px] font-medium"
@@ -1172,7 +992,7 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
             </div>
 
             {/* Company, Contact */}
-            {[{ label: "Company", href: "/company" }, { label: "Contact", href: "/contact" }].map((item) => (
+            {[ { label: "Company", href: "/company" }, { label: "Contact", href: "/contact" } ].map((item) => (
               <Link
                 key={item.href} href={item.href}
                 className="flex items-center justify-between py-3.5 border-b border-[#E2E8F0] dark:border-white/7 text-[#0F172A] dark:text-white/90 text-[15px] font-medium"
