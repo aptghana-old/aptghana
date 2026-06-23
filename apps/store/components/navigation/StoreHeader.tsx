@@ -12,6 +12,7 @@ interface DisplayGroup {
   color: string;
   href: string;
   iconPath: string;
+  iconImage?: string;
   categories: {
     name: string; desc: string; href: string; img?: {
       url: string, alt?: string
@@ -271,6 +272,9 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                         style={{ background: activeGroup === i ? grp.color + "20" : "var(--bg-raised)" }}
                       >
                         <Icon d={grp.iconPath} size={15} strokeWidth={1.75} className={activeGroup === i ? "" : "text-theme-3"} style={{ color: activeGroup === i ? grp.color : undefined } as React.CSSProperties} />
+                        {grp.iconImage && (
+                          <img src={grp.iconImage} alt={grp.label} className="w-4 h-4 object-contain" />
+                        )}
                       </div>
                       <span className="truncate">{grp.label}</span>
                       {activeGroup === i && (

@@ -81,7 +81,7 @@ async function getNavGroups(): Promise<NavGroup[]> {
     }
 
     return JSON.parse(JSON.stringify(groups.map((group: any) => {
-      const meta = GROUP_META[group.slug] ?? DEFAULT_META;
+      const meta = GROUP_META[ group.slug ] ?? DEFAULT_META;
       const categories = (catsByGroupId.get(String(group._id)) ?? []).map((cat: any) => {
         const subcategories = (subcatsByCatId.get(String(cat._id)) ?? []).map((s) => ({
           ...s,
@@ -89,6 +89,7 @@ async function getNavGroups(): Promise<NavGroup[]> {
         }));
         return {
           name: cat.name, slug: cat.slug,
+          img: cat.image ? { url: cat.image, alt: cat.name } : undefined,
           href: `/catalog/${group.slug}/${cat.slug}`,
           desc: (cat.shortDescription || cat.description || "").slice(0, 160),
           image: cat.image?.url ?? "",
