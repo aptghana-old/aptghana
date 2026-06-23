@@ -129,7 +129,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
 
               {/* Logo */}
               <Link href="/" className="flex items-center shrink-0">
-                <Image src="/images/logo.png" alt="APT Ghana" width={140} height={69}
+                <Image src="/logo.png" alt="APT Ghana" width={140} height={69}
                   className="h-10 w-auto object-contain dark:invert" priority />
               </Link>
 
