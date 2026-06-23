@@ -8,13 +8,13 @@ import { useCart } from "@/lib/store/cart";
 /* ──────────────────────────────────────────────────────────────────────────────
    TYPES
 ────────────────────────────────────────────────────────────────────────────── */
-interface Media         { url: string; alt: string; width?: number; height?: number }
-interface SpecAttr      { name: string; value: string; unit?: string }
-interface SpecGroup     { group: string; attributes: SpecAttr[] }
-interface DocItem       { type: string; title: string; url: string; language: string; fileSize?: number }
-interface CrossRef      { brand: string; mpn: string; description?: string }
-interface VideoItem     { title: string; url: string; thumbnail?: string }
-interface BrandSummary  {
+interface Media { url: string; alt: string; width?: number; height?: number }
+interface SpecAttr { name: string; value: string; unit?: string }
+interface SpecGroup { group: string; attributes: SpecAttr[] }
+interface DocItem { type: string; title: string; url: string; language: string; fileSize?: number }
+interface CrossRef { brand: string; mpn: string; description?: string }
+interface VideoItem { title: string; url: string; thumbnail?: string }
+interface BrandSummary {
   slug: string; name: string; logo?: Media;
   website?: string; country?: string; shortDescription?: string;
   productCount?: number; isPartner?: boolean;
@@ -50,7 +50,7 @@ function Icon({ d, size = 18, sw = 1.75, className = "", fill = "none", style }:
   d: string | string[]; size?: number; sw?: number; className?: string; fill?: string;
   style?: React.CSSProperties;
 }) {
-  const paths = Array.isArray(d) ? d : [d];
+  const paths = Array.isArray(d) ? d : [ d ];
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill={fill}
       stroke="currentColor" strokeWidth={sw} strokeLinecap="round" strokeLinejoin="round"
@@ -61,26 +61,26 @@ function Icon({ d, size = 18, sw = 1.75, className = "", fill = "none", style }:
 }
 
 const IC = {
-  cart:      "M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z",
-  quote:     "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
-  heart:     "M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z",
-  compare:   "M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5",
-  share:     "M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z",
-  check:     "M4.5 12.75l6 6 9-13.5",
-  chevronD:  "M19.5 8.25l-7.5 7.5-7.5-7.5",
-  chevronL:  "M15.75 19.5L8.25 12l7.5-7.5",
-  chevronR:  "M8.25 4.5l7.5 7.5-7.5 7.5",
-  zoom:      "M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6",
-  close:     "M6 18L18 6M6 6l12 12",
-  download:  "M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4",
-  pdf:       ["M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"],
-  link:      "M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244",
-  phone:     "M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z",
-  info:      "M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z",
-  search:    "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z",
-  print:     "M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z",
-  external:  "M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25",
-  tag:       "M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z M6 6h.008v.008H6V6z",
+  cart: "M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z",
+  quote: "M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z",
+  heart: "M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z",
+  compare: "M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5",
+  share: "M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z",
+  check: "M4.5 12.75l6 6 9-13.5",
+  chevronD: "M19.5 8.25l-7.5 7.5-7.5-7.5",
+  chevronL: "M15.75 19.5L8.25 12l7.5-7.5",
+  chevronR: "M8.25 4.5l7.5 7.5-7.5 7.5",
+  zoom: "M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607zM10.5 7.5v6m3-3h-6",
+  close: "M6 18L18 6M6 6l12 12",
+  download: "M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4",
+  pdf: [ "M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" ],
+  link: "M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244",
+  phone: "M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z",
+  info: "M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.708 2.836a.75.75 0 001.063.853l.041-.021M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9-3.75h.008v.008H12V8.25z",
+  search: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z",
+  print: "M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0110.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0l.229 2.523a1.125 1.125 0 01-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0021 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 00-1.913-.247M6.34 18H5.25A2.25 2.25 0 013 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 011.913-.247m10.5 0a48.536 48.536 0 00-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5zm-3 0h.008v.008H15V10.5z",
+  external: "M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25",
+  tag: "M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z M6 6h.008v.008H6V6z",
 };
 
 /* ──────────────────────────────────────────────────────────────────────────────
@@ -90,7 +90,7 @@ function fmt(n: number, cur: string) {
   return `${cur} ${n.toLocaleString("en-GH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 function brandLabel(slug: string) {
-  return slug.split("-").map((w) => w[0].toUpperCase() + w.slice(1)).join(" ");
+  return slug.split("-").map((w) => w[ 0 ].toUpperCase() + w.slice(1)).join(" ");
 }
 function fileSize(bytes?: number) {
   if (!bytes) return null;
@@ -108,24 +108,24 @@ function fileSize(bytes?: number) {
 ────────────────────────────────────────────────────────────────────────────── */
 function PurchasePanel({ product }: { product: ProductFull }) {
   const { add } = useCart();
-  const [qty, setQty]             = useState(Math.max(1, product.pricing.minimumOrderQty || 1));
-  const [added, setAdded]         = useState(false);
-  const [wishlisted, setWishlisted] = useState(false);
-  const [copied, setCopied]       = useState(false);
+  const [ qty, setQty ] = useState(Math.max(1, product.pricing.minimumOrderQty || 1));
+  const [ added, setAdded ] = useState(false);
+  const [ wishlisted, setWishlisted ] = useState(false);
+  const [ copied, setCopied ] = useState(false);
 
-  const inStock   = (product.inventory?.quantity ?? 0) > 0;
-  const minQty    = Math.max(1, product.pricing.minimumOrderQty || 1);
+  const inStock = (product.inventory?.quantity ?? 0) > 0;
+  const minQty = Math.max(1, product.pricing.minimumOrderQty || 1);
   const hasPricing = product.pricing.listPrice > 0;
   const showDiscount = product.discount > 0;
   const brandName = product.brand?.name ?? brandLabel(product.brandSlug);
 
   function handleAddToCart() {
     add({
-      id:       product._id,
-      sku:      product.sku,
-      name:     product.name,
+      id: product._id,
+      sku: product.sku,
+      name: product.name,
       imageUrl: product.images.main?.url ?? "",
-      price:    product.pricing.listPrice,
+      price: product.pricing.listPrice,
       currency: product.pricing.currency,
       minQty,
     }, qty);
@@ -191,9 +191,9 @@ function PurchasePanel({ product }: { product: ProductFull }) {
         style={{ borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}
       >
         {[
-          { label: "APT SKU",  val: product.sku },
+          { label: "APT SKU", val: product.sku },
           { label: "Mfr. Part", val: product.mpn },
-          ...(product.supplierRef ? [{ label: "Supplier Ref", val: product.supplierRef }] : []),
+          ...(product.supplierRef ? [ { label: "Supplier Ref", val: product.supplierRef } ] : []),
         ].map(({ label, val }) => (
           <div key={label}>
             <dt className="mb-0.5" style={{ color: "var(--text-4)" }}>{label}</dt>
@@ -267,52 +267,52 @@ function PurchasePanel({ product }: { product: ProductFull }) {
       <div className="space-y-3">
         {/* Procurement basket: products without pricing are still addable for quotation */}
         <div className="flex items-stretch gap-2">
-            {/* Qty stepper */}
-            <div
-              className="flex items-stretch rounded-xl overflow-hidden shrink-0"
-              style={{ border: "1.5px solid var(--border-hi)" }}
-            >
-              <button
-                onClick={() => handleQty(-minQty)}
-                disabled={qty <= minQty}
-                className="w-10 flex items-center justify-center text-lg font-medium transition-colors disabled:opacity-30"
-                style={{ color: "var(--text-2)", background: "var(--bg-raised)" }}
-                aria-label="Decrease quantity"
-              >
-                −
-              </button>
-              <input
-                type="number"
-                value={qty}
-                min={minQty}
-                step={minQty}
-                onChange={(e) => setQty(Math.max(minQty, parseInt(e.target.value) || minQty))}
-                className="w-14 text-center text-[14px] font-bold focus:outline-none"
-                style={{ background: "var(--bg-surface)", color: "var(--text-1)" }}
-                aria-label="Quantity"
-              />
-              <button
-                onClick={() => handleQty(minQty)}
-                className="w-10 flex items-center justify-center text-lg font-medium transition-colors"
-                style={{ color: "var(--text-2)", background: "var(--bg-raised)" }}
-                aria-label="Increase quantity"
-              >
-                +
-              </button>
-            </div>
-
-            {/* Add to Cart */}
+          {/* Qty stepper */}
+          <div
+            className="flex items-stretch rounded-xl overflow-hidden shrink-0"
+            style={{ border: "1.5px solid var(--border-hi)" }}
+          >
             <button
-              onClick={handleAddToCart}
-              className="flex-1 h-12 flex items-center justify-center gap-2 rounded-xl text-[14px] font-bold text-white transition-all active:scale-[0.97]"
-              style={{
-                background: added ? "#15803d" : "#0057b8",
-                boxShadow: "0 2px 12px rgba(0,87,184,0.3)",
-              }}
+              onClick={() => handleQty(-minQty)}
+              disabled={qty <= minQty}
+              className="w-10 flex items-center justify-center text-lg font-medium transition-colors disabled:opacity-30"
+              style={{ color: "var(--text-2)", background: "var(--bg-raised)" }}
+              aria-label="Decrease quantity"
             >
-              <Icon d={added ? IC.check : IC.cart} size={17} sw={2} />
-              {added ? "Added to cart" : "Add to Cart"}
+              −
             </button>
+            <input
+              type="number"
+              value={qty}
+              min={minQty}
+              step={minQty}
+              onChange={(e) => setQty(Math.max(minQty, parseInt(e.target.value) || minQty))}
+              className="w-14 text-center text-[14px] font-bold focus:outline-none"
+              style={{ background: "var(--bg-surface)", color: "var(--text-1)" }}
+              aria-label="Quantity"
+            />
+            <button
+              onClick={() => handleQty(minQty)}
+              className="w-10 flex items-center justify-center text-lg font-medium transition-colors"
+              style={{ color: "var(--text-2)", background: "var(--bg-raised)" }}
+              aria-label="Increase quantity"
+            >
+              +
+            </button>
+          </div>
+
+          {/* Add to Cart */}
+          <button
+            onClick={handleAddToCart}
+            className="flex-1 h-12 flex items-center justify-center gap-2 rounded-xl text-[14px] font-bold text-white transition-all active:scale-[0.97]"
+            style={{
+              background: added ? "#15803d" : "#0057b8",
+              boxShadow: "0 2px 12px rgba(0,87,184,0.3)",
+            }}
+          >
+            <Icon d={added ? IC.check : IC.cart} size={17} sw={2} />
+            {added ? "Added to cart" : "Add to Cart"}
+          </button>
         </div>
 
         {/* Request Quote */}
@@ -351,7 +351,7 @@ function PurchasePanel({ product }: { product: ProductFull }) {
           {
             label: "Compare",
             icon: IC.compare,
-            onClick: () => {},
+            onClick: () => { },
           },
           {
             label: copied ? "Copied!" : "Share",
@@ -421,8 +421,8 @@ function PurchasePanel({ product }: { product: ProductFull }) {
    SPECS TAB
 ────────────────────────────────────────────────────────────────────────────── */
 function SpecsPanel({ specs }: { specs: SpecGroup[] }) {
-  const [query, setQuery]         = useState("");
-  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [ query, setQuery ] = useState("");
+  const [ collapsed, setCollapsed ] = useState<Set<string>>(new Set());
 
   const filtered = useMemo(() => {
     if (!query.trim()) return specs;
@@ -438,7 +438,7 @@ function SpecsPanel({ specs }: { specs: SpecGroup[] }) {
         ),
       }))
       .filter((g) => g.attributes.length > 0);
-  }, [specs, query]);
+  }, [ specs, query ]);
 
   const totalAttrs = specs.reduce((s, g) => s + g.attributes.length, 0);
   const toggle = (name: string) =>
@@ -577,12 +577,12 @@ function SpecsPanel({ specs }: { specs: SpecGroup[] }) {
    DOCUMENTS TAB
 ────────────────────────────────────────────────────────────────────────────── */
 const DOC_META: Record<string, { label: string; color: string; bg: string }> = {
-  datasheet:   { label: "Datasheet",    color: "#dc2626", bg: "#fef2f2" },
-  manual:      { label: "Manual",       color: "#0057b8", bg: "#ddeeff" },
-  drawing:     { label: "Drawing",      color: "#7c3aed", bg: "#f5f3ff" },
-  certificate: { label: "Certificate",  color: "#15803d", bg: "#f0fdf4" },
-  compliance:  { label: "Compliance",   color: "#92400e", bg: "#fef3c7" },
-  other:       { label: "Document",     color: "#374151", bg: "var(--bg-raised)" },
+  datasheet: { label: "Datasheet", color: "#dc2626", bg: "#fef2f2" },
+  manual: { label: "Manual", color: "#0057b8", bg: "#ddeeff" },
+  drawing: { label: "Drawing", color: "#7c3aed", bg: "#f5f3ff" },
+  certificate: { label: "Certificate", color: "#15803d", bg: "#f0fdf4" },
+  compliance: { label: "Compliance", color: "#92400e", bg: "#fef3c7" },
+  other: { label: "Document", color: "#374151", bg: "var(--bg-raised)" },
 };
 
 function DocsPanel({ docs }: { docs: DocItem[] }) {
@@ -598,15 +598,15 @@ function DocsPanel({ docs }: { docs: DocItem[] }) {
   // Group by type
   const grouped = docs.reduce<Record<string, DocItem[]>>((acc, doc) => {
     const key = doc.type ?? "other";
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(doc);
+    if (!acc[ key ]) acc[ key ] = [];
+    acc[ key ].push(doc);
     return acc;
   }, {});
 
   return (
     <div className="space-y-6">
-      {Object.entries(grouped).map(([type, items]) => {
-        const meta = DOC_META[type] ?? DOC_META.other;
+      {Object.entries(grouped).map(([ type, items ]) => {
+        const meta = DOC_META[ type ] ?? DOC_META.other;
         return (
           <div key={type}>
             <h3 className="text-[13px] font-bold uppercase tracking-wide mb-3" style={{ color: "var(--text-3)" }}>
@@ -783,7 +783,7 @@ function CrossRefPanel({ refs }: { refs: CrossRef[] }) {
       <table className="w-full text-[13px]">
         <thead>
           <tr style={{ background: "var(--bg-raised)", borderBottom: "2px solid var(--border)" }}>
-            {["Manufacturer", "Part Number", "Description"].map((h) => (
+            {[ "Manufacturer", "Part Number", "Description" ].map((h) => (
               <th key={h} className="text-left px-4 py-3 text-[12px] font-bold uppercase tracking-wide" style={{ color: "var(--text-3)" }}>
                 {h}
               </th>
@@ -816,13 +816,13 @@ function CrossRefPanel({ refs }: { refs: CrossRef[] }) {
 type TabKey = "overview" | "specs" | "docs" | "crossrefs";
 
 function ProductTabs({ product }: { product: ProductFull }) {
-  const [active, setActive] = useState<TabKey>("overview");
+  const [ active, setActive ] = useState<TabKey>("overview");
 
   const tabs = (
     [
-      { key: "overview"  as TabKey, label: "Overview" },
-      { key: "specs"     as TabKey, label: "Specifications", count: product.specifications.reduce((s, g) => s + g.attributes.length, 0) },
-      { key: "docs"      as TabKey, label: "Documents",      count: product.documents.length },
+      { key: "overview" as TabKey, label: "Overview" },
+      { key: "specs" as TabKey, label: "Specifications", count: product.specifications.reduce((s, g) => s + g.attributes.length, 0) },
+      { key: "docs" as TabKey, label: "Documents", count: product.documents.length },
       { key: "crossrefs" as TabKey, label: "Cross-References", count: product.crossReferences?.length, hidden: !product.crossReferences?.length },
     ] as { key: TabKey; label: string; count?: number; hidden?: boolean }[]
   ).filter((t) => !t.hidden);
@@ -915,7 +915,7 @@ function ProductTabs({ product }: { product: ProductFull }) {
 ────────────────────────────────────────────────────────────────────────────── */
 function BrandSection({ product }: { product: ProductFull }) {
   const brand = product.brand;
-  const name  = brand?.name ?? brandLabel(product.brandSlug);
+  const name = brand?.name ?? brandLabel(product.brandSlug);
 
   return (
     <div
@@ -1064,9 +1064,9 @@ function RelatedProducts({ products }: { products: RelatedProduct[] }) {
 function Breadcrumb({ product }: { product: ProductFull }) {
   const name = product.brand?.name ?? brandLabel(product.brandSlug);
   const crumbs = [
-    { label: "Home",     href: "/" },
-    { label: "Products", href: "/products" },
-    { label: name,       href: `/brands/${product.brandSlug}` },
+    { label: "Home", href: "/" },
+    { label: "Catalog", href: "/catalog" },
+    { label: name, href: `/brands/${product.brandSlug}` },
     { label: product.name },
   ];
   return (
@@ -1093,7 +1093,7 @@ function Breadcrumb({ product }: { product: ProductFull }) {
    ROOT EXPORT
 ────────────────────────────────────────────────────────────────────────────── */
 export default function ProductDetail({ product }: { product: ProductFull }) {
-  const allImages = [product.images?.main, ...(product.images?.gallery ?? [])].filter(
+  const allImages = [ product.images?.main, ...(product.images?.gallery ?? []) ].filter(
     (img): img is Media => !!(img?.url)
   );
 

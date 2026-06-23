@@ -1,10 +1,10 @@
 import Link from "next/link";
 
 const SUGGESTIONS = [
-  { label: "Browse all products", href: "/products" },
+  { label: "Browse all products", href: "/catalog" },
   { label: "View clearance items", href: "/clearance" },
   { label: "Contact our team", href: "/contact" },
-  { label: "Browse by category", href: "/products" },
+  { label: "Browse by category", href: "/catalog" },
 ];
 
 const TIPS = [

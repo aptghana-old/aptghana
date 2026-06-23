@@ -73,7 +73,7 @@ export default async function OrdersPage() {
             title="No orders yet"
             description="When you place orders, they will appear here for tracking and reordering."
             action={
-              <Link href="/products" className="inline-flex items-center gap-1.5 h-10 px-5 bg-navy-500 hover:bg-navy-400 text-white text-sm font-bold rounded-xl transition-colors">
+              <Link href="/catalog" className="inline-flex items-center gap-1.5 h-10 px-5 bg-navy-500 hover:bg-navy-400 text-white text-sm font-bold rounded-xl transition-colors">
                 Browse Products
               </Link>
             }
@@ -103,7 +103,7 @@ export default async function OrdersPage() {
                     <td className="px-4 py-4 text-(--text-3)">{fmt(order.createdAt)}</td>
                     <td className="px-4 py-4 text-(--text-3)">{order.items?.length ?? "—"}</td>
                     <td className="px-4 py-4 font-semibold text-(--text-1)">{fmtCurrency(order.total, order.currency)}</td>
-                    <td className="px-4 py-4"><StatusBadge status={order.status} label={ORDER_LABELS[order.status]} /></td>
+                    <td className="px-4 py-4"><StatusBadge status={order.status} label={ORDER_LABELS[ order.status ]} /></td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         {order.status === "pending" && order.payToken && (
@@ -141,7 +141,7 @@ export default async function OrdersPage() {
                   <p className="text-xs text-(--text-4) mt-0.5">{fmt(order.createdAt)}</p>
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
-                  <StatusBadge status={order.status} label={ORDER_LABELS[order.status]} />
+                  <StatusBadge status={order.status} label={ORDER_LABELS[ order.status ]} />
                   <p className="text-xs font-bold text-(--text-1)">
                     {order.status === "pending" && order.payToken ? "Pay now → " : ""}
                     {fmtCurrency(order.total, order.currency)}

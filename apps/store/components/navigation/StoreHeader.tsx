@@ -37,6 +37,26 @@ function Icon({ d, size = 20, strokeWidth = 1.75, className = "", style }: { d: 
   );
 }
 
+/* ─── Fixed-size image container — reserves space before image loads ─────── */
+function MegaMenuCategoryImage({ src, alt }: { src: string; alt: string }) {
+  return (
+    <div
+      className="w-10 h-10 shrink-0 rounded-lg flex items-center justify-center overflow-hidden"
+      style={{ background: "var(--bg-raised)" }}
+    >
+      <Image
+        src={src}
+        alt={alt}
+        width={40}
+        height={40}
+        className="object-contain w-full h-full"
+        sizes="40px"
+        loading="lazy"
+      />
+    </div>
+  );
+}
+
 /* ─── Header component ───────────────────────────────────────────────────── */
 function adaptNavGroups(navGroups: import("@/app/layout").NavGroup[]): DisplayGroup[] {
   return navGroups.map((g) => ({
@@ -123,8 +143,8 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
           &nbsp;·&nbsp; Same-day quotation before 3 PM
         </div>
 
-        {/* Main header row */}
-        <div className="bg-navy-900">
+        {/* ── Desktop header row (lg+): Logo · Search · Actions ── */}
+        <div className="hidden lg:block bg-navy-900">
           <div className="container-store">
             <div className="flex items-center gap-3 h-15">
 
@@ -142,7 +162,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search products, brands, part numbers, SKUs..."
-                    className="flex-1 h-11 px-4 bg-white/[0.07] text-sm text-white placeholder-white/30 focus:outline-none focus:bg-white/[0.10] transition-colors"
+                    className="flex-1 min-w-0 h-11 px-4 bg-white/[0.07] text-sm text-white placeholder-white/30 focus:outline-none focus:bg-white/[0.10] transition-colors"
                     autoComplete="off"
                   />
                   <button
@@ -150,7 +170,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                     className="h-11 px-5 bg-navy-500 hover:bg-navy-400 text-white flex items-center gap-2 text-sm font-semibold shrink-0 transition-colors"
                   >
                     <Icon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" size={17} strokeWidth={2.5} />
-                    <span className="hidden sm:block">Search</span>
+                    <span>Search</span>
                   </button>
                 </div>
               </form>
@@ -174,16 +194,54 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
 
                 <Link
                   href="/rfq"
-                  className="hidden sm:flex items-center gap-1.5 h-9 px-4 bg-apt-orange hover:bg-apt-orange-hover text-white text-[13px] font-bold rounded-lg ml-1 transition-colors shadow-md shadow-orange-900/30"
+                  className="flex items-center gap-1.5 h-9 px-4 bg-apt-orange hover:bg-apt-orange-hover text-white text-[13px] font-bold rounded-lg ml-1 transition-colors shadow-md shadow-orange-900/30"
                 >
                   <Icon d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25M9 16.5v.75m3-3v3M15 12v5.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" size={16} />
                   RFQ
                 </Link>
+              </div>
+            </div>
+          </div>
+        </div>
 
-                {/* Mobile hamburger */}
+        {/* ── Mobile header (< lg): Row 1 + Row 2 ── */}
+        <div className="lg:hidden bg-navy-900">
+          <div className="container-store">
+
+            {/* Row 1: Logo (left) · Account, Wishlist, Cart, Menu (right) */}
+            <div className="flex items-center h-14">
+              <Link href="/" className="flex items-center shrink-0">
+                <Image src="/logo.png" alt="APT Ghana" width={120} height={59}
+                  className="h-9 w-auto object-contain" priority />
+              </Link>
+
+              <div className="ml-auto flex items-center gap-0.5">
+                <UserAccountButton />
+
+                <Link
+                  href="/wishlist"
+                  className="p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                  aria-label="Wishlist"
+                >
+                  <Icon d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 4.875 7.502 9.875 8.932 10.717.448.264.992.264 1.44 0C15.498 18.125 21 13.125 21 8.25z" size={20} />
+                </Link>
+
+                <Link
+                  href="/cart"
+                  className="relative p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                  aria-label="Cart"
+                >
+                  <Icon d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" size={20} />
+                  {cartCount > 0 && (
+                    <span className="absolute top-1 right-1 w-3.5 h-3.5 text-[9px] font-bold bg-apt-orange text-white rounded-full flex items-center justify-center">
+                      {cartCount}
+                    </span>
+                  )}
+                </Link>
+
                 <button
                   onClick={() => setMobileOpen(!mobileOpen)}
-                  className="lg:hidden p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-lg ml-1 transition-all"
+                  className="p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-lg ml-0.5 transition-all"
                   aria-label="Menu"
                 >
                   {mobileOpen
@@ -192,6 +250,29 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                   }
                 </button>
               </div>
+            </div>
+
+            {/* Row 2: Full-width search — never overflows */}
+            <div className="pb-3">
+              <form onSubmit={handleSearch}>
+                <div className="flex w-full rounded-xl overflow-hidden shadow-md shadow-black/20 ring-1 ring-white/10 focus-within:ring-navy-400/60 transition-shadow">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search products, brands, part numbers..."
+                    className="flex-1 min-w-0 h-11 px-4 bg-white/[0.07] text-sm text-white placeholder-white/30 focus:outline-none focus:bg-white/[0.10] transition-colors"
+                    autoComplete="off"
+                  />
+                  <button
+                    type="submit"
+                    className="h-11 px-4 bg-navy-500 hover:bg-navy-400 text-white flex items-center justify-center shrink-0 transition-colors"
+                    aria-label="Search"
+                  >
+                    <Icon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" size={17} strokeWidth={2.5} />
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>
@@ -244,10 +325,10 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
           </div>
         </div>
 
-        {/* Mega menu panel */}
+        {/* Mega menu panel — images use Next.js Image with explicit sizes to prevent CLS */}
         {megaOpen && hasCatalog && (
           <div
-            className="absolute left-0 right-0 top-full z-50 mega-panel"
+            className="absolute left-0 right-0 top-full z-50 mega-panel mega-enter"
             onMouseEnter={cancelCloseMega}
             onMouseLeave={delayedCloseMega}
           >
@@ -267,13 +348,24 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                         : "text-theme-2 hover:bg-[var(--bg-raised)]"
                         }`}
                     >
+                      {/* Fixed 28×28 icon container prevents layout shift */}
                       <div
-                        className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all"
+                        className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 overflow-hidden transition-all"
                         style={{ background: activeGroup === i ? grp.color + "20" : "var(--bg-raised)" }}
                       >
                         {grp.iconImage ? (
-                          <img src={grp.iconImage} alt={grp.label} className="w-4 h-4 object-contain" />
-                        ) : (<Icon d={grp.iconPath} size={15} strokeWidth={1.75} className={activeGroup === i ? "" : "text-theme-3"} style={{ color: activeGroup === i ? grp.color : undefined } as React.CSSProperties} />)}
+                          <Image
+                            src={grp.iconImage}
+                            alt={grp.label}
+                            width={16}
+                            height={16}
+                            className="object-contain"
+                            sizes="16px"
+                            loading="lazy"
+                          />
+                        ) : (
+                          <Icon d={grp.iconPath} size={15} strokeWidth={1.75} className={activeGroup === i ? "" : "text-theme-3"} style={{ color: activeGroup === i ? grp.color : undefined } as React.CSSProperties} />
+                        )}
                       </div>
                       <span className="truncate">{grp.label}</span>
                       {activeGroup === i && (
@@ -310,9 +402,9 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                         onClick={() => setMegaOpen(false)}
                         className="flex items-start gap-2.5 px-3 py-2.5 rounded-xl hover:bg-[var(--bg-raised)] transition-colors group"
                       >
-
+                        {/* Fixed 40×40 container prevents CLS when image loads */}
                         {cat.img?.url ? (
-                          <img src={cat.img?.url} alt={cat.img?.alt} className="size-10 object-contain" />
+                          <MegaMenuCategoryImage src={cat.img.url} alt={cat.img.alt ?? cat.name} />
                         ) : (
                           <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 transition-all" style={{ background: group.color }} />
                         )}
@@ -345,35 +437,6 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                     ))}
                   </div>
                 </div>
-
-                {/* Right: featured brand */}
-                <div className="w-56 shrink-0 hidden xl:block">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-theme-4 mb-3">Featured Partner</p>
-                  <Link
-                    href={group.featured.href}
-                    onClick={() => setMegaOpen(false)}
-                    className="block p-4 rounded-xl border border-theme hover:border-navy-500/40 hover:shadow-lg transition-all group bg-[var(--bg-raised)]"
-                  >
-                    <span className="inline-block px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest rounded-full mb-3" style={{ background: group.color + "15", color: group.color }}>
-                      {group.featured.tag}
-                    </span>
-                    <p className="font-bold text-theme-1 group-hover:text-navy-500 transition-colors text-base mb-1">{group.featured.name}</p>
-                    <p className="text-xs text-theme-3 leading-relaxed mb-4">{group.featured.desc}</p>
-                    <span className="flex items-center gap-1 text-xs font-semibold text-navy-500">
-                      View Products
-                      <Icon d="M8.25 4.5l7.5 7.5-7.5 7.5" size={13} strokeWidth={2.5} className="group-hover:translate-x-0.5 transition-transform" />
-                    </span>
-                  </Link>
-
-                  <Link
-                    href="/brands"
-                    onClick={() => setMegaOpen(false)}
-                    className="flex items-center justify-between mt-3 px-4 py-2.5 rounded-xl border border-theme hover:border-apt-orange/40 bg-[var(--bg-raised)] transition-all group"
-                  >
-                    <span className="text-sm font-semibold text-theme-2 group-hover:text-apt-orange transition-colors">All 26 Brands</span>
-                    <Icon d="M17 8l4 4m0 0l-4 4m4-4H3" size={15} strokeWidth={2} className="text-theme-3 group-hover:text-apt-orange transition-colors group-hover:translate-x-0.5" />
-                  </Link>
-                </div>
               </div>
             </div>
           </div>
@@ -405,9 +468,9 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search products..."
-                  className="flex-1 h-11 px-4 bg-white/[0.06] text-sm text-white placeholder-white/30 focus:outline-none"
+                  className="flex-1 min-w-0 h-11 px-4 bg-white/[0.06] text-sm text-white placeholder-white/30 focus:outline-none"
                 />
-                <button type="submit" className="h-11 px-4 bg-navy-500 text-white transition-colors">
+                <button type="submit" className="h-11 px-4 bg-navy-500 text-white shrink-0 transition-colors">
                   <Icon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" size={17} strokeWidth={2.5} />
                 </button>
               </div>

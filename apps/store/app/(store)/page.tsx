@@ -6,12 +6,13 @@ import { STORE_URL, CONTACT_PHONE, SOCIAL_LINKS } from "@apt/config";
 import { safeJsonLd } from "@apt/auth";
 import type {
   HpSlide, HpSidePanel,
-  ServicesBarConfig, PromoBannersConfig, CategoriesConfig,
+  ServicesBarConfig, PromoBannersConfig,
   FeaturedProductsConfig, FullWidthBannerConfig, BrandsTickerConfig,
   IndustriesConfig, WhyChooseConfig, StatsConfig, ResourcesConfig, CTAConfig,
 } from "@apt/db";
 import HeroCarousel, { type HeroSlide } from "@/components/home/HeroCarousel";
 import { getPublishedHomepageConfig } from "@/lib/homepage";
+import ProductCard, { ProductCardData } from "@/components/products/ProductCard";
 
 export const metadata: Metadata = {
   title: "APT Ghana Store | Industrial Technology Platform",
@@ -29,78 +30,103 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 /* ─── Types ───────────────────────────────────────────────────────────────── */
-interface Product {
-  _id: string; name: string; slug: string; brand: string;
-  price?: number; images?: string[]; stock?: number; clearance?: boolean; sku?: string;
-}
+
 interface Brand { _id: string; name: string; slug: string; }
 interface DBCategory { _id: string; name: string; slug: string; shortDescription?: string; }
 interface DBIndustry { _id: string; name: string; slug: string; shortDescription?: string; accentColor?: string; }
 
-/* ─── Category icon map ───────────────────────────────────────────────────── */
-const CAT_META: Record<string, { color: string; bg: string; iconPath: string }> = {
-  "electrical-solutions":        { color: "#3DCD58", bg: "#E8F9ED", iconPath: "M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z" },
-  "electric-motors-gearboxes":   { color: "#0369a1", bg: "#f0f9ff", iconPath: "M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.298 2.247a1.125 1.125 0 0 1-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-2.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.431l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.28Z M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" },
-  "pneumatic-solutions":         { color: "#0891b2", bg: "#ecfeff", iconPath: "M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z" },
-  "conveying-solutions":         { color: "#7c3aed", bg: "#f5f3ff", iconPath: "M7.5 21 3 16.5m0 0L7.5 12M3 16.5h13.5m0-13.5L21 7.5m0 0L16.5 12M21 7.5H7.5" },
-  "mechanical-power-transmission":{ color: "#d97706", bg: "#fffbeb", iconPath: "M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" },
-  "hydraulic-solutions":         { color: "#0057b8", bg: "#eff6ff", iconPath: "M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 2.625c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125m16.5 5.625c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" },
-};
-const CAT_DEFAULT = { color: "#64748b", bg: "#f8fafc", iconPath: "M3.75 6A2.25 2.25 0 0 1 6 3.75h2.25A2.25 2.25 0 0 1 10.5 6v2.25a2.25 2.25 0 0 1-2.25 2.25H6a2.25 2.25 0 0 1-2.25-2.25V6ZM3.75 15.75A2.25 2.25 0 0 1 6 13.5h2.25a2.25 2.25 0 0 1 2.25 2.25V18a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 18v-2.25Z" };
-
-const STATIC_CATEGORIES = [
-  { name: "Electrical Solutions", slug: "electrical-solutions", shortDescription: "Circuit protection, switchgear, contactors & control devices" },
-  { name: "Automation & Control", slug: "automation", shortDescription: "PLCs, HMIs, sensors, variable speed drives & servo systems" },
-  { name: "Pneumatic Systems", slug: "pneumatic-solutions", shortDescription: "Cylinders, valves, FRLs, fittings & air treatment equipment" },
-  { name: "Power & Energy", slug: "power", shortDescription: "UPS systems, power meters, transformers & energy management" },
-  { name: "Conveying Solutions", slug: "conveying-solutions", shortDescription: "Conveyor belts, rollers, chains & material handling systems" },
-  { name: "Safety Systems", slug: "safety", shortDescription: "Emergency stops, safety relays, light curtains & guards" },
-  { name: "Motors & Gearboxes", slug: "electric-motors-gearboxes", shortDescription: "IE2/IE3 motors, gear reducers and coupling systems" },
-  { name: "Hydraulic Solutions", slug: "hydraulic-solutions", shortDescription: "Hydraulic cylinders, pumps, valves and power packs" },
-];
-
 /* Static brand fallback removed — brands section shows empty when DB has none */
 
 const INDUSTRY_ICONS: Record<string, string> = {
-  "mining":         "M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 2.625c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125m16.5 5.625c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125",
-  "manufacturing":  "M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z",
-  "energy":         "M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z",
-  "water":          "M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z",
-  "construction":   "M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z",
-  "food-beverage":  "M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 1-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5",
+  "mining": "M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 2.625c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125m16.5 5.625c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125",
+  "manufacturing": "M11.42 15.17 17.25 21A2.652 2.652 0 0 0 21 17.25l-5.877-5.877M11.42 15.17l2.496-3.03c.317-.384.74-.626 1.208-.766M11.42 15.17l-4.655 5.653a2.548 2.548 0 1 1-3.586-3.586l6.837-5.63m5.108-.233c.55-.164 1.163-.188 1.743-.14a4.5 4.5 0 0 0 4.486-6.336l-3.276 3.277a3.004 3.004 0 0 1-2.25-2.25l3.276-3.276a4.5 4.5 0 0 0-6.336 4.486c.091 1.076-.071 2.264-.904 2.95l-.102.085m-1.745 1.437L5.909 7.5H4.5L2.25 3.75l1.5-1.5L7.5 4.5v1.409l4.26 4.26m-1.745 1.437 1.745-1.437m6.615 8.206L15.75 15.75M4.867 19.125h.008v.008h-.008v-.008Z",
+  "energy": "M3.75 13.5l10.5-11.25L12 10.5h8.25L9.75 21.75 12 13.5H3.75z",
+  "water": "M12 18.75a6 6 0 0 0 6-6v-1.5m-6 7.5a6 6 0 0 1-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 0 1-3-3V4.5a3 3 0 1 1 6 0v8.25a3 3 0 0 1-3 3Z",
+  "construction": "M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Zm0 3h.008v.008h-.008v-.008Z",
+  "food-beverage": "M9.75 3.104v5.714a2.25 2.25 0 0 1-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 0 1 4.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0 1 12 15a9.065 9.065 0 0 1-6.23-.693L5 14.5m14.8.8 1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0 1 12 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5",
 };
-const FALLBACK_ICON = INDUSTRY_ICONS["mining"];
+const FALLBACK_ICON = INDUSTRY_ICONS[ "mining" ];
 
 /* ─── Data fetching ───────────────────────────────────────────────────────── */
 async function getHomeData() {
   try {
     await connectDB();
-    const [products, brands, dbCategories, dbIndustries] = await Promise.all([
-      ProductModel.find({ status: "active" })
-        .sort({ createdAt: -1 }).limit(8)
-        .select("name slug brand price images stock clearance sku").lean(),
-      BrandModel.find({}).sort({ name: 1 }).limit(24).select("name slug").lean(),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (CategoryModel as any).find({ level: "group", status: "active" })
-        .sort({ displayOrder: 1 }).limit(8).select("name slug shortDescription").lean(),
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (IndustryModel as any).find({ status: "active" })
-        .sort({ displayOrder: 1 }).select("name slug shortDescription accentColor").lean(),
-    ]);
+
+    const [ featuredProducts, brands, dbCategories, dbIndustries ] =
+      await Promise.all([
+        ProductModel.find({
+          status: "active",
+        })
+          .sort({ createdAt: -1 })
+          .limit(8)
+          .select([
+            "_id",
+            "name",
+            "slug",
+            "sku",
+            "brand",
+            "price",
+            "images",
+            "stock",
+            "clearance",
+          ].join(" "))
+          .lean(),
+
+        BrandModel.find({})
+          .sort({ name: 1 })
+          .limit(24)
+          .select("name slug")
+          .lean(),
+
+        (CategoryModel as any)
+          .find({ level: "group", status: "active" })
+          .sort({ displayOrder: 1 })
+          .limit(8)
+          .select("name slug shortDescription")
+          .lean(),
+
+        (IndustryModel as any)
+          .find({ status: "active" })
+          .sort({ displayOrder: 1 })
+          .select("name slug shortDescription accentColor")
+          .lean(),
+      ]);
+
+    const products = featuredProducts.map((product) => ({
+      _id: product._id,
+      name: product.name,
+      slug: product.slug,
+      sku: product.sku,
+      brand: product.brand,
+      price: product.price,
+      images: Array.isArray(product.images) ? product.images : [],
+      stock: product.stock ?? 0,
+      clearance: product.clearance ?? false,
+    })) as unknown as ProductCardData[];
+
     return {
-      products: products as unknown as Product[],
+      products,
       brands: brands as unknown as Brand[],
-      dbCategories: JSON.parse(JSON.stringify(dbCategories)) as DBCategory[],
-      dbIndustries: JSON.parse(JSON.stringify(dbIndustries)) as DBIndustry[],
+      dbCategories: JSON.parse(
+        JSON.stringify(dbCategories)
+      ) as DBCategory[],
+      dbIndustries: JSON.parse(
+        JSON.stringify(dbIndustries)
+      ) as DBIndustry[],
     };
   } catch {
-    return { products: [], brands: [], dbCategories: [], dbIndustries: [] };
+    return {
+      products: [],
+      brands: [],
+      dbCategories: [],
+      dbIndustries: [],
+    };
   }
 }
 
 /* ─── Page ────────────────────────────────────────────────────────────────── */
 export default async function StorePage() {
-  const [{ products, brands, dbCategories, dbIndustries }, hpConfig] = await Promise.all([
+  const [ { products, brands, dbCategories, dbIndustries }, hpConfig ] = await Promise.all([
     getHomeData(),
     getPublishedHomepageConfig(),
   ]);
@@ -129,7 +155,7 @@ export default async function StorePage() {
     .map((p: HpSidePanel) => ({ title: p.title, desc: p.desc, href: p.href, image: p.image, badge: p.badge }));
 
   /* Ordered visible sections */
-  const sections = [...hpConfig.sections]
+  const sections = [ ...hpConfig.sections ]
     .filter((s) => s.enabled)
     .sort((a, b) => a.order - b.order);
 
@@ -145,7 +171,7 @@ export default async function StorePage() {
       contactType: "sales",
       areaServed: "GH",
     },
-    sameAs: [SOCIAL_LINKS.linkedin, SOCIAL_LINKS.twitter, SOCIAL_LINKS.youtube],
+    sameAs: [ SOCIAL_LINKS.linkedin, SOCIAL_LINKS.twitter, SOCIAL_LINKS.youtube ],
   };
 
   return (
@@ -167,15 +193,7 @@ export default async function StorePage() {
           case "quick_access":
             return <QuickAccessBar key={section.id} />;
           case "promo_banners":
-            return <PromoBannersSection key={section.id} cfg={cfg as PromoBannersConfig} />;
-          case "categories":
-            return (
-              <CategoriesSection
-                key={section.id}
-                dbCategories={dbCategories}
-                cfg={cfg as CategoriesConfig}
-              />
-            );
+            return <PromoBannersSection key={section.id} cfg={cfg as PromoBannersConfig} />
           case "featured_products":
             return products.length > 0 ? (
               <FeaturedProductsSection
@@ -186,14 +204,6 @@ export default async function StorePage() {
             ) : null;
           case "full_width_banner":
             return <FullWidthPromoBanner key={section.id} cfg={cfg as FullWidthBannerConfig} />;
-          case "brands_ticker":
-            return (
-              <BrandsSection
-                key={section.id}
-                brands={displayBrands}
-                cfg={cfg as BrandsTickerConfig}
-              />
-            );
           case "industries":
             return (
               <IndustriesSection
@@ -223,11 +233,11 @@ function ServicesBar({ cfg }: { cfg?: ServicesBarConfig }) {
   const items = cfg?.items?.length
     ? cfg.items.sort((a, b) => a.order - b.order)
     : [
-        { id: "1", order: 0, title: "6,000+ Products", desc: "Available for immediate order", accent: "#0057b8", iconPath: "M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" },
-        { id: "2", order: 1, title: "Fast Nationwide Delivery", desc: "VIP Bus · Courier · Carriers", color: "#0891b2", iconPath: "M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" },
-        { id: "3", order: 2, title: "Warehouse Pickup", desc: "Collect same day in Accra", color: "#d97706", iconPath: "M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016 2.993 2.993 0 0 0 2.25-1.016 3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" },
-        { id: "4", order: 3, title: "Dedicated Technical Support", desc: "Engineers on call Mon–Fri", color: "#7c3aed", iconPath: "M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" },
-      ];
+      { id: "1", order: 0, title: "6,000+ Products", desc: "Available for immediate order", accent: "#0057b8", iconPath: "M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" },
+      { id: "2", order: 1, title: "Fast Nationwide Delivery", desc: "VIP Bus · Courier · Carriers", color: "#0891b2", iconPath: "M8.25 18.75a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 0 1-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 0 0-3.213-9.193 2.056 2.056 0 0 0-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 0 0-10.026 0 1.106 1.106 0 0 0-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" },
+      { id: "3", order: 2, title: "Warehouse Pickup", desc: "Collect same day in Accra", color: "#d97706", iconPath: "M13.5 21v-7.5a.75.75 0 0 1 .75-.75h3a.75.75 0 0 1 .75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349M3.75 21V9.349m0 0a3.001 3.001 0 0 0 3.75-.615A2.993 2.993 0 0 0 9.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 0 0 2.25 1.016 2.993 2.993 0 0 0 2.25-1.016 3.001 3.001 0 0 0 3.75.614m-16.5 0a3.004 3.004 0 0 1-.621-4.72l1.189-1.19A1.5 1.5 0 0 1 5.378 3h13.243a1.5 1.5 0 0 1 1.06.44l1.19 1.189a3 3 0 0 1-.621 4.72M6.75 18h3.75a.75.75 0 0 0 .75-.75V13.5a.75.75 0 0 0-.75-.75H6.75a.75.75 0 0 0-.75.75v3.75c0 .414.336.75.75.75Z" },
+      { id: "4", order: 3, title: "Dedicated Technical Support", desc: "Engineers on call Mon–Fri", color: "#7c3aed", iconPath: "M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" },
+    ];
 
   return (
     <div className="bg-theme-surface border-y border-theme">
@@ -295,10 +305,10 @@ function PromoBannersSection({ cfg }: { cfg?: PromoBannersConfig }) {
   const banners = cfg?.banners?.length
     ? cfg.banners
     : [
-        { id: "1", headline: "Clearance Sale", sub: "Genuine products at reduced prices — limited stock available", cta: "Shop Clearance", href: "/clearance", image: "/images/home/Production-Line-WM.jpg", badge: "Up to 40% Off", badgeColor: "#dc2626" },
-        { id: "2", headline: "New Arrivals", sub: "Latest additions from Schneider Electric, WEG and Camozzi", cta: "See What's New", href: "/products?sort=newest", image: "/images/home/SE_APM_Drive_Hero_image.jpg", badge: "Just In", badgeColor: "#0057b8" },
-        { id: "3", headline: "Submit an RFQ", sub: "Can't find what you need? Our team sources it. Same-day quotes.", cta: "Request Quote", href: "/rfq", image: "/images/home/dedicated-team-and-technical.jpg", badge: "Free Service", badgeColor: "#3DCD58" },
-      ];
+      { id: "1", headline: "Clearance Sale", sub: "Genuine products at reduced prices — limited stock available", cta: "Shop Clearance", href: "/clearance", image: "/images/home/Production-Line-WM.jpg", badge: "Up to 40% Off", badgeColor: "#dc2626" },
+      { id: "2", headline: "New Arrivals", sub: "Latest additions from Schneider Electric, WEG and Camozzi", cta: "See What's New", href: "/catalog?sort=newest", image: "/images/home/SE_APM_Drive_Hero_image.jpg", badge: "Just In", badgeColor: "#0057b8" },
+      { id: "3", headline: "Submit an RFQ", sub: "Can't find what you need? Our team sources it. Same-day quotes.", cta: "Request Quote", href: "/rfq", image: "/images/home/dedicated-team-and-technical.jpg", badge: "Free Service", badgeColor: "#3DCD58" },
+    ];
 
   return (
     <section className="py-6 bg-theme-base border-b border-theme">
@@ -331,62 +341,8 @@ function PromoBannersSection({ cfg }: { cfg?: PromoBannersConfig }) {
   );
 }
 
-/* ─── Categories ──────────────────────────────────────────────────────────── */
-function CategoriesSection({ dbCategories, cfg }: { dbCategories: DBCategory[]; cfg?: CategoriesConfig }) {
-  const raw = dbCategories.length > 0 ? dbCategories : STATIC_CATEGORIES;
-  const limit = cfg?.limit ?? 8;
-  const cats = raw.slice(0, limit).map((c: any) => {
-    const m = CAT_META[c.slug] ?? CAT_DEFAULT;
-    return { ...c, ...m, desc: c.shortDescription ?? "" };
-  });
-
-  return (
-    <section className="py-14 sm:py-16 bg-theme-surface">
-      <div className="container-store">
-        <div className="flex items-end justify-between mb-8 gap-4">
-          <div>
-            <p className="text-xs font-bold text-navy-500 uppercase tracking-widest mb-1">{cfg?.label ?? "Browse the Catalogue"}</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-theme-1 tracking-tight">{cfg?.title ?? "Shop by Category"}</h2>
-            {cfg?.subtitle && <p className="text-theme-3 mt-2">{cfg.subtitle}</p>}
-          </div>
-          {(cfg?.showViewAll ?? true) && (
-            <Link href="/catalog" className="shrink-0 hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-navy-500 hover:text-navy-400 transition-colors">
-              Catalogue
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-            </Link>
-          )}
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {cats.map((cat) => (
-            <Link key={cat.slug} href={`/catalog/${cat.slug}`}
-              className="group relative flex flex-col items-start gap-3 p-5 bg-theme-surface rounded-2xl border border-theme hover:border-navy-500/30 hover:shadow-lg transition-all duration-200 overflow-hidden">
-              <div className="absolute top-0 left-0 right-0 h-0.5 rounded-t-2xl transition-all duration-200 opacity-0 group-hover:opacity-100" style={{ background: cat.color }} />
-              <div className="w-11 h-11 rounded-xl flex items-center justify-center transition-all group-hover:scale-110" style={{ background: cat.color + "14" }}>
-                <svg className="w-5 h-5" style={{ color: cat.color }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d={cat.iconPath} />
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <h3 className="font-bold text-theme-1 group-hover:text-navy-500 transition-colors text-sm leading-snug">{cat.name}</h3>
-                <p className="text-xs text-theme-3 mt-1.5 leading-relaxed line-clamp-2">{cat.desc}</p>
-              </div>
-            </Link>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 /* ─── Featured products ───────────────────────────────────────────────────── */
-function FeaturedProductsSection({ products, cfg }: { products: Product[]; cfg?: FeaturedProductsConfig }) {
-  function fmtBrand(slug?: string) {
-    if (!slug) return "";
-    return slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
-  }
-
+function FeaturedProductsSection({ products, cfg }: { products: ProductCardData[]; cfg?: FeaturedProductsConfig }) {
   return (
     <section className="py-14 sm:py-16 bg-theme-base border-t border-theme">
       <div className="container-store">
@@ -396,7 +352,7 @@ function FeaturedProductsSection({ products, cfg }: { products: Product[]; cfg?:
             <h2 className="text-3xl sm:text-4xl font-bold text-theme-1 tracking-tight">{cfg?.title ?? "Featured Products"}</h2>
             {cfg?.subtitle && <p className="text-theme-3 mt-2">{cfg.subtitle}</p>}
           </div>
-          <Link href="/products" className="shrink-0 hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-navy-500 hover:text-navy-400 transition-colors">
+          <Link href="/catalog" className="shrink-0 hidden sm:inline-flex items-center gap-1.5 text-sm font-bold text-navy-500 hover:text-navy-400 transition-colors">
             Browse All
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -405,49 +361,11 @@ function FeaturedProductsSection({ products, cfg }: { products: Product[]; cfg?:
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
           {products.map((product) => (
-            <Link key={String(product._id)} href={`/products/${product.slug}`} className="group card-product flex flex-col overflow-hidden">
-              <div className="relative aspect-square bg-theme-raised overflow-hidden">
-                {product.images?.[0] ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={product.images[0]} alt={product.name} loading="lazy"
-                    className="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-300" />
-                ) : (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <svg className="w-12 h-12 text-theme-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
-                    </svg>
-                  </div>
-                )}
-                {product.clearance && (
-                  <span className="absolute top-2 left-2 bg-se-green text-white text-[9px] font-bold px-1.5 py-0.5 rounded-md shadow">CLEARANCE</span>
-                )}
-              </div>
-              <div className="p-4 flex flex-col flex-1">
-                <p className="text-[10px] font-bold text-navy-500 uppercase tracking-wider mb-1">{fmtBrand(product.brand)}</p>
-                <h3 className="text-sm font-semibold text-theme-1 leading-snug mb-auto line-clamp-2 group-hover:text-navy-500 transition-colors">{product.name}</h3>
-                <div className="flex items-center justify-between mt-3 pt-3 border-t border-theme">
-                  <div>
-                    {product.price ? (
-                      <p className="text-sm font-bold text-theme-1">GH₵ {product.price.toLocaleString("en-GH", { minimumFractionDigits: 2 })}</p>
-                    ) : (
-                      <p className="text-sm font-bold text-se-green">Price on Request</p>
-                    )}
-                  </div>
-                  {product.stock != null && (
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${product.stock > 0 ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400" : "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"}`}>
-                      {product.stock > 0 ? "In Stock" : "Order"}
-                    </span>
-                  )}
-                </div>
-                <div className="mt-2.5 w-full flex items-center justify-center gap-1.5 h-8 rounded-lg border border-theme text-[11px] font-bold text-theme-3 bg-theme-raised opacity-0 group-hover:opacity-100 transition-opacity">
-                  View Details →
-                </div>
-              </div>
-            </Link>
+            <ProductCard key={product.id} product={product} layout="grid" />
           ))}
         </div>
         <div className="mt-8 flex flex-wrap gap-3 justify-center">
-          <Link href="/products" className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-navy-500 hover:bg-navy-400 text-white font-bold text-sm transition-colors">
+          <Link href="/catalog" className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl bg-navy-500 hover:bg-navy-400 text-white font-bold text-sm transition-colors">
             Browse All Products
           </Link>
           <Link href="/clearance" className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl border border-theme bg-theme-surface hover:border-navy-500/30 text-theme-2 hover:text-navy-500 font-semibold text-sm transition-all">
@@ -514,7 +432,7 @@ function BrandsSection({ brands, cfg }: { brands: Brand[]; cfg?: BrandsTickerCon
       </div>
       <div className="relative overflow-hidden">
         <div className="flex animate-marquee" style={{ width: "max-content" }}>
-          {[...brands, ...brands].map((brand, i) => (
+          {[ ...brands, ...brands ].map((brand, i) => (
             <a key={`${brand._id}-${i}`} href={`/brands/${brand.slug}`}
               className="group flex items-center justify-center shrink-0 mx-2 h-14 px-5 bg-white/[0.04] border border-white/[0.07] rounded-xl hover:bg-white/[0.09] hover:border-white/20 transition-all duration-200"
               style={{ minWidth: `${tileWidth}px` }}>
@@ -536,7 +454,7 @@ function IndustriesSection({ dbIndustries, cfg }: { dbIndustries: DBIndustry[]; 
   const displayIndustries = dbIndustries.map((ind) => ({
     name: ind.name, desc: ind.shortDescription ?? "",
     href: `/solutions/${ind.slug}`, accent: ind.accentColor ?? "#0057b8",
-    icon: INDUSTRY_ICONS[ind.slug] ?? FALLBACK_ICON,
+    icon: INDUSTRY_ICONS[ ind.slug ] ?? FALLBACK_ICON,
   }));
 
   if (displayIndustries.length === 0) return null;
@@ -630,7 +548,7 @@ function StatsSection({ cfg }: { cfg?: StatsConfig }) {
     { id: "3", value: "26", label: "Global Brand Partners", desc: "All manufacturer-authorized" },
     { id: "4", value: "500+", label: "Projects Delivered", desc: "Mining, manufacturing & energy" },
   ];
-  const FALLBACK_FOOTNOTES = ["ISO 9001 Certified", "GSA Registered", "Authorized Manufacturer Distributor"];
+  const FALLBACK_FOOTNOTES = [ "ISO 9001 Certified", "GSA Registered", "Authorized Manufacturer Distributor" ];
 
   const stats = cfg?.items?.length ? cfg.items : FALLBACK_STATS;
   const footnotes = cfg?.footnotes?.length ? cfg.footnotes : FALLBACK_FOOTNOTES;
@@ -732,7 +650,7 @@ function CTASection({ cfg }: { cfg?: CTAConfig }) {
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}><path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
             </Link>
             {cfg?.secondaryLabel && (
-              <Link href={cfg.secondaryHref ?? "/products"} className="inline-flex items-center gap-2 h-12 px-8 bg-navy-500 hover:bg-navy-400 text-white font-semibold text-sm rounded-xl transition-colors">
+              <Link href={cfg.secondaryHref ?? "catalog"} className="inline-flex items-center gap-2 h-12 px-8 bg-navy-500 hover:bg-navy-400 text-white font-semibold text-sm rounded-xl transition-colors">
                 {cfg.secondaryLabel}
               </Link>
             )}

@@ -22,6 +22,9 @@
   --color-se-green-hover: #2aa347;
   --color-se-green-light: #e8f9ed;
 
+  --color-apt-orange: #e65c00;
+  --color-apt-orange-hover: #cc5200;
+
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 

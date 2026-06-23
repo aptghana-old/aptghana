@@ -108,6 +108,7 @@ export default function CatalogBrowse({ data }: Props) {
         image={entity.image}
         productCount={totalHits > 0 ? totalHits : undefined}
         breadcrumbs={breadcrumbs}
+        // eslint-disable-next-line react/no-children-prop
         children={children}
         accentColor={accentColor}
       />

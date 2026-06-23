@@ -57,7 +57,7 @@ function Breadcrumb({ query }: { query: string }) {
     <nav className="flex items-center gap-1.5 text-[12px] text-(--text-4) mb-4" aria-label="Breadcrumb">
       <Link href="/" className="hover:text-(--text-2) transition-colors">Home</Link>
       <span>/</span>
-      <Link href="/products" className="hover:text-(--text-2) transition-colors">Products</Link>
+      <Link href="/catalog" className="hover:text-(--text-2) transition-colors">Catalog</Link>
       <span>/</span>
       <span className="text-(--text-2) font-medium truncate max-w-[200px]">
         {query ? `"${query}"` : "Search"}
