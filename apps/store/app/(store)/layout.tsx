@@ -89,7 +89,7 @@ async function getNavGroups(): Promise<NavGroup[]> {
         }));
         return {
           name: cat.name, slug: cat.slug,
-          img: cat.image ? { url: cat.image, alt: cat.name } : undefined,
+          img: cat.image ? { url: cat.image.url, alt: cat.name } : undefined,
           href: `/catalog/${group.slug}/${cat.slug}`,
           desc: (cat.shortDescription || cat.description || "").slice(0, 160),
           image: cat.image?.url ?? "",

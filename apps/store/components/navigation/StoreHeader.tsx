@@ -271,10 +271,9 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                         className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 transition-all"
                         style={{ background: activeGroup === i ? grp.color + "20" : "var(--bg-raised)" }}
                       >
-                        <Icon d={grp.iconPath} size={15} strokeWidth={1.75} className={activeGroup === i ? "" : "text-theme-3"} style={{ color: activeGroup === i ? grp.color : undefined } as React.CSSProperties} />
-                        {grp.iconImage && (
+                        {grp.iconImage ? (
                           <img src={grp.iconImage} alt={grp.label} className="w-4 h-4 object-contain" />
-                        )}
+                        ) : (<Icon d={grp.iconPath} size={15} strokeWidth={1.75} className={activeGroup === i ? "" : "text-theme-3"} style={{ color: activeGroup === i ? grp.color : undefined } as React.CSSProperties} />)}
                       </div>
                       <span className="truncate">{grp.label}</span>
                       {activeGroup === i && (
