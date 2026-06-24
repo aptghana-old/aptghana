@@ -142,6 +142,7 @@ export function buildProductRecord(
   product: ProductForIndex,
   brandName: string,
   categories: CategoryForIndex[],
+  brandLogoUrl?: string,
 ): SearchProductRecord {
   const pricing   = product.pricing   ?? {};
   const inventory = product.inventory ?? {};
@@ -165,6 +166,7 @@ export function buildProductRecord(
     shortDescription: product.shortDescription ?? "",
     brandSlug:        product.brandSlug ?? "",
     brandName,
+    brandLogoUrl,
     categories:       categories.map((c) => c.name),
     hierarchicalCategories,
     tags:             product.tags ?? [],

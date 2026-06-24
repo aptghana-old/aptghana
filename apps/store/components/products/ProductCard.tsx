@@ -36,6 +36,8 @@ export interface ProductCardData {
   cataloguePath?: string;
   /** Raw filter tag strings in "Key: Value" format from product tags/specs */
   filterTags?: string[];
+  /** Brand logo image URL — shown as a small stamp overlaid on the product image */
+  brandImage?: string;
 }
 
 interface ProductCardProps {
@@ -104,7 +106,7 @@ function ProductImg({ url, alt, className }: { url: string; alt: string; classNa
     <img
       src={url}
       alt={alt}
-      className="w-full h-full object-contain p-3 transition-transform duration-300 group-hover/card:scale-[1.04]"
+      className="w-full h-full object-contain transition-transform duration-300 group-hover/card:scale-[1.04]"
       loading="lazy"
       onError={() => setFailed(true)}
     />
@@ -115,8 +117,8 @@ function ProductImg({ url, alt, className }: { url: string; alt: string; classNa
 function StockBadge({ inStock }: { inStock: boolean }) {
   return (
     <span className={`inline-flex items-center gap-1 shrink-0 text-[10px] sm:text-[11px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full ${inStock
-        ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
-        : "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
+      ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
+      : "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
       }`}>
       <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${inStock ? "bg-green-500" : "bg-amber-400"}`} />
       {inStock ? "In Stock" : "On Request"}
@@ -179,12 +181,12 @@ function WishlistBtn({
 
   /* 40px on mobile for tap target, 32px on sm+ */
   const smCls = `absolute top-1.5 right-1.5 w-10 h-10 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow transition-all ${inWishlist
-      ? "bg-red-500 text-white"
-      : "bg-(--bg-surface)/80 backdrop-blur-sm text-(--text-3) hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/30"
+    ? "bg-red-500 text-white"
+    : "bg-(--bg-surface)/80 backdrop-blur-sm text-(--text-3) hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/30"
     }`;
   const mdCls = `w-8 h-8 rounded-lg flex items-center justify-center border transition-all ${inWishlist
-      ? "bg-red-50 border-red-200 text-red-500 dark:bg-red-900/20 dark:border-red-800"
-      : "border-(--border) text-(--text-3) hover:border-red-300 hover:text-red-400"
+    ? "bg-red-50 border-red-200 text-red-500 dark:bg-red-900/20 dark:border-red-800"
+    : "border-(--border) text-(--text-3) hover:border-red-300 hover:text-red-400"
     }`;
 
   return (
@@ -230,8 +232,8 @@ function CompareBtn({
   const smCls = `w-7 h-7 rounded flex items-center justify-center transition-colors ${inCompare ? "text-navy-500" : "text-(--text-4) hover:text-navy-500"
     }`;
   const mdCls = `w-8 h-8 rounded-lg flex items-center justify-center border transition-all ${inCompare
-      ? "bg-navy-50 border-navy-300 text-navy-500 dark:bg-navy-900/40 dark:border-navy-600"
-      : "border-(--border) text-(--text-3) hover:border-navy-300 hover:text-navy-400"
+    ? "bg-navy-50 border-navy-300 text-navy-500 dark:bg-navy-900/40 dark:border-navy-600"
+    : "border-(--border) text-(--text-3) hover:border-navy-300 hover:text-navy-400"
     }`;
 
   const disabled = isAtMax && !inCompare;
@@ -457,18 +459,25 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
       <>
         <article className="group/card card-product flex gap-3 sm:gap-4 p-3 sm:p-4">
           {/* Thumbnail */}
-          <Link href={`/products/${product.slug}`} tabIndex={-1} aria-hidden
-            className="shrink-0 w-20 h-20 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-(--bg-raised) block">
-            <ProductImg url={product.image.url} alt={product.image.alt || product.name} className="w-full h-full" />
-          </Link>
+          <div className="relative shrink-0 w-24 h-24 sm:w-36 sm:h-36 rounded-xl overflow-hidden bg-white">
+            <Link href={`/products/${product.slug}`} tabIndex={-1} aria-hidden className="block w-full h-full">
+              <ProductImg url={product.image.url} alt={product.image.alt || product.name} className="w-full h-full" />
+            </Link>
+            {product.brandImage && (
+              <div className="absolute bottom-1.5 right-1.5 bg-white/95 rounded px-1.5 py-0.5 border border-black/5 shadow-sm pointer-events-none">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={product.brandImage}
+                  alt={`${brandLabel} logo`}
+                  className="max-h-4 sm:max-h-5 max-w-10 sm:max-w-12 object-contain"
+                  loading="lazy"
+                />
+              </div>
+            )}
+          </div>
 
           {/* Body */}
           <div className="flex-1 min-w-0 flex flex-col gap-1">
-
-            {/* Catalogue path */}
-            {product.cataloguePath && (
-              <p className="text-[10px] text-(--text-4) truncate">{product.cataloguePath}</p>
-            )}
 
             {/* Brand + badges + stock */}
             <div className="flex items-start justify-between gap-2">
@@ -587,6 +596,19 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
             </div>
           )}
 
+          {/* Brand logo stamp — bottom-right of image */}
+          {product.brandImage && (
+            <div className="absolute bottom-2 right-2 bg-white/95 rounded px-1.5 py-0.5 border border-black/5 shadow-sm pointer-events-none z-1">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={product.brandImage}
+                alt={`${brandLabel} logo`}
+                className="max-h-4 sm:max-h-5 max-w-10 sm:max-w-12 object-contain"
+                loading="lazy"
+              />
+            </div>
+          )}
+
           {/* Wishlist — 40px tap target on mobile, 32px on sm+ */}
           <WishlistBtn productId={product.id} size="sm" />
         </div>
@@ -689,7 +711,7 @@ export function ProductCardSkeleton({ layout = "grid" }: { layout?: ProductCardL
   if (layout === "list") {
     return (
       <div className="card-product flex gap-4 p-4 animate-pulse">
-        <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl bg-(--bg-raised) shrink-0" />
+        <div className="w-24 h-24 sm:w-36 sm:h-36 rounded-xl bg-(--bg-raised) shrink-0" />
         <div className="flex-1 space-y-2.5 py-0.5">
           <div className="h-3 w-20 bg-(--bg-raised) rounded" />
           <div className="h-4 w-3/4 bg-(--bg-raised) rounded" />

@@ -625,6 +625,7 @@ export interface SearchProductRecord {
   shortDescription: string;
   brandSlug: string;
   brandName: string;
+  brandLogoUrl?: string;
   categories: string[];
   hierarchicalCategories: {
     lvl0?: string;

@@ -63,6 +63,7 @@ export interface ProductSearchHit {
   shortDescription: string;
   brandSlug: string;
   brandName: string;
+  brandLogoUrl?: string;
   imageUrl: string;
   listPrice: number;
   currency: string;

@@ -6,15 +6,26 @@ interface Props {
   query?: string;
   facets?: Record<string, Record<string, number>>;
   basePath?: string;
+  /** Desktop sidebar open state (SearchResultsLayout) */
+  filtersOpen?: boolean;
+  /** Desktop sidebar toggle (SearchResultsLayout) */
+  onToggleFilters?: () => void;
 }
 
-export default function SearchControls({ total, query, facets, basePath = "/search" }: Props) {
+export default function SearchControls({
+  total, query, facets, basePath = "/search", filtersOpen, onToggleFilters,
+}: Props) {
   return (
     <div className="flex items-center gap-2 mb-5">
-      {/* Filter button — mobile/tablet only (desktop uses sidebar) */}
+      {/* Filter button — mobile/tablet only; desktop uses sidebar toggle in SortViewBar */}
       <MobileFilterDrawer facets={facets} total={total} basePath={basePath} />
-      {/* Sort controls — takes remaining space */}
-      <SortViewBar total={total} query={query} basePath={basePath} />
+      <SortViewBar
+        total={total}
+        query={query}
+        basePath={basePath}
+        filtersOpen={filtersOpen}
+        onToggleFilters={onToggleFilters}
+      />
     </div>
   );
 }

@@ -5,9 +5,7 @@ import { SearchTracker } from "@/components/search/SearchTracker";
 import { searchProducts, type ProductSearchHit, type SearchSort } from "@apt/search";
 import type { SearchFilters } from "@apt/types";
 import ProductCard, { type ProductCardData } from "@/components/products/ProductCard";
-import FilterSidebar from "@/components/search/FilterSidebar";
-import ActiveFilters from "@/components/search/ActiveFilters";
-import SearchControls from "@/components/search/SearchControls";
+import SearchResultsLayout from "@/components/search/SearchResultsLayout";
 import SearchPagination from "@/components/search/SearchPagination";
 import ZeroResults from "@/components/search/ZeroResults";
 
@@ -33,8 +31,8 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
 }
 
 /* ─── Hit → card ──────────────────────────────────────────────────────────── */
-function buildCataloguePath(hc: ProductSearchHit["hierarchicalCategories"]): string | undefined {
-  const parts = [hc.lvl0, hc.lvl1, hc.lvl2, hc.lvl3].filter(Boolean) as string[];
+function buildCataloguePath(hc: ProductSearchHit[ "hierarchicalCategories" ]): string | undefined {
+  const parts = [ hc.lvl0, hc.lvl1, hc.lvl2, hc.lvl3 ].filter(Boolean) as string[];
   return parts.length > 0 ? parts.join(" › ") : undefined;
 }
 
@@ -57,6 +55,7 @@ function hitToCard(hit: ProductSearchHit): ProductCardData {
     discount: hit.discount,
     cataloguePath: buildCataloguePath(hit.hierarchicalCategories),
     filterTags: (hit.filterTags ?? hit.tags ?? []).filter((t) => t.includes(":")),
+    brandImage: hit.brandLogoUrl,
   };
 }
 
@@ -87,7 +86,7 @@ function ResultsGrid({ hits, view }: { hits: ProductSearchHit[]; view: string })
     );
   }
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
       {hits.map((hit) => (
         <ProductCard key={hit.id} product={hitToCard(hit)} layout="grid" />
       ))}
@@ -96,24 +95,6 @@ function ResultsGrid({ hits, view }: { hits: ProductSearchHit[]; view: string })
 }
 
 /* ─── Skeleton ────────────────────────────────────────────────────────────── */
-function SkeletonGrid({ view }: { view: string }) {
-  if (view === "list") {
-    return (
-      <div className="space-y-3">
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="h-28 rounded-2xl animate-pulse" style={{ background: "var(--bg-raised)" }} />
-        ))}
-      </div>
-    );
-  }
-  return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
-      {Array.from({ length: 12 }).map((_, i) => (
-        <div key={i} className="aspect-[3/4] rounded-2xl animate-pulse" style={{ background: "var(--bg-raised)" }} />
-      ))}
-    </div>
-  );
-}
 
 /* ─── Page ────────────────────────────────────────────────────────────────── */
 export default async function SearchPage({ searchParams }: SearchPageProps) {
@@ -196,59 +177,34 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           </div>
         )}
 
-        {/* Main layout: sidebar + results */}
-        {(results || error) && (
-          <div className="flex gap-8 items-start">
-            {/* Desktop sidebar */}
-            <aside className="hidden lg:block w-64 xl:w-72 shrink-0 sticky top-24 self-start">
-              <div
-                className="rounded-2xl p-4"
-                style={{ background: "var(--bg-surface)", border: "1px solid var(--border)" }}
-              >
-                <Suspense fallback={null}>
-                  <FilterSidebar facets={facets} />
-                </Suspense>
-              </div>
-            </aside>
+        {/* Main layout: sidebar + results (only when search has been run) */}
+        {results && (
+          <SearchResultsLayout
+            hasHits={results.hits.length > 0}
+            totalHits={totalHits}
+            facets={facets}
+            query={q}
+          >
+            {results.hits.length > 0 && (
+              <ResultsGrid hits={results.hits} view={view} />
+            )}
 
-            {/* Results column */}
-            <div className="flex-1 min-w-0">
+            {results.hits.length === 0 && (
+              <ZeroResults query={q} />
+            )}
+
+            {totalPages > 1 && (
               <Suspense fallback={null}>
-                <ActiveFilters />
+                <SearchPagination totalPages={totalPages} currentPage={pageNum} />
               </Suspense>
+            )}
 
-              <Suspense fallback={<div className="h-10 rounded-xl animate-pulse mb-5" style={{ background: "var(--bg-raised)" }} />}>
-                <SearchControls total={totalHits} query={q} facets={facets} />
-              </Suspense>
-
-              {/* Hits */}
-              {results && results.hits.length > 0 && (
-                <ResultsGrid hits={results.hits} view={view} />
-              )}
-
-              {/* Zero results */}
-              {results && results.hits.length === 0 && !error && (
-                <ZeroResults query={q} />
-              )}
-
-              {/* Skeleton while loading */}
-              {!results && !error && <SkeletonGrid view={view} />}
-
-              {/* Pagination */}
-              {results && totalPages > 1 && (
-                <Suspense fallback={null}>
-                  <SearchPagination totalPages={totalPages} currentPage={pageNum} />
-                </Suspense>
-              )}
-
-              {/* Performance note */}
-              {results && results.processingTimeMs > 0 && (
-                <p className="text-center text-[11px] text-(--text-4) mt-4">
-                  {totalHits.toLocaleString()} results in {results.processingTimeMs}ms
-                </p>
-              )}
-            </div>
-          </div>
+            {results.processingTimeMs > 0 && (
+              <p className="text-center text-[11px] text-(--text-4) mt-4">
+                {totalHits.toLocaleString()} results in {results.processingTimeMs}ms
+              </p>
+            )}
+          </SearchResultsLayout>
         )}
       </main>
     </>

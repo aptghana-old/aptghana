@@ -43,10 +43,14 @@ async function reindexProducts(
   const categoriesColl = db.collection("categories_v2");
 
   // Build brand lookup
-  const brands = await brandsColl.find({}, { projection: { slug: 1, name: 1 } }).toArray();
+  const brands = await brandsColl.find({}, { projection: { slug: 1, name: 1, logo: 1 } }).toArray();
   const brandMap = new Map(brands.map((b) => [
     (b as Record<string, unknown>).slug as string,
     (b as Record<string, unknown>).name as string,
+  ]));
+  const brandLogoMap = new Map(brands.map((b) => [
+    (b as Record<string, unknown>).slug as string,
+    ((b as Record<string, { url?: string }>).logo)?.url,
   ]));
 
   // Build category lookup
@@ -65,7 +69,8 @@ async function reindexProducts(
 
   for await (const rawProduct of cursor) {
     const product = rawProduct as unknown as ProductForIndex;
-    const brandName = brandMap.get(product.brandSlug ?? "") ?? product.brandSlug ?? "";
+    const brandName    = brandMap.get(product.brandSlug ?? "") ?? product.brandSlug ?? "";
+    const brandLogoUrl = brandLogoMap.get(product.brandSlug ?? "") ?? undefined;
 
     const catIds  = extractCategoryIds(product.categories ?? []);
     const catDocs: CategoryForIndex[] = catIds
@@ -81,7 +86,7 @@ async function reindexProducts(
       })
       .filter(Boolean) as CategoryForIndex[];
 
-    batch.push(buildProductRecord(product, brandName, catDocs));
+    batch.push(buildProductRecord(product, brandName, catDocs, brandLogoUrl));
 
     if (batch.length >= BATCH_SIZE) {
       await index.addDocuments(batch, { primaryKey: "id" });
