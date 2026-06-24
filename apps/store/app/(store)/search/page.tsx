@@ -33,6 +33,11 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
 }
 
 /* ─── Hit → card ──────────────────────────────────────────────────────────── */
+function buildCataloguePath(hc: ProductSearchHit["hierarchicalCategories"]): string | undefined {
+  const parts = [hc.lvl0, hc.lvl1, hc.lvl2, hc.lvl3].filter(Boolean) as string[];
+  return parts.length > 0 ? parts.join(" › ") : undefined;
+}
+
 function hitToCard(hit: ProductSearchHit): ProductCardData {
   return {
     id: hit.id,
@@ -46,8 +51,12 @@ function hitToCard(hit: ProductSearchHit): ProductCardData {
     image: { url: hit.imageUrl ?? "", alt: hit.name },
     pricing: { listPrice: hit.listPrice, currency: hit.currency },
     inStock: hit.inStock,
+    isNew: hit.isNew,
+    isFeatured: hit.isFeatured,
     isClearance: hit.isClearance,
     discount: hit.discount,
+    cataloguePath: buildCataloguePath(hit.hierarchicalCategories),
+    filterTags: (hit.filterTags ?? hit.tags ?? []).filter((t) => t.includes(":")),
   };
 }
 

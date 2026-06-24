@@ -96,7 +96,7 @@ export default function VerifyEmailPage() {
       {!success && !error && (
         <div className="text-center py-4">
           <p className="text-sm text-(--text-3)">
-            Check your inbox for a verification link. If you don't see it, check your spam folder.
+            Check your inbox for a verification link. If you don&apos;t see it, check your spam folder.
           </p>
           <Link href="/account" className="mt-4 inline-block text-sm font-semibold text-navy-500 hover:text-navy-400 transition-colors">
             ← Back to sign in

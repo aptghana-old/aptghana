@@ -59,7 +59,7 @@ export default function RegisterPage() {
           </div>
           <p className="text-sm text-(--text-2) leading-relaxed mb-5">{message}</p>
           <p className="text-xs text-(--text-3) mb-5">
-            Didn't receive it?{" "}
+            Didn&apos;t receive it?{" "}
             <button
               onClick={async () => {
                 await fetch("/api/auth/resend-verification", {

@@ -1,5 +1,5 @@
 import { connectDB, CategoryModel } from "@apt/db";
-import { searchProducts, type ProductSearchHit } from "@apt/search";
+import { searchProducts } from "@apt/search";
 import type { SearchFilters } from "@apt/types";
 
 export type SearchSort = "relevance" | "price_asc" | "price_desc" | "name_asc";

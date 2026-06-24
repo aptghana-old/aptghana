@@ -366,7 +366,7 @@ export function LibraryBrowser({
 
         {/* Help CTA */}
         <div className="rounded-2xl p-5 text-white" style={{ background: "#0a1628" }}>
-          <h2 className="font-semibold mb-1.5 text-[13px]">Can't find what you need?</h2>
+          <h2 className="font-semibold mb-1.5 text-[13px]">Can&apos;t find what you need?</h2>
           <p className="text-[12px] text-white/50 mb-4">Our engineers can locate specific documentation.</p>
           <a
             href="/contact"
@@ -467,7 +467,7 @@ export function LibraryBrowser({
             {activeQuery && (
               <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-medium bg-[#f5f3ff] text-[#7c3aed]">
                 <Search size={11} />
-                "{activeQuery}"
+                &ldquo;{activeQuery}&rdquo;
                 <button onClick={() => navigate({ q: undefined })} className="ml-0.5 opacity-60 hover:opacity-100">✕</button>
               </span>
             )}

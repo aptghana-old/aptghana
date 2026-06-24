@@ -1,0 +1,158 @@
+/* ========================= */
+/*           BUTTONS         */
+/* ========================= */
+
+/* ---------- Base btn ---------- */
+
+.btn {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  letter-spacing: 0.05em;
+  font-weight: 600;
+  padding-left: 2rem; /* px-8 */
+  padding-right: 2rem;
+  border-radius: 0.125rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem; /* gap-3 */
+  transition-property: color, background-color, border-color, fill, stroke;
+  transition-duration: 150ms;
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--tw-color-uranus-base);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+}
+
+/* btn-native */
+.btn-native {
+  transition-property: color, background-color, border-color, fill, stroke;
+  transition-duration: 150ms;
+}
+
+.can-hover .btn-native:hover {
+  color: var(--tw-color-neutral-dark);
+}
+
+.btn-native:disabled {
+  cursor: not-allowed;
+}
+
+/* btn--selected */
+.btn--selected {
+  background-color: #23263b;
+  color: white;
+}
+
+/* ========================= */
+/*         Button Types      */
+/* ========================= */
+
+/* Primary / Item */
+.btn-primary,
+.btn-item {
+  background-color: #23263b;
+  color: white;
+}
+
+.can-hover .btn-primary:hover,
+.can-hover .btn-item:hover {
+  background-color: var(--tw-color-neutral-darkest);
+}
+
+.btn-primary:active,
+.btn-item:active {
+  background-color: #23263b;
+}
+
+.btn-primary:disabled,
+.btn-item:disabled {
+  background-color: #d3d4d8;
+  color: var(--tw-color-neutral-dark);
+}
+
+/* Secondary */
+.btn-secondary {
+  background-color: white;
+  border: 1px solid #23263b;
+  color: #23263b;
+}
+
+.can-hover .btn-secondary:hover {
+  border-color: var(--tw-color-neutral-darkest);
+  color: var(--tw-color-neutral-darkest);
+}
+
+.btn-secondary:active {
+  background-color: #f4f4f5;
+  border-color: #23263b;
+  color: #23263b;
+}
+
+.btn-secondary:disabled {
+  background-color: #f4f4f5;
+  border-color: #d3d4d8;
+  color: var(--tw-color-neutral-dark);
+}
+
+/* Tertiary */
+.btn-tertiary {
+  background-color: #5468ff;
+  color: white;
+}
+
+.can-hover .btn-tertiary:hover {
+  background-color: var(--tw-color-nebula-dark);
+  color: var(--tw-color-nebula-lightest);
+}
+
+.btn-tertiary:active {
+  background-color: var(--tw-color-nebula-darkest);
+  color: var(--tw-color-nebula-lightest);
+}
+
+.btn-tertiary:disabled {
+  background-color: #d3d4d8;
+  color: var(--tw-color-neutral-dark);
+}
+
+/* Item override (second definition) */
+.btn-item {
+  padding-left: 0.875rem; /* px-3.5 */
+  padding-right: 0.875rem;
+  background-color: white;
+  border: 1px solid #23263b;
+  color: #23263b;
+}
+
+.can-hover .btn-item:hover {
+  color: white;
+}
+
+.btn-item:disabled {
+  background-color: #f4f4f5;
+  border-color: #d3d4d8;
+  color: var(--tw-color-neutral-dark);
+}
+
+.btn-item.btn-selected {
+  background-color: #23263b;
+  color: white;
+}
+
+/* ========== Sizes ========== */
+
+.btn-small {
+  padding-top: 0.5rem; /* py-2 */
+  padding-bottom: 0.5rem;
+}
+
+.btn-large {
+  padding-top: 0.75rem; /* py-3 */
+  padding-bottom: 0.75rem;
+}

@@ -6,9 +6,24 @@
   "types": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./footer": "./src/footer/index.ts"
+    "./footer": "./src/footer/index.ts",
+    "./components/button": "./src/components/button/button.tsx",
+    "./components/chip": "./src/components/chip/chip.tsx",
+    "./components/collapse": "./src/components/collapse/collapse.tsx",
+    "./components/count": "./src/components/count/count.tsx",
+    "./components/dropdown": "./src/components/dropdown/dropdown.tsx",
+    "./components/icon-label": "./src/components/icon-label/icon-label.tsx",
+    "./components/label": "./src/components/label/label.tsx",
+    "./components/link": "./src/components/link/link.tsx",
+    "./components/pill": "./src/components/pill/pill.tsx",
+    "./components/select": "./src/components/select/select.tsx",
+    "./tokens.css": "./src/tokens.css"
+  },
+  "dependencies": {
+    "classnames": "^2.5.1"
   },
   "peerDependencies": {
+    "lucide-react": ">=0.300.0",
     "next": ">=16",
     "react": ">=19"
   }

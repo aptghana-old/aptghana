@@ -72,8 +72,15 @@ export interface ProductSearchHit {
   isFeatured: boolean;
   discount: number;
   categories: string[];
-  hierarchicalCategories: Record<string, string>;
+  hierarchicalCategories: {
+    lvl0?: string;
+    lvl1?: string;
+    lvl2?: string;
+    lvl3?: string;
+  };
   tags: string[];
+  /** Flattened tags + features + applications — used for filter display on cards */
+  filterTags?: string[];
   relevanceScore: number;
   salesCount: number;
 }

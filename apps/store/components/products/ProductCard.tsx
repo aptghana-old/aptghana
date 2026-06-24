@@ -32,6 +32,10 @@ export interface ProductCardData {
   isFeatured?: boolean;
   discount?: number;
   specs?: { name: string; value: string; unit?: string }[];
+  /** Catalogue breadcrumb, e.g. "Automation > PLCs > Compact PLCs" */
+  cataloguePath?: string;
+  /** Raw filter tag strings in "Key: Value" format from product tags/specs */
+  filterTags?: string[];
 }
 
 interface ProductCardProps {
@@ -445,57 +449,88 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
 
   /* ── List layout (shown on sm+ only; mobile always uses grid) ──────────── */
   if (layout === "list") {
+    const listFilterTags = product.filterTags?.filter((t) => t.includes(":")).slice(0, 5)
+      ?? product.specs?.slice(0, 5).map((s) => `${s.name}: ${s.value}${s.unit ? ` ${s.unit}` : ""}`)
+      ?? [];
+
     return (
       <>
-        <article className="group/card card-product flex gap-4 p-4">
+        <article className="group/card card-product flex gap-3 sm:gap-4 p-3 sm:p-4">
           {/* Thumbnail */}
           <Link href={`/products/${product.slug}`} tabIndex={-1} aria-hidden
-            className="shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-(--bg-raised) block">
+            className="shrink-0 w-20 h-20 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-(--bg-raised) block">
             <ProductImg url={product.image.url} alt={product.image.alt || product.name} className="w-full h-full" />
           </Link>
 
           {/* Body */}
-          <div className="flex-1 min-w-0 flex flex-col">
-            {/* Top row */}
+          <div className="flex-1 min-w-0 flex flex-col gap-1">
+
+            {/* Catalogue path */}
+            {product.cataloguePath && (
+              <p className="text-[10px] text-(--text-4) truncate">{product.cataloguePath}</p>
+            )}
+
+            {/* Brand + badges + stock */}
             <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
-                  <span className="text-[11px] font-bold text-navy-500 uppercase tracking-wide">{brandLabel}</span>
-                  {product.isNew && <span className="px-1.5 py-px text-[9px] font-bold bg-navy-500 text-white rounded uppercase tracking-wide">New</span>}
-                  {product.isClearance && <span className="px-1.5 py-px text-[9px] font-bold bg-se-green text-white rounded uppercase tracking-wide">Clearance</span>}
-                  {hasDisc && <span className="px-1.5 py-px text-[9px] font-bold bg-red-500 text-white rounded uppercase tracking-wide">-{product.discount}%</span>}
-                </div>
-                <Link href={`/products/${product.slug}`}>
-                  <h3 className="text-sm font-semibold text-(--text-1) line-clamp-1 group-hover/card:text-navy-500 transition-colors leading-snug">
-                    {product.name}
-                  </h3>
-                </Link>
-                {(product.sku || product.mpn) && (
-                  <div className="flex items-center gap-3 mt-0.5">
-                    {product.sku && <span className="text-[10px] font-mono text-(--text-4)">SKU {product.sku}</span>}
-                    {product.mpn && <span className="text-[10px] font-mono text-(--text-4)">MPN {product.mpn}</span>}
-                  </div>
-                )}
+              <div className="flex items-center gap-1.5 flex-wrap min-w-0">
+                <span className="text-[11px] font-bold text-navy-500 uppercase tracking-wide shrink-0">{brandLabel}</span>
+                {product.isNew && <span className="px-1.5 py-px text-[9px] font-bold bg-navy-500 text-white rounded uppercase tracking-wide">New</span>}
+                {product.isFeatured && <span className="px-1.5 py-px text-[9px] font-bold bg-apt-orange text-white rounded uppercase tracking-wide">Featured</span>}
+                {product.isClearance && <span className="px-1.5 py-px text-[9px] font-bold bg-se-green text-white rounded uppercase tracking-wide">Clearance</span>}
+                {hasDisc && <span className="px-1.5 py-px text-[9px] font-bold bg-red-500 text-white rounded uppercase tracking-wide">-{product.discount}%</span>}
               </div>
               <StockBadge inStock={product.inStock} />
             </div>
 
-            {product.shortDescription && (
-              <p className="text-xs text-(--text-3) leading-relaxed line-clamp-2 mt-1.5">{product.shortDescription}</p>
+            {/* Product name */}
+            <Link href={`/products/${product.slug}`}>
+              <h3 className="text-sm font-semibold text-(--text-1) line-clamp-2 group-hover/card:text-navy-500 transition-colors leading-snug">
+                {product.name}
+              </h3>
+            </Link>
+
+            {/* SKU / MPN */}
+            {(product.sku || product.mpn) && (
+              <div className="flex items-center gap-3 flex-wrap">
+                {product.sku && (
+                  <span className="text-[10px] font-mono text-(--text-4)">
+                    <span className="text-(--text-4) not-italic">SKU </span>{product.sku}
+                  </span>
+                )}
+                {product.mpn && (
+                  <span className="text-[10px] font-mono text-(--text-4)">
+                    <span className="text-(--text-4) not-italic">MPN </span>{product.mpn}
+                  </span>
+                )}
+              </div>
             )}
 
-            {product.specs && product.specs.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-2">
-                {product.specs.slice(0, 4).map((s) => (
-                  <span key={s.name} className="px-2 py-px text-[10px] font-medium rounded-md bg-(--bg-raised) text-(--text-2) border border-(--border)">
-                    {s.name}: {s.value}{s.unit ? ` ${s.unit}` : ""}
-                  </span>
-                ))}
+            {/* Short description — sm+ only to save mobile space */}
+            {product.shortDescription && (
+              <p className="hidden sm:block text-xs text-(--text-3) leading-relaxed line-clamp-2">{product.shortDescription}</p>
+            )}
+
+            {/* Filter tags / specs — desktop only (≥sm) */}
+            {listFilterTags.length > 0 && (
+              <div className="hidden sm:flex flex-wrap gap-1.5 mt-0.5">
+                {listFilterTags.map((tag) => {
+                  const sepIdx = tag.indexOf(":");
+                  const key = sepIdx > 0 ? tag.slice(0, sepIdx).trim() : tag;
+                  const val = sepIdx > 0 ? tag.slice(sepIdx + 1).trim() : "";
+                  return (
+                    <span
+                      key={tag}
+                      className="px-2 py-0.5 text-[10px] font-medium rounded-md bg-(--bg-raised) text-(--text-2) border border-(--border) whitespace-nowrap"
+                    >
+                      {key}{val ? <span className="font-bold"> {val}</span> : null}
+                    </span>
+                  );
+                })}
               </div>
             )}
 
             {/* Bottom row: price + actions */}
-            <div className="flex items-center gap-2 mt-auto pt-2.5 flex-wrap">
+            <div className="flex items-center gap-2 mt-auto pt-2 flex-wrap">
               <div className="flex-1 min-w-[80px]">
                 {hasPrice ? (
                   <span className="text-sm font-bold text-(--text-1)">{formatPrice(product.pricing.listPrice, product.pricing.currency)}</span>
@@ -542,10 +577,11 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
             <ProductImg url={product.image.url} alt={product.image.alt || product.name} className="w-full h-full" />
           </Link>
 
-          {/* Badges */}
-          {(product.isNew || product.isClearance || hasDisc) && (
+          {/* Status badges — top-left */}
+          {(product.isNew || product.isClearance || product.isFeatured || hasDisc) && (
             <div className="absolute top-2 left-2 flex flex-col gap-1 pointer-events-none">
               {product.isNew && <span className="px-1.5 py-px text-[9px] font-bold bg-navy-500 text-white rounded uppercase tracking-wide shadow-sm">New</span>}
+              {product.isFeatured && <span className="px-1.5 py-px text-[9px] font-bold bg-apt-orange text-white rounded uppercase tracking-wide shadow-sm">Featured</span>}
               {product.isClearance && <span className="px-1.5 py-px text-[9px] font-bold bg-se-green text-white rounded uppercase tracking-wide shadow-sm">Clearance</span>}
               {hasDisc && <span className="px-1.5 py-px text-[9px] font-bold bg-red-500 text-white rounded uppercase tracking-wide shadow-sm">-{product.discount}%</span>}
             </div>
@@ -557,6 +593,11 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
 
         {/* Content */}
         <div className="p-2.5 sm:p-3 flex flex-col flex-1">
+
+          {/* Catalogue path — tiny breadcrumb, sm+ only */}
+          {product.cataloguePath && (
+            <p className="hidden sm:block text-[9px] text-(--text-4) truncate mb-0.5">{product.cataloguePath}</p>
+          )}
 
           {/* Brand row + secondary actions (compare/quickview on sm+ only) */}
           <div className="flex items-center justify-between mb-1 gap-1 min-h-[18px]">
@@ -580,9 +621,20 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
             </h3>
           </Link>
 
-          {/* SKU */}
-          {product.sku && (
-            <p className="text-[9px] sm:text-[10px] font-mono text-(--text-4) mt-0.5 truncate">{product.sku}</p>
+          {/* SKU + MPN */}
+          {(product.sku || product.mpn) && (
+            <div className="flex flex-col gap-px mt-0.5">
+              {product.sku && (
+                <p className="text-[9px] sm:text-[10px] font-mono text-(--text-4) truncate">
+                  SKU {product.sku}
+                </p>
+              )}
+              {product.mpn && (
+                <p className="text-[9px] sm:text-[10px] font-mono text-(--text-4) truncate">
+                  MPN {product.mpn}
+                </p>
+              )}
+            </div>
           )}
 
           {/* Availability */}

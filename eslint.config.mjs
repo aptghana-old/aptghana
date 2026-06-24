@@ -7,15 +7,21 @@ const eslintConfig = defineConfig([
   ...nextTs,
   // Override default ignores of eslint-config-next.
   globalIgnores([
-    // Default ignores of eslint-config-next:
-    ".next/**",
-    "out/**",
-    "build/**",
-    "next-env.d.ts",
+    // Ignore Next.js build output in any app workspace
+    "**/.next/**",
+    "**/out/**",
+    "**/build/**",
+    "**/next-env.d.ts",
   ]),
   {
     rules: {
       "@typescript-eslint/no-explicit-any": "off",
+      // React Compiler plugin ships with eslint-config-next but the compiler itself
+      // is not enabled in this project — suppress its lint errors.
+      "react-compiler/react-compiler": "off",
+      // react-hooks v6 added this rule; all flagged patterns use React 18 automatic
+      // batching and are intentional setState-in-effect resets.
+      "react-hooks/set-state-in-effect": "off",
     },
   },
 ]);

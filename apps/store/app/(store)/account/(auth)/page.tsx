@@ -113,7 +113,7 @@ export default function SignInPage() {
       footer={
         step === "credentials" ? (
           <>
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link href="/account/register" className="text-navy-500 font-semibold hover:text-navy-400 transition-colors">
               Create one
             </Link>

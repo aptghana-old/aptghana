@@ -1,0 +1,27 @@
+.chip {
+  font-size: 0.75rem;   /* small-bold = text-xs + font-bold */
+  font-weight: 700;
+  padding: 0.5rem;      /* p-2 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;         /* gap-1 */
+  background-color: #f4f4f5;
+  border: 1px solid #d3d4d8;
+  border-radius: 0.125rem; /* rounded-sm */
+  transition: background-color 150ms, color 150ms; /* transition-colors */
+}
+
+.chip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--color-uranus-base);
+}
+
+.chip:hover {
+  background-color: #ffffff; /* can-hover:bg-white */
+}
+
+.chip.chip-selected {
+  color: #ffffff;
+  background-color: #23263b;
+}
