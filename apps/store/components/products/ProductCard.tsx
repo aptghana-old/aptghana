@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useCart, type CartProductInput } from "@/lib/store/cart";
 import { useWishlist } from "@/lib/store/wishlist";
 import { useCompare, type CompareItem } from "@/lib/store/compare";
+import { PriceBlock } from "./PriceBlock";
 
 /* ─── Types ───────────────────────────────────────────────────────────────── */
 export type ProductCardLayout = "grid" | "list";
@@ -25,6 +26,12 @@ export interface ProductCardData {
     tradePrice?: number;
     currency: string;
     minimumOrderQty?: number;
+    /** Tax label shown beneath price. Defaults to "exc. VAT". Pass "" to hide. */
+    taxLabel?: string;
+    /** VAT/tax rate as a decimal, e.g. 0.15 for 15%. Used to show inc-tax price in quick view. */
+    taxRate?: number;
+    /** Per-unit label, e.g. "each", "per m", "per pack of 10". */
+    unit?: string;
   };
   inStock: boolean;
   isClearance?: boolean;
@@ -52,9 +59,6 @@ function formatBrand(slug: string, name?: string): string {
   return slug.split("-").map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
 }
 
-function formatPrice(amount: number, currency = "USD"): string {
-  return `${currency} ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
 
 function rfqHref(product: ProductCardData): string {
   return product.sku
@@ -342,8 +346,6 @@ function QuickViewModal({
     timer.current = setTimeout(() => setAdded(false), 1500);
   };
 
-  const hasPrice = product.pricing.listPrice > 0;
-
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" role="dialog" aria-modal aria-label={`Quick view: ${product.name}`}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
@@ -395,17 +397,8 @@ function QuickViewModal({
           )}
 
           <div className="mt-auto pt-3 border-t border-(--border)">
-            <div className="flex items-center justify-between mb-3">
-              <div>
-                {hasPrice ? (
-                  <div className="text-xl font-bold text-(--text-1)">{formatPrice(product.pricing.listPrice, product.pricing.currency)}</div>
-                ) : (
-                  <div className="text-base font-bold text-se-green">Price on Request</div>
-                )}
-                {(product.pricing.minimumOrderQty ?? 1) > 1 && (
-                  <p className="text-xs text-(--text-4) mt-0.5">Min. order: {product.pricing.minimumOrderQty} units</p>
-                )}
-              </div>
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <PriceBlock pricing={product.pricing} discount={product.discount} size="lg" />
               <StockBadge inStock={product.inStock} />
             </div>
 
@@ -444,7 +437,6 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
     setQuickView(true);
   }, []);
 
-  const hasPrice = product.pricing.listPrice > 0;
   const hasDisc = (product.discount ?? 0) > 0;
   const minQty = product.pricing.minimumOrderQty ?? 1;
   const brandLabel = formatBrand(product.brandSlug, product.brandName);
@@ -464,7 +456,7 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
               <ProductImg url={product.image.url} alt={product.image.alt || product.name} className="w-full h-full" />
             </Link>
             {/* Brand stamp — always visible; logo if indexed, brand name text otherwise */}
-            <div className="absolute bottom-1.5 right-1.5 bg-white/95 rounded px-1.5 py-0.5 border border-black/5 shadow-sm pointer-events-none flex items-center justify-center min-w-[28px]">
+            <div className="absolute top-2 right-2 shadow-sm pointer-events-none flex items-center justify-center min-w-[28px]">
               {product.brandImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -545,13 +537,8 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
 
             {/* Bottom row: price + actions */}
             <div className="flex items-center gap-2 mt-auto pt-2 flex-wrap">
-              <div className="flex-1 min-w-[80px]">
-                {hasPrice ? (
-                  <span className="text-sm font-bold text-(--text-1)">{formatPrice(product.pricing.listPrice, product.pricing.currency)}</span>
-                ) : (
-                  <span className="text-sm font-bold text-se-green">Price on Request</span>
-                )}
-                {minQty > 1 && <span className="text-[10px] text-(--text-4) ml-2">Min {minQty}</span>}
+              <div className="flex-1 min-w-20">
+                <PriceBlock pricing={product.pricing} discount={product.discount} size="md" />
               </div>
 
               <div className="flex items-center gap-1.5">
@@ -586,7 +573,7 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
       <article className="group/card card-product flex flex-col overflow-hidden">
 
         {/* Image + overlays */}
-        <div className="relative aspect-square bg-(--bg-raised) overflow-hidden">
+        <div className="relative h-32 bg-(--bg-raised) overflow-hidden">
           <Link href={`/products/${product.slug}`} className="block w-full h-full" tabIndex={-1} aria-hidden>
             <ProductImg url={product.image.url} alt={product.image.alt || product.name} className="w-full h-full" />
           </Link>
@@ -602,7 +589,7 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
           )}
 
           {/* Brand stamp — always visible; logo if indexed, brand name text otherwise */}
-          <div className="absolute bottom-2 right-2 bg-white/95 rounded px-1.5 py-0.5 border border-black/5 shadow-sm pointer-events-none z-1 flex items-center justify-center min-w-[28px]">
+          <div className="absolute top-2 right-2 shadow-sm pointer-events-none z-1 flex items-center justify-center min-w-[28px]">
             {product.brandImage ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -624,11 +611,6 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
 
         {/* Content */}
         <div className="p-2.5 sm:p-3 flex flex-col flex-1">
-
-          {/* Catalogue path — tiny breadcrumb, sm+ only */}
-          {product.cataloguePath && (
-            <p className="hidden sm:block text-[9px] text-(--text-4) truncate mb-0.5">{product.cataloguePath}</p>
-          )}
 
           {/* Brand row + secondary actions (compare/quickview on sm+ only) */}
           <div className="flex items-center justify-between mb-1 gap-1 min-h-[18px]">
@@ -675,21 +657,7 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
 
           {/* Price + CTAs */}
           <div className="mt-2 pt-2 border-t border-(--border)">
-            {/* Price row */}
-            <div className="flex items-baseline gap-1 mb-1.5">
-              <div className="flex-1 min-w-0 overflow-hidden">
-                {hasPrice ? (
-                  <span className="block text-[12px] sm:text-[13px] font-bold text-(--text-1) truncate">
-                    {formatPrice(product.pricing.listPrice, product.pricing.currency)}
-                  </span>
-                ) : (
-                  <span className="text-[11px] font-bold text-se-green">Price on Request</span>
-                )}
-              </div>
-              {minQty > 1 && (
-                <span className="text-[9px] text-(--text-4) shrink-0">Min {minQty}</span>
-              )}
-            </div>
+            <PriceBlock pricing={product.pricing} discount={product.discount} size="sm" className="mb-1.5" />
 
             {/* Action buttons */}
             <div className="flex items-center gap-1.5">

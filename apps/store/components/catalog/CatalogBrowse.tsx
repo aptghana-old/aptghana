@@ -53,7 +53,7 @@ function ResultsGrid({ hits, view }: { hits: ProductSearchHit[]; view: string })
     );
   }
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
       {hits.map((hit) => (
         <ProductCard key={hit.id} product={hitToCard(hit)} layout="grid" />
       ))}
@@ -76,7 +76,7 @@ function SkeletonGrid({ view }: { view: string }) {
     );
   }
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+    <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4">
       {Array.from({ length: 12 }).map((_, i) => (
         <div
           key={i}
