@@ -67,6 +67,7 @@ export interface ProductSearchHit {
   listPrice: number;
   currency: string;
   inStock: boolean;
+  isNew: boolean;
   isClearance: boolean;
   isFeatured: boolean;
   discount: number;
@@ -74,6 +75,7 @@ export interface ProductSearchHit {
   hierarchicalCategories: Record<string, string>;
   tags: string[];
   relevanceScore: number;
+  salesCount: number;
 }
 
 // ─── Search ───────────────────────────────────────────────────────────────────
@@ -196,6 +198,81 @@ export async function getRelatedProducts(
 
 // ─── Autocomplete ─────────────────────────────────────────────────────────────
 
+// ─── Shared brand/category extraction helpers ─────────────────────────────────
+
+function extractBrands(
+  hits: ProductSearchHit[],
+  facets: Record<string, Record<string, number>> | undefined,
+  max = 3,
+): AutocompleteSuggestion[] {
+  const seen = new Map<string, AutocompleteSuggestion>();
+  for (const h of hits) {
+    if (!seen.has(h.brandSlug)) {
+      const count = facets?.brandSlug?.[h.brandSlug];
+      seen.set(h.brandSlug, {
+        type:  "brand",
+        id:    h.brandSlug,
+        label: h.brandName || slugToName(h.brandSlug),
+        meta:  count ? `${count} products` : undefined,
+        href:  `/brands/${h.brandSlug}`,
+      });
+    }
+  }
+  return Array.from(seen.values()).slice(0, max);
+}
+
+function extractCategories(
+  hits: ProductSearchHit[],
+  facets: Record<string, Record<string, number>> | undefined,
+  query: string,
+  max = 3,
+): AutocompleteSuggestion[] {
+  const seen = new Map<string, AutocompleteSuggestion>();
+  for (const h of hits) {
+    const cat = h.hierarchicalCategories?.lvl0;
+    if (cat && !seen.has(cat)) {
+      const count = facets?.["hierarchicalCategories.lvl0"]?.[cat];
+      seen.set(cat, {
+        type:  "category",
+        id:    cat,
+        label: cat,
+        meta:  count ? `${count} products` : undefined,
+        href:  `/search?cats=${encodeURIComponent(cat)}&q=${encodeURIComponent(query.trim())}`,
+      });
+    }
+  }
+  return Array.from(seen.values()).slice(0, max);
+}
+
+// ─── Rich product autocomplete (returns full ProductSearchHit records) ─────────
+
+export interface ProductAutocompleteResult {
+  products:   ProductSearchHit[];
+  brands:     AutocompleteSuggestion[];
+  categories: AutocompleteSuggestion[];
+  totalHits:  number;
+}
+
+export async function getProductAutocomplete(
+  query: string,
+  limit = 10,
+): Promise<ProductAutocompleteResult> {
+  if (!query || query.trim().length < 2) {
+    return { products: [], brands: [], categories: [], totalHits: 0 };
+  }
+
+  const result = await searchProducts(query.trim(), {}, 1, limit);
+
+  return {
+    products:   result.hits.slice(0, limit),
+    brands:     extractBrands(result.hits, result.facets),
+    categories: extractCategories(result.hits, result.facets, query),
+    totalHits:  result.totalHits,
+  };
+}
+
+// ─── Legacy suggestion shape (kept for backward compatibility) ─────────────────
+
 export async function getAutocompleteSuggestions(
   query: string,
   limit = 6,
@@ -215,38 +292,11 @@ export async function getAutocompleteSuggestions(
     imageUrl: h.imageUrl || undefined,
   }));
 
-  const seenBrands = new Map<string, AutocompleteSuggestion>();
-  for (const h of result.hits) {
-    if (!seenBrands.has(h.brandSlug)) {
-      const count = result.facets?.brandSlug?.[h.brandSlug];
-      seenBrands.set(h.brandSlug, {
-        type:  "brand" as const,
-        id:    h.brandSlug,
-        label: h.brandName || slugToName(h.brandSlug),
-        meta:  count ? `${count} products` : undefined,
-        href:  `/brands/${h.brandSlug}`,
-      });
-    }
-  }
-  const brands = Array.from(seenBrands.values()).slice(0, 3);
-
-  const seenCats = new Map<string, AutocompleteSuggestion>();
-  for (const h of result.hits) {
-    const cat = h.hierarchicalCategories?.lvl0;
-    if (cat && !seenCats.has(cat)) {
-      const count = result.facets?.["hierarchicalCategories.lvl0"]?.[cat];
-      seenCats.set(cat, {
-        type:  "category" as const,
-        id:    cat,
-        label: cat,
-        meta:  count ? `${count} products` : undefined,
-        href:  `/search?cats=${encodeURIComponent(cat)}&q=${encodeURIComponent(query.trim())}`,
-      });
-    }
-  }
-  const categories = Array.from(seenCats.values()).slice(0, 3);
-
-  return { products, brands, categories };
+  return {
+    products,
+    brands:     extractBrands(result.hits, result.facets),
+    categories: extractCategories(result.hits, result.facets, query),
+  };
 }
 
 export async function getSearchSuggestions(query: string, limit = 5): Promise<string[]> {

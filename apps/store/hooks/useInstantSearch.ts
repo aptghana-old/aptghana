@@ -1,22 +1,29 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import type { AutocompleteResult } from "@apt/search";
+import type { AutocompleteSuggestion, ProductSearchHit } from "@apt/search";
 
-export interface InstantSearchState {
-  query:      string;
-  results:    AutocompleteResult | null;
-  loading:    boolean;
-  error:      boolean;
-  setQuery:   (q: string) => void;
-  clear:      () => void;
+export interface AutocompleteResponse {
+  products:   ProductSearchHit[];
+  brands:     AutocompleteSuggestion[];
+  categories: AutocompleteSuggestion[];
+  totalHits:  number;
 }
 
-const EMPTY: AutocompleteResult = { products: [], brands: [], categories: [] };
+export interface InstantSearchState {
+  query:    string;
+  results:  AutocompleteResponse | null;
+  loading:  boolean;
+  error:    boolean;
+  setQuery: (q: string) => void;
+  clear:    () => void;
+}
 
-export function useInstantSearch(debounceMs = 180): InstantSearchState {
+const EMPTY: AutocompleteResponse = { products: [], brands: [], categories: [], totalHits: 0 };
+
+export function useInstantSearch(debounceMs = 200): InstantSearchState {
   const [query,   setQueryState] = useState("");
-  const [results, setResults]    = useState<AutocompleteResult | null>(null);
+  const [results, setResults]    = useState<AutocompleteResponse | null>(null);
   const [loading, setLoading]    = useState(false);
   const [error,   setError]      = useState(false);
   const abortRef = useRef<AbortController | null>(null);
@@ -43,7 +50,7 @@ export function useInstantSearch(debounceMs = 180): InstantSearchState {
           { signal: ctrl.signal },
         );
         if (!res.ok) throw new Error("search unavailable");
-        const data: AutocompleteResult = await res.json();
+        const data: AutocompleteResponse = await res.json();
         setResults(data);
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
@@ -60,9 +67,7 @@ export function useInstantSearch(debounceMs = 180): InstantSearchState {
     };
   }, [query, debounceMs]);
 
-  const setQuery = useCallback((q: string) => {
-    setQueryState(q);
-  }, []);
+  const setQuery = useCallback((q: string) => setQueryState(q), []);
 
   const clear = useCallback(() => {
     setQueryState("");

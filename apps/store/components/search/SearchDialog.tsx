@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { AutocompleteSuggestion } from "@apt/search";
 import { useInstantSearch } from "@/hooks/useInstantSearch";
+import { AutocompleteProductCard } from "./AutocompleteProductCard";
+import type { AutocompleteSuggestion } from "@apt/search";
 
 /* ─── Icon helper ─────────────────────────────────────────────────────────── */
 function Ico({ d, size = 16, sw = 1.75, cls = "" }: { d: string; size?: number; sw?: number; cls?: string }) {
@@ -44,23 +45,6 @@ function addRecentSearch(q: string) {
 
 /* ─── Types ───────────────────────────────────────────────────────────────── */
 type FlatItem = { key: string; label: string; meta?: string; href?: string; imageUrl?: string; isSearch?: boolean; type?: string };
-
-/* ─── Product image thumbnail ─────────────────────────────────────────────── */
-function Thumb({ url, alt }: { url?: string; alt: string }) {
-  const [failed, setFailed] = useState(false);
-  if (!url || failed) {
-    return (
-      <div className="w-8 h-8 rounded flex items-center justify-center shrink-0" style={{ background: "var(--bg-raised)" }}>
-        <Ico d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" size={14} sw={1.5} cls="text-(--text-4)" />
-      </div>
-    );
-  }
-  return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img src={url} alt={alt} onError={() => setFailed(true)}
-      className="w-8 h-8 rounded object-contain shrink-0" style={{ background: "var(--bg-raised)" }} />
-  );
-}
 
 /* ─── Main component ──────────────────────────────────────────────────────── */
 export default function SearchDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
@@ -104,8 +88,11 @@ export default function SearchDialog({ open, onClose }: { open: boolean; onClose
     const items: FlatItem[] = [
       { key: "search_all", label: `Search "${query}"`, isSearch: true, type: "search" },
     ];
-    for (const s of results.products) items.push({ key: `p_${s.id}`, label: s.label, meta: s.meta, href: s.href, imageUrl: s.imageUrl, type: "product" });
-    for (const s of results.brands) items.push({ key: `b_${s.id}`, label: s.label, meta: s.meta, href: s.href, type: "brand" });
+    // results.products is now ProductSearchHit[]
+    for (const h of results.products) {
+      items.push({ key: `p_${h.id}`, label: h.name, meta: h.brandName, href: `/products/${h.sku.toLowerCase()}`, imageUrl: h.imageUrl, type: "product" });
+    }
+    for (const s of results.brands)     items.push({ key: `b_${s.id}`, label: s.label, meta: s.meta, href: s.href, type: "brand" });
     for (const s of results.categories) items.push({ key: `c_${s.id}`, label: s.label, meta: s.meta, href: s.href, type: "category" });
     return items;
   }, [query, results, recents]);
@@ -263,24 +250,19 @@ export default function SearchDialog({ open, onClose }: { open: boolean; onClose
           {!loading && hasResults && results!.products.length > 0 && (
             <section className="mt-1">
               <div className="px-5 py-1.5 text-[10px] font-bold uppercase tracking-widest text-(--text-4)">Products</div>
-              {results!.products.map((s: AutocompleteSuggestion, i: number) => {
+              {results!.products.map((hit, i) => {
                 const idx = 1 + i;
                 return (
-                  <button
-                    key={s.id}
+                  <AutocompleteProductCard
+                    key={hit.id}
+                    hit={hit}
+                    query={query}
+                    onSelect={() => {
+                      navigate({ key: `p_${hit.id}`, label: hit.name, href: `/products/${hit.sku.toLowerCase()}` });
+                    }}
+                    isActive={activeIdx === idx}
                     id={`search-item-${idx}`}
-                    role="option"
-                    aria-selected={activeIdx === idx}
-                    onClick={() => navigate({ key: `p_${s.id}`, label: s.label, href: s.href })}
-                    className={`w-full flex items-center gap-3 px-5 py-2.5 text-left transition-colors ${activeIdx === idx ? "bg-(--bg-raised)" : "hover:bg-(--bg-raised)"}`}
-                  >
-                    <Thumb url={s.imageUrl} alt={s.label} />
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm text-(--text-1) truncate">{s.label}</div>
-                      {s.meta && <div className="text-[11px] text-(--text-4) truncate">{s.meta}</div>}
-                    </div>
-                    <Ico d={ICONS.arrow} size={13} cls="text-(--text-4) shrink-0" />
-                  </button>
+                  />
                 );
               })}
             </section>

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import UserAccountButton from "./UserAccountButton";
+import { SearchAutocomplete } from "@/components/search/SearchAutocomplete";
 
 /* ─── Mega menu types ────────────────────────────────────────────────────── */
 interface DisplayGroup {
@@ -84,7 +85,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
   const [ activeGroup, setActiveGroup ] = useState(0);
   const [ mobileOpen, setMobileOpen ] = useState(false);
   const [ mobileGroup, setMobileGroup ] = useState<number | null>(null);
-  const [ searchQuery, setSearchQuery ] = useState("");
+  const [ drawerSearch, setDrawerSearch ] = useState("");
   const [ scrolled, setScrolled ] = useState(false);
   const [ cartCount ] = useState(0);
   const megaCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -123,11 +124,6 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
     if (megaCloseTimer.current) clearTimeout(megaCloseTimer.current);
   }, []);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) window.location.href = `/search?q=${encodeURIComponent(searchQuery.trim())}`;
-  };
-
   const group = displayGroups[ activeGroup ] ?? displayGroups[ 0 ];
 
   return (
@@ -154,26 +150,10 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                   className="h-10 w-auto object-contain dark:invert" priority />
               </Link>
 
-              {/* Search bar */}
-              <form onSubmit={handleSearch} className="flex-1 flex max-w-2xl mx-auto">
-                <div className="flex w-full rounded-xl overflow-hidden shadow-lg shadow-black/20 ring-1 ring-white/10 focus-within:ring-navy-400/60 transition-shadow">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search products, brands, part numbers, SKUs..."
-                    className="flex-1 min-w-0 h-11 px-4 bg-white/[0.07] text-sm text-white placeholder-white/30 focus:outline-none focus:bg-white/[0.10] transition-colors"
-                    autoComplete="off"
-                  />
-                  <button
-                    type="submit"
-                    className="h-11 px-5 bg-navy-500 hover:bg-navy-400 text-white flex items-center gap-2 text-sm font-semibold shrink-0 transition-colors"
-                  >
-                    <Icon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" size={17} strokeWidth={2.5} />
-                    <span>Search</span>
-                  </button>
-                </div>
-              </form>
+              {/* Search bar with autocomplete */}
+              <div className="flex-1 flex max-w-2xl mx-auto">
+                <SearchAutocomplete variant="desktop" className="flex-1" />
+              </div>
 
               {/* Actions */}
               <div className="flex items-center gap-0.5 shrink-0">
@@ -252,27 +232,9 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
               </div>
             </div>
 
-            {/* Row 2: Full-width search — never overflows */}
+            {/* Row 2: Full-width search with autocomplete */}
             <div className="pb-3">
-              <form onSubmit={handleSearch}>
-                <div className="flex w-full rounded-xl overflow-hidden shadow-md shadow-black/20 ring-1 ring-white/10 focus-within:ring-navy-400/60 transition-shadow">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search products, brands, part numbers..."
-                    className="flex-1 min-w-0 h-11 px-4 bg-white/[0.07] text-sm text-white placeholder-white/30 focus:outline-none focus:bg-white/[0.10] transition-colors"
-                    autoComplete="off"
-                  />
-                  <button
-                    type="submit"
-                    className="h-11 px-4 bg-navy-500 hover:bg-navy-400 text-white flex items-center justify-center shrink-0 transition-colors"
-                    aria-label="Search"
-                  >
-                    <Icon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" size={17} strokeWidth={2.5} />
-                  </button>
-                </div>
-              </form>
+              <SearchAutocomplete variant="mobile" />
             </div>
           </div>
         </div>
@@ -460,17 +422,25 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
               </button>
             </div>
 
-            {/* Mobile search */}
-            <form onSubmit={(e) => { e.preventDefault(); setMobileOpen(false); if (searchQuery.trim()) window.location.href = `/search?q=${encodeURIComponent(searchQuery)}`; }} className="px-4 py-3 border-b border-white/[0.06]">
+            {/* Mobile drawer quick search */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                setMobileOpen(false);
+                if (drawerSearch.trim()) window.location.href = `/search?q=${encodeURIComponent(drawerSearch.trim())}`;
+              }}
+              className="px-4 py-3 border-b border-white/[0.06]"
+            >
               <div className="flex rounded-xl overflow-hidden ring-1 ring-white/10">
                 <input
                   type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  value={drawerSearch}
+                  onChange={(e) => setDrawerSearch(e.target.value)}
                   placeholder="Search products..."
                   className="flex-1 min-w-0 h-11 px-4 bg-white/[0.06] text-sm text-white placeholder-white/30 focus:outline-none"
+                  autoComplete="off"
                 />
-                <button type="submit" className="h-11 px-4 bg-navy-500 text-white shrink-0 transition-colors">
+                <button type="submit" className="h-11 px-4 bg-navy-500 text-white shrink-0 transition-colors" aria-label="Search">
                   <Icon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" size={17} strokeWidth={2.5} />
                 </button>
               </div>

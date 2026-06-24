@@ -640,6 +640,7 @@ export interface SearchProductRecord {
   listPrice: number;
   currency: string;
   inStock: boolean;
+  isNew: boolean;
   isFeatured: boolean;
   isClearance: boolean;
   discount: number;

@@ -1,229 +1,371 @@
+APT Ghana Enterprise Platform Development Rules
+
 @AGENTS.md
 
-# APT Ghana Enterprise Platform Development Rules
-
-## Mission
+Mission
 
 You are building the digital ecosystem for Automation & Plant Technologies Ltd (APT Ghana).
 
-This is not a typical company website or ecommerce store.
+This is not a typical company website or ecommerce platform.
 
-The objective is to create an enterprise platform comparable to the digital experiences of:
+The objective is to create an enterprise-grade platform comparable to:
 
-- Schneider Electric
-- Siemens
-- ABB
-- Rockwell Automation
-- Grainger
-- RS Components
-- Rexel
-- Apple
-- Stripe
+* Schneider Electric
+* Siemens
+* ABB
+* Rockwell Automation
+* Grainger
+* RS Components
+* Rexel
+* Apple
+* Stripe
 
-Every implementation should prioritize:
+Every implementation must prioritize:
 
-- Scalability
-- Maintainability
-- Performance
-- Accessibility
-- Reusability
-- Enterprise UX
-- Investor-ready presentation
+* Scalability
+* Maintainability
+* Performance
+* Accessibility
+* Reusability
+* Enterprise UX
+* Investor-ready presentation
 
----
+⸻
 
-## Platform Architecture
+Mobile-First Mandate (Highest Priority)
 
-The platform consists of three applications:
+For web (aptghana.com) and store (store.aptghana.com):
 
-```
+Mobile is the primary platform.
+
+Design and build for:
+
+1. Mobile
+2. Tablet
+3. Laptop
+4. Desktop
+5. Ultrawide
+
+Never design for desktop first and then attempt to make it responsive.
+
+Every feature, component, page, modal, drawer, form, search experience, navigation system, product listing, filter, checkout flow, article page, catalogue page, and marketing page must be optimized for mobile first.
+
+Mobile Requirements
+
+Target devices include:
+
+* iPhone SE
+* iPhone 12/13/14/15
+* Samsung Galaxy A-series
+* Samsung Galaxy S-series
+* Pixel devices
+* Small Android devices (320px+)
+
+The platform must function correctly at:
+
+* 320px
+* 360px
+* 375px
+* 390px
+* 414px
+* 768px
+* 1024px+
+* 1440px+
+
+⸻
+
+Store & Web Mobile UX Rules
+
+Navigation
+
+Navigation must be designed for touch-first interaction.
+
+Requirements:
+
+* Large touch targets (minimum 44x44px)
+* No hover-only functionality
+* Mega menus must have mobile equivalents
+* Drawers must be thumb-friendly
+* Search must never overflow small screens
+* Menus must support one-handed navigation
+
+Typography
+
+Mobile readability takes priority.
+
+Requirements:
+
+* No tiny text
+* Minimum readable body size
+* Proper line heights
+* Consistent spacing hierarchy
+
+Avoid:
+
+* Dense enterprise dashboards on mobile
+* Compressed tables
+* Tiny metadata blocks
+
+Product Cards
+
+Product cards must:
+
+* Scale elegantly on mobile
+* Prevent layout shifts
+* Maintain image ratios
+* Use responsive typography
+* Keep actions accessible
+
+Search
+
+Search is a primary feature.
+
+Requirements:
+
+* Mobile-first autocomplete
+* Product previews
+* Keyboard-friendly
+* Touch-friendly
+* No horizontal scrolling
+* Fast rendering
+
+Images
+
+Images must:
+
+* Reserve space before loading
+* Prevent CLS
+* Use responsive sizing
+* Support lazy loading
+* Use optimized formats
+
+Tables
+
+Avoid traditional desktop tables on mobile.
+
+Use:
+
+* Cards
+* Stacked layouts
+* Responsive data views
+
+Only use horizontal scrolling when absolutely necessary.
+
+⸻
+
+Admin Platform Exception
+
+Admin is an internal operating system.
+
+Admin should support mobile usage, but may prioritize:
+
+1. Desktop
+2. Laptop
+3. Tablet
+4. Mobile
+
+Complex workflows such as:
+
+* Product management
+* Search administration
+* Category management
+* User management
+* Analytics
+* Reporting
+
+may use desktop-optimized layouts.
+
+However:
+
+* No broken mobile layouts
+* No overflowing content
+* No unusable forms
+* No inaccessible actions
+
+⸻
+
+Platform Architecture
+
 apps/
-  admin/   → admin.aptghana.com   (internal operating system)
-  store/   → store.aptghana.com   (B2B/B2C commerce platform)
-  web/     → aptghana.com         (corporate website)
-```
+admin/ → admin.aptghana.com
+store/ → store.aptghana.com
+web/ → aptghana.com
 
-These are three applications sharing one ecosystem, not three unrelated projects.
+These are three applications sharing one ecosystem.
 
----
+⸻
 
-## Shared First Philosophy
+Shared First Philosophy
 
 Whenever possible, DO NOT duplicate:
 
-- pages, layouts, components, sections
-- utilities, hooks, services
-- schemas, types, validation
-- SEO logic
+* pages
+* layouts
+* components
+* sections
+* hooks
+* utilities
+* services
+* schemas
+* validation
+* types
+* SEO logic
 
-Instead create shared packages:
+Create shared packages instead.
 
-```
 packages/
-  ui/
-  design-system/
-  shared/
-  cms/
-  seo/
-  analytics/
-  auth/
-  search/
-  content/
-  entities/
-```
+ui/
+design-system/
+shared/
+cms/
+seo/
+analytics/
+auth/
+search/
+content/
+entities/
 
-Applications should compose from shared modules rather than copy code.
+Applications should compose from shared modules.
 
----
+⸻
 
-## Shared Pages
+Shared Content
 
-Many pages exist in both the corporate website and the storefront:
+Pages that exist in multiple applications must share implementations:
 
-- About, Brands, Contact, Careers, Resources, Industries
-- Privacy Policy, Terms, Cookies, Warranty, Support, FAQs
+* About
+* Brands
+* Contact
+* Careers
+* Resources
+* Industries
+* Legal pages
+* Support pages
 
-Do NOT implement these twice. Create reusable page modules or shared content components. If one application requires additional functionality, extend the shared implementation rather than creating a duplicate.
+Extend shared implementations instead of duplicating them.
 
-```
-Shared About Page
-  ↓ Corporate Website (extra storytelling)
-  ↓ Store (extra commerce CTAs)
-```
+⸻
 
----
+Design System
 
-## Shared Footer Sections
+Maintain a single enterprise design language across all applications.
 
-Never duplicate footer links. Compose each app's footer from shared building blocks:
+Everything should feel like one ecosystem.
 
-```
-shared/footer/company
-shared/footer/resources
-shared/footer/legal
-shared/footer/support
-```
+Standardize:
 
----
+* Typography
+* Spacing
+* Buttons
+* Cards
+* Forms
+* Tables
+* Drawers
+* Dialogs
+* Navigation
+* Elevation
+* Animations
 
-## Shared Brand System
+⸻
 
-Maintain one source of truth for brand entities:
-
-- logo, description, SEO, metadata
-- manufacturer, country, website, related products
-
-Store-specific additions (featured products, listings, filters) may extend the shared entity, but the underlying brand entity must remain shared.
-
----
-
-## Shared SEO
-
-Never duplicate SEO implementations. Create reusable utilities for:
-
-- metadata generation, Open Graph, Twitter Cards
-- canonical URLs, structured data, breadcrumbs, sitemap generation
-
----
-
-## Design Language
-
-Maintain one enterprise design system across every application:
-
-- typography, spacing, icons, elevation, animations
-- radius, shadows, grids, forms, buttons, cards, tables
-
-Nothing should look like it belongs to another product.
-
----
-
-## Color System
-
-APT Ghana is a major distributor of Schneider Electric products. The visual identity should align with that level of professionalism.
-
-Primary palette: premium greens and complementary neutral tones. Use color intentionally for hierarchy, emphasis, and usability — not decoration.
-
-Avoid: random accent colors, inconsistent palettes, neon effects, oversaturated gradients.
-
-The experience should feel clean, technical, and sophisticated.
-
----
-
-## Theme System
-
-Every component must support Light Mode, Dark Mode, and System Mode. Dark mode is not an afterthought — it must be designed intentionally.
-
-Never hardcode `text-black`, `bg-white`, or `bg-black`. Always use semantic design tokens:
-
-```
-surface / surface-secondary
-foreground / foreground-muted
-border
-primary / secondary / accent
-```
-
----
-
-## Mobile First
-
-Design mobile → tablet → desktop → ultrawide. Do not create desktop layouts and shrink them.
-
-Components that must always be responsive: Header, Footer, Navigation, Mega menus, Search, Tables, Product grids, Forms, Dashboards, Filters, Drawers, Dialogs, Cards.
-
----
-
-## Adaptive Components
+Theme System
 
 Every component must support:
 
-- Light mode and dark mode
-- Keyboard navigation and accessibility
-- Touch and mouse interaction
+* Light mode
+* Dark mode
+* System mode
 
-Hover-only functionality is unacceptable.
+Never hardcode:
 
----
+* text-black
+* bg-white
+* bg-black
 
-## Performance
+Always use semantic tokens.
 
-Prefer: Server Components, Streaming, Suspense, Partial prerendering, Lazy loading, Optimized images, Optimized fonts.
+⸻
 
-Avoid unnecessary client-side rendering.
+Performance
 
----
+Prefer:
 
-## Loading States
+* Server Components
+* Streaming
+* Suspense
+* Partial prerendering
+* Lazy loading
+* Optimized images
+* Optimized fonts
 
-Every route should include `loading.tsx`, `error.tsx`, and `not-found.tsx`. Static layout elements should render immediately. Only dynamic content should show skeletons. Create reusable skeleton components — not page-specific implementations.
+Avoid unnecessary client rendering.
 
----
+⸻
 
-## Code Quality
+Loading States
 
-Never:
+Every route must include:
 
-- duplicate logic or components
-- hardcode business data, URLs, colors, or navigation
+* loading.tsx
+* error.tsx
+* not-found.tsx
 
-Always centralize configuration.
+Use reusable skeleton systems.
 
----
+Avoid static fallback content.
 
-## Enterprise Mindset
+⸻
 
-Before implementing any feature, ask:
+Empty States
 
-1. Can this be shared across applications?
-2. Can this become part of the design system?
-3. Can this scale to thousands of products and pages?
-4. Can non-developers manage it in the future?
-5. Is there unnecessary duplication?
-6. Does this meet Fortune 500 quality expectations?
+Never use placeholder fallback data.
 
-If the answer to any of these is no, redesign the implementation before writing code.
+Instead create:
 
----
+* Empty states
+* No results states
+* Not found states
+* Missing content states
 
-## Final Rule
+Each should be visually polished and contextual.
 
-Optimize for long-term architecture over short-term convenience. Every line of code should strengthen a scalable enterprise platform that can support the future growth of APT Ghana across admin, store, and web.
+⸻
+
+Code Quality
+
+Always:
+
+* Centralize configuration
+* Centralize constants
+* Centralize types
+* Centralize interfaces
+* Centralize schemas
+
+Never duplicate business logic.
+
+⸻
+
+Enterprise Mindset
+
+Before implementing any feature ask:
+
+1. Is it mobile-first?
+2. Can it be shared?
+3. Can it scale to millions of records?
+4. Can non-developers manage it?
+5. Does it avoid duplication?
+6. Does it meet Fortune 500 quality expectations?
+
+If not, redesign before implementation.
+
+⸻
+
+Final Rule
+
+For Store and Web:
+
+Mobile experience is more important than desktop experience.
+
+A feature is not complete until it works flawlessly on small mobile devices.
+
+Optimize for long-term architecture, enterprise UX, accessibility, performance, and scalability.

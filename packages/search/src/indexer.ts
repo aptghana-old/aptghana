@@ -40,6 +40,7 @@ export interface ProductForIndex {
   pricing?: { listPrice?: number; currency?: string };
   inventory?: { quantity?: number; tracked?: boolean };
   specifications?: RawSpecGroup[];
+  isNew?: boolean;
   isClearance?: boolean;
   isFeatured?: boolean;
   discount?: number;
@@ -177,6 +178,7 @@ export function buildProductRecord(
     listPrice:      pricing.listPrice  ?? 0,
     currency:       pricing.currency   ?? "GHS",
     inStock,
+    isNew:          product.isNew       ?? false,
     isFeatured:     product.isFeatured  ?? false,
     isClearance:    product.isClearance ?? false,
     discount:       product.discount    ?? 0,
