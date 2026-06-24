@@ -23,7 +23,7 @@ export default function CatalogHero({
   return (
     <div className="bg-navy-900 text-white">
       {/* Hero band */}
-      <div className="container-store pt-8 pb-7 relative overflow-hidden">
+      <div className="container-store pt-5 pb-5 md:pt-8 md:pb-7 relative overflow-hidden">
         {/* Subtle bg tint from image */}
         {image && (
           <div
@@ -61,7 +61,7 @@ export default function CatalogHero({
           {/* Title row */}
           <div className="flex items-end gap-5 flex-wrap">
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl sm:text-3xl font-bold text-white leading-tight">{name}</h1>
+              <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-tight">{name}</h1>
               {description && (
                 <p className="mt-2 text-sm text-white/50 max-w-2xl leading-relaxed line-clamp-2">
                   {description}
@@ -89,12 +89,12 @@ export default function CatalogHero({
           style={{ background: "var(--bg-base)" }}
         >
           <div className="container-store py-6">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3">
               {children.map((child) => (
                 <Link
                   key={child.slug}
                   href={child.href}
-                  className="group flex flex-col gap-2.5 p-3.5 rounded-xl transition-all border hover:shadow-[var(--shadow-2)] hover:border-[var(--border-hi)]"
+                  className="group flex flex-col gap-2 p-2.5 sm:p-3.5 rounded-xl transition-all border hover:shadow-[var(--shadow-2)] hover:border-[var(--border-hi)]"
                   style={{ background: "var(--bg-surface)", borderColor: "var(--border)" }}
                 >
                   {/* Thumbnail */}

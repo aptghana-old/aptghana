@@ -16,20 +16,23 @@ export default function MobileFilterDrawer({ facets, total, basePath = "/search"
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-2 px-3 py-2 rounded-lg text-[13px] font-medium border lg:hidden"
+        className="flex items-center gap-2 h-10 px-3.5 rounded-xl text-[13px] font-semibold border lg:hidden shrink-0 transition-colors"
         style={{
-          background: "var(--bg-surface)",
+          background:  "var(--bg-surface)",
           borderColor: "var(--border)",
-          color: "var(--text-2)",
+          color:       "var(--text-2)",
         }}
         aria-label="Open filters"
       >
-        <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+        <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75 4.5 4.5m0 0-4.5 4.5m4.5-4.5H11.25" />
         </svg>
         Filters
-        {total !== undefined && (
-          <span className="ml-1 text-[11px] px-1.5 py-0.5 rounded-full font-semibold" style={{ background: "var(--bg-raised)", color: "var(--text-4)" }}>
+        {total !== undefined && total > 0 && (
+          <span
+            className="text-[10px] px-1.5 py-0.5 rounded-full font-bold tabular-nums"
+            style={{ background: "var(--bg-raised)", color: "var(--text-3)" }}
+          >
             {total.toLocaleString()}
           </span>
         )}

@@ -21,9 +21,9 @@ export interface ProductCardData {
   shortDescription?: string;
   image: { url: string; alt?: string };
   pricing: {
-    listPrice:       number;
-    tradePrice?:     number;
-    currency:        string;
+    listPrice:        number;
+    tradePrice?:      number;
+    currency:         string;
     minimumOrderQty?: number;
   };
   inStock:      boolean;
@@ -35,8 +35,8 @@ export interface ProductCardData {
 }
 
 interface ProductCardProps {
-  product:   ProductCardData;
-  layout?:   ProductCardLayout;
+  product:  ProductCardData;
+  layout?:  ProductCardLayout;
   priority?: boolean;
 }
 
@@ -50,7 +50,6 @@ function formatPrice(amount: number, currency = "USD"): string {
   return `${currency} ${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
-/** Single-product RFQ link — prefers SKU, falls back to product id. */
 function rfqHref(product: ProductCardData): string {
   return product.sku
     ? `/rfq?sku=${encodeURIComponent(product.sku)}`
@@ -111,7 +110,7 @@ function ProductImg({ url, alt, className }: { url: string; alt: string; classNa
 /* ─── Availability pill ───────────────────────────────────────────────────── */
 function StockBadge({ inStock }: { inStock: boolean }) {
   return (
-    <span className={`inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full ${
+    <span className={`inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold px-1.5 sm:px-2 py-0.5 rounded-full ${
       inStock
         ? "bg-green-50 text-green-700 dark:bg-green-900/20 dark:text-green-400"
         : "bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400"
@@ -175,7 +174,7 @@ function WishlistBtn({
 
   const isLoading = status === "syncing";
 
-  const smCls = `absolute top-2 right-2 w-9 h-9 sm:w-7 sm:h-7 rounded-full flex items-center justify-center shadow transition-all ${
+  const smCls = `absolute top-1.5 right-1.5 w-10 h-10 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow transition-all ${
     inWishlist
       ? "bg-red-500 text-white"
       : "bg-(--bg-surface)/80 backdrop-blur-sm text-(--text-3) hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/30"
@@ -197,7 +196,7 @@ function WishlistBtn({
       >
         {isLoading
           ? <span className="w-3.5 h-3.5 rounded-full border-2 border-current border-t-transparent animate-spin" />
-          : <Ico d={inWishlist ? D.heartFill : D.heart} size={size === "sm" ? 13 : 14} sw={2} fill={inWishlist ? "currentColor" : "none"} />
+          : <Ico d={inWishlist ? D.heartFill : D.heart} size={size === "sm" ? 14 : 14} sw={2} fill={inWishlist ? "currentColor" : "none"} />
         }
       </button>
       <SignInNudge visible={nudge} />
@@ -226,7 +225,7 @@ function CompareBtn({
     toggle(item);
   }, [product, toggle]);
 
-  const smCls = `w-8 h-8 sm:w-6 sm:h-6 rounded flex items-center justify-center transition-colors ${
+  const smCls = `w-7 h-7 rounded flex items-center justify-center transition-colors ${
     inCompare ? "text-navy-500" : "text-(--text-4) hover:text-navy-500"
   }`;
   const mdCls = `w-8 h-8 rounded-lg flex items-center justify-center border transition-all ${
@@ -246,16 +245,16 @@ function CompareBtn({
       title={disabled ? "Compare list is full (max 4)" : undefined}
       className={`${size === "sm" ? smCls : mdCls} ${disabled ? "opacity-40 cursor-not-allowed" : ""}`}
     >
-      <Ico d={D.compare} size={size === "sm" ? 12 : 13} sw={2} />
+      <Ico d={D.compare} size={12} sw={2} />
     </button>
   );
 }
 
 /* ─── Add-to-cart button ──────────────────────────────────────────────────── */
 function CartBtn({
-  product, size = "sm",
+  product, size = "sm", className = "",
 }: {
-  product: ProductCardData; size?: "sm" | "md";
+  product: ProductCardData; size?: "sm" | "md"; className?: string;
 }) {
   const { add } = useCart();
   const [added, setAdded] = useState(false);
@@ -284,12 +283,12 @@ function CartBtn({
     return (
       <button
         onClick={handleClick}
-        className={`shrink-0 flex items-center gap-1 px-3 py-2.5 sm:px-2.5 sm:py-1.5 rounded-lg text-[11px] font-bold transition-all ${
+        className={`${className} flex items-center justify-center gap-1 h-9 px-2 rounded-lg text-[11px] font-bold transition-all ${
           added ? "bg-se-green text-white scale-95" : "bg-navy-500 hover:bg-navy-400 text-white"
         }`}
       >
         <Ico d={added ? D.check : D.cart} size={12} sw={2.5} />
-        {added ? "Added" : "Cart"}
+        {added ? "Added" : "Add"}
       </button>
     );
   }
@@ -297,7 +296,7 @@ function CartBtn({
   return (
     <button
       onClick={handleClick}
-      className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all ${
+      className={`${className} flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all ${
         added ? "bg-se-green text-white" : "bg-navy-500 hover:bg-navy-400 text-white"
       }`}
     >
@@ -438,7 +437,7 @@ function QuickViewModal({
 }
 
 /* ─── ProductCard ─────────────────────────────────────────────────────────── */
-export default function ProductCard({ product, layout = "grid" }: ProductCardProps) {
+export default function ProductCard({ product }: ProductCardProps) {
   const [quickView, setQuickView] = useState(false);
 
   const handleQV = useCallback((e: React.MouseEvent) => {
@@ -451,100 +450,11 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
   const minQty     = product.pricing.minimumOrderQty ?? 1;
   const brandLabel = formatBrand(product.brandSlug, product.brandName);
 
-  /* ── List layout ────────────────────────────────────────────────────────── */
-  if (layout === "list") {
-    return (
-      <>
-        <article className="group/card card-product flex gap-4 p-4">
-          {/* Thumbnail */}
-          <Link href={`/products/${product.slug}`} tabIndex={-1} aria-hidden
-            className="shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-(--bg-raised) block">
-            <ProductImg url={product.image.url} alt={product.image.alt || product.name} className="w-full h-full" />
-          </Link>
-
-          {/* Body */}
-          <div className="flex-1 min-w-0 flex flex-col">
-            {/* Top row */}
-            <div className="flex items-start justify-between gap-2">
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
-                  <span className="text-[11px] font-bold text-navy-500 uppercase tracking-wide">{brandLabel}</span>
-                  {product.isNew       && <span className="px-1.5 py-px text-[9px] font-bold bg-navy-500 text-white rounded uppercase tracking-wide">New</span>}
-                  {product.isClearance && <span className="px-1.5 py-px text-[9px] font-bold bg-se-green text-white rounded uppercase tracking-wide">Clearance</span>}
-                  {hasDisc             && <span className="px-1.5 py-px text-[9px] font-bold bg-red-500 text-white rounded uppercase tracking-wide">-{product.discount}%</span>}
-                </div>
-                <Link href={`/products/${product.slug}`}>
-                  <h3 className="text-sm font-semibold text-(--text-1) line-clamp-1 group-hover/card:text-navy-500 transition-colors leading-snug">
-                    {product.name}
-                  </h3>
-                </Link>
-                {(product.sku || product.mpn) && (
-                  <div className="flex items-center gap-3 mt-0.5">
-                    {product.sku && <span className="text-[10px] font-mono text-(--text-4)">SKU {product.sku}</span>}
-                    {product.mpn && <span className="text-[10px] font-mono text-(--text-4)">MPN {product.mpn}</span>}
-                  </div>
-                )}
-              </div>
-              <StockBadge inStock={product.inStock} />
-            </div>
-
-            {product.shortDescription && (
-              <p className="text-xs text-(--text-3) leading-relaxed line-clamp-2 mt-1.5">{product.shortDescription}</p>
-            )}
-
-            {product.specs && product.specs.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-2">
-                {product.specs.slice(0, 4).map((s) => (
-                  <span key={s.name} className="px-2 py-px text-[10px] font-medium rounded-md bg-(--bg-raised) text-(--text-2) border border-(--border)">
-                    {s.name}: {s.value}{s.unit ? ` ${s.unit}` : ""}
-                  </span>
-                ))}
-              </div>
-            )}
-
-            {/* Bottom row: price + actions */}
-            <div className="flex items-center gap-2 mt-auto pt-2.5 flex-wrap">
-              <div className="flex-1 min-w-[80px]">
-                {hasPrice ? (
-                  <span className="text-sm font-bold text-(--text-1)">{formatPrice(product.pricing.listPrice, product.pricing.currency)}</span>
-                ) : (
-                  <span className="text-sm font-bold text-se-green">Price on Request</span>
-                )}
-                {minQty > 1 && <span className="text-[10px] text-(--text-4) ml-2">Min {minQty}</span>}
-              </div>
-
-              <div className="flex items-center gap-1.5">
-                <CartBtn product={product} size="md" />
-                <Link href={rfqHref(product)}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border border-(--border) text-(--text-2) hover:border-navy-500/40 hover:text-navy-500 transition-colors">
-                  <Ico d={D.rfq} size={13} sw={2} />
-                  RFQ
-                </Link>
-                <WishlistBtn productId={product.id} size="md" />
-                <CompareBtn  product={product}      size="md" />
-                <button onClick={handleQV} aria-label="Quick view"
-                  className="w-8 h-8 rounded-lg flex items-center justify-center border border-(--border) text-(--text-3) hover:border-navy-300 hover:text-navy-400 transition-colors">
-                  <Ico d={D.eye} size={14} sw={2} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        {quickView && createPortal(
-          <QuickViewModal product={product} onClose={() => setQuickView(false)} />,
-          document.body,
-        )}
-      </>
-    );
-  }
-
-  /* ── Grid layout ────────────────────────────────────────────────────────── */
   return (
     <>
       <article className="group/card card-product flex flex-col overflow-hidden">
 
-        {/* Image */}
+        {/* Image + overlays */}
         <div className="relative aspect-square bg-(--bg-raised) overflow-hidden">
           <Link href={`/products/${product.slug}`} className="block w-full h-full" tabIndex={-1} aria-hidden>
             <ProductImg url={product.image.url} alt={product.image.alt || product.name} className="w-full h-full" />
@@ -552,70 +462,81 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
 
           {/* Badges */}
           {(product.isNew || product.isClearance || hasDisc) && (
-            <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 pointer-events-none">
+            <div className="absolute top-2 left-2 flex flex-col gap-1 pointer-events-none">
               {product.isNew       && <span className="px-1.5 py-px text-[9px] font-bold bg-navy-500 text-white rounded uppercase tracking-wide shadow-sm">New</span>}
               {product.isClearance && <span className="px-1.5 py-px text-[9px] font-bold bg-se-green text-white rounded uppercase tracking-wide shadow-sm">Clearance</span>}
               {hasDisc             && <span className="px-1.5 py-px text-[9px] font-bold bg-red-500 text-white rounded uppercase tracking-wide shadow-sm">-{product.discount}%</span>}
             </div>
           )}
 
-          {/* Wishlist (top-right, always visible) */}
+          {/* Wishlist — 40px tap target on mobile, 32px on sm+ */}
           <WishlistBtn productId={product.id} size="sm" />
         </div>
 
         {/* Content */}
-        <div className="p-3.5 flex flex-col flex-1">
+        <div className="p-2.5 sm:p-3 flex flex-col flex-1">
 
-          {/* Brand + secondary actions */}
-          <div className="flex items-center justify-between mb-1 gap-1">
-            <span className="text-[11px] font-bold text-navy-500 uppercase tracking-wide truncate">{brandLabel}</span>
-            <div className="flex items-center gap-0.5 shrink-0">
+          {/* Brand row + secondary actions (compare/quickview on tablet+ only) */}
+          <div className="flex items-center justify-between mb-1 gap-1 min-h-[18px]">
+            <span className="text-[10px] font-bold text-navy-500 uppercase tracking-wide truncate">{brandLabel}</span>
+            <div className="hidden sm:flex items-center gap-0.5 shrink-0">
               <CompareBtn product={product} size="sm" />
-              <button onClick={handleQV} aria-label="Quick view"
-                className="w-8 h-8 sm:w-6 sm:h-6 rounded flex items-center justify-center text-(--text-4) hover:text-navy-500 transition-colors">
-                <Ico d={D.eye} size={12} sw={2} />
+              <button
+                onClick={handleQV}
+                aria-label="Quick view"
+                className="w-7 h-7 rounded flex items-center justify-center text-(--text-4) hover:text-navy-500 transition-colors"
+              >
+                <Ico d={D.eye} size={11} sw={2} />
               </button>
             </div>
           </div>
 
-          {/* Name */}
-          <Link href={`/products/${product.slug}`} className="block flex-1">
-            <h3 className="text-sm font-semibold text-(--text-1) leading-snug line-clamp-2 group-hover/card:text-navy-500 transition-colors">
+          {/* Product name */}
+          <Link href={`/products/${product.slug}`} className="block flex-1 mb-1">
+            <h3 className="text-[12px] sm:text-sm font-semibold text-(--text-1) leading-snug line-clamp-2 group-hover/card:text-navy-500 transition-colors">
               {product.name}
             </h3>
           </Link>
 
           {/* SKU */}
           {product.sku && (
-            <p className="text-[10px] font-mono text-(--text-4) mt-1 truncate">{product.sku}</p>
+            <p className="text-[9px] sm:text-[10px] font-mono text-(--text-4) mt-0.5 truncate">{product.sku}</p>
           )}
 
           {/* Availability */}
-          <div className="mt-2.5">
+          <div className="mt-2">
             <StockBadge inStock={product.inStock} />
           </div>
 
-          {/* Price + CTA */}
-          <div className="flex items-end justify-between gap-2 mt-2.5 pt-2.5 border-t border-(--border)">
-            <div className="min-w-0 flex-1">
-              {hasPrice ? (
-                <div className="text-[13px] font-bold text-(--text-1) leading-none">
-                  {formatPrice(product.pricing.listPrice, product.pricing.currency)}
-                </div>
-              ) : (
-                <div className="text-[12px] font-bold text-se-green leading-tight">Price on Request</div>
-              )}
+          {/* Price + CTAs */}
+          <div className="mt-2 pt-2 border-t border-(--border)">
+            {/* Price row */}
+            <div className="flex items-baseline gap-1 mb-1.5">
+              <div className="flex-1 min-w-0 overflow-hidden">
+                {hasPrice ? (
+                  <span className="block text-[12px] sm:text-[13px] font-bold text-(--text-1) truncate">
+                    {formatPrice(product.pricing.listPrice, product.pricing.currency)}
+                  </span>
+                ) : (
+                  <span className="text-[11px] font-bold text-se-green">Price on Request</span>
+                )}
+              </div>
               {minQty > 1 && (
-                <div className="text-[10px] text-(--text-4) mt-0.5">Min {minQty} units</div>
+                <span className="text-[9px] text-(--text-4) shrink-0">Min {minQty}</span>
               )}
             </div>
 
-            <div className="flex items-center gap-1 shrink-0">
-              <Link href={rfqHref(product)} title="Request a quote" aria-label={`Request a quote for ${product.name}`}
-                className="flex items-center justify-center w-9 h-9 sm:w-7 sm:h-7 rounded-lg bg-(--bg-raised) text-(--text-3) hover:bg-navy-50 hover:text-navy-600 dark:hover:bg-navy-900/40 dark:hover:text-navy-300 border border-(--border) transition-colors">
+            {/* Action buttons */}
+            <div className="flex items-center gap-1.5">
+              <CartBtn product={product} size="sm" className="flex-1" />
+              <Link
+                href={rfqHref(product)}
+                title="Request a quote"
+                aria-label={`Request a quote for ${product.name}`}
+                className="flex items-center justify-center w-9 h-9 sm:w-8 sm:h-8 rounded-lg bg-(--bg-raised) text-(--text-3) hover:bg-navy-50 hover:text-navy-600 dark:hover:bg-navy-900/40 dark:hover:text-navy-300 border border-(--border) transition-colors shrink-0"
+              >
                 <Ico d={D.rfq} size={12} sw={2} />
               </Link>
-              <CartBtn product={product} size="sm" />
             </div>
           </div>
         </div>
@@ -630,37 +551,22 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
 }
 
 /* ─── Skeleton ────────────────────────────────────────────────────────────── */
-export function ProductCardSkeleton({ layout = "grid" }: { layout?: ProductCardLayout }) {
-  if (layout === "list") {
-    return (
-      <div className="card-product flex gap-4 p-4 animate-pulse">
-        <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl bg-(--bg-raised) shrink-0" />
-        <div className="flex-1 space-y-2.5 py-0.5">
-          <div className="h-3 w-20 bg-(--bg-raised) rounded" />
-          <div className="h-4 w-3/4 bg-(--bg-raised) rounded" />
-          <div className="h-3 w-1/3 bg-(--bg-raised) rounded" />
-          <div className="h-3 w-5/6 bg-(--bg-raised) rounded" />
-          <div className="h-3 w-2/3 bg-(--bg-raised) rounded" />
-          <div className="flex gap-2 pt-1">
-            <div className="h-8 w-24 bg-(--bg-raised) rounded-lg" />
-            <div className="h-8 w-14 bg-(--bg-raised) rounded-lg" />
-          </div>
-        </div>
-      </div>
-    );
-  }
+export function ProductCardSkeleton({ layout: _layout }: { layout?: ProductCardLayout }) {
   return (
     <div className="card-product overflow-hidden animate-pulse">
       <div className="aspect-square bg-(--bg-raised)" />
-      <div className="p-3.5 space-y-2.5">
-        <div className="h-3 w-16 bg-(--bg-raised) rounded" />
-        <div className="h-4 bg-(--bg-raised) rounded" />
-        <div className="h-4 w-4/5 bg-(--bg-raised) rounded" />
-        <div className="h-3 w-12 bg-(--bg-raised) rounded mt-1" />
-        <div className="h-5 w-20 bg-(--bg-raised) rounded-full mt-2.5" />
-        <div className="flex items-center justify-between pt-2.5 border-t border-(--border)">
-          <div className="h-4 w-20 bg-(--bg-raised) rounded" />
-          <div className="h-7 w-14 bg-(--bg-raised) rounded-lg" />
+      <div className="p-2.5 sm:p-3 space-y-2">
+        <div className="h-2.5 w-14 bg-(--bg-raised) rounded" />
+        <div className="h-3.5 bg-(--bg-raised) rounded" />
+        <div className="h-3.5 w-4/5 bg-(--bg-raised) rounded" />
+        <div className="h-2.5 w-10 bg-(--bg-raised) rounded mt-0.5" />
+        <div className="h-5 w-16 bg-(--bg-raised) rounded-full mt-2" />
+        <div className="pt-2 border-t border-(--border) space-y-1.5">
+          <div className="h-3.5 w-20 bg-(--bg-raised) rounded" />
+          <div className="flex gap-1.5">
+            <div className="flex-1 h-9 bg-(--bg-raised) rounded-lg" />
+            <div className="w-9 h-9 bg-(--bg-raised) rounded-lg" />
+          </div>
         </div>
       </div>
     </div>

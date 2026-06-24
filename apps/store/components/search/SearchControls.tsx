@@ -10,11 +10,11 @@ interface Props {
 
 export default function SearchControls({ total, query, facets, basePath = "/search" }: Props) {
   return (
-    <div className="flex items-center gap-3 mb-4 flex-wrap">
+    <div className="flex items-center gap-2 mb-5">
+      {/* Filter button — mobile/tablet only (desktop uses sidebar) */}
       <MobileFilterDrawer facets={facets} total={total} basePath={basePath} />
-      <div className="flex-1 min-w-0">
-        <SortViewBar total={total} query={query} basePath={basePath} />
-      </div>
+      {/* Sort controls — takes remaining space */}
+      <SortViewBar total={total} query={query} basePath={basePath} />
     </div>
   );
 }

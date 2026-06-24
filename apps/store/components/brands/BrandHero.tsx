@@ -15,7 +15,7 @@ export default function BrandHero({ brand, breadcrumbs, categoryFacets, productC
   return (
     <div className="bg-navy-900 text-white">
       {/* Hero band */}
-      <div className="container-store pt-8 pb-7 relative overflow-hidden">
+      <div className="container-store pt-5 pb-5 md:pt-8 md:pb-7 relative overflow-hidden">
         {/* Subtle cover image tint */}
         {brand.coverImageUrl && (
           <div
@@ -51,11 +51,11 @@ export default function BrandHero({ brand, breadcrumbs, categoryFacets, productC
             ))}
           </nav>
 
-          {/* Main row: logo badge + info + count */}
-          <div className="flex items-start gap-5 flex-wrap">
+          {/* Main row: logo badge + info */}
+          <div className="flex items-start gap-3 sm:gap-5">
             {/* Logo badge */}
             <div
-              className="w-16 h-16 rounded-2xl shrink-0 flex items-center justify-center overflow-hidden"
+              className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl shrink-0 flex items-center justify-center overflow-hidden"
               style={{ background: "rgba(255,255,255,1)" }}
             >
               {brand.logoUrl ? (
@@ -75,31 +75,46 @@ export default function BrandHero({ brand, breadcrumbs, categoryFacets, productC
 
             {/* Info */}
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap mb-1">
-                <h1 className="text-2xl sm:text-3xl font-bold text-white leading-tight">
-                  {brand.name}
-                </h1>
-                {brand.isPartner && (
-                  <span
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest shrink-0"
-                    style={{
-                      background: "rgba(61,205,88,0.15)",
-                      border: "1px solid rgba(61,205,88,0.35)",
-                      color: "#3DCD58",
-                    }}
-                  >
+              {/* Name + count on same row */}
+              <div className="flex items-start justify-between gap-3 mb-1">
+                <div className="flex items-center gap-2 flex-wrap min-w-0">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-tight">
+                    {brand.name}
+                  </h1>
+                  {brand.isPartner && (
                     <span
-                      className="w-1.5 h-1.5 rounded-full"
-                      style={{ background: "#3DCD58" }}
-                      aria-hidden
-                    />
-                    Authorized Partner
-                  </span>
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-widest shrink-0"
+                      style={{
+                        background: "rgba(61,205,88,0.15)",
+                        border: "1px solid rgba(61,205,88,0.35)",
+                        color: "#3DCD58",
+                      }}
+                    >
+                      <span
+                        className="w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full"
+                        style={{ background: "#3DCD58" }}
+                        aria-hidden
+                      />
+                      Partner
+                    </span>
+                  )}
+                </div>
+
+                {/* Product count — top-right, compact */}
+                {productCount > 0 && (
+                  <div className="shrink-0 text-right">
+                    <span className="text-lg sm:text-2xl font-bold text-white tabular-nums">
+                      {productCount.toLocaleString()}
+                    </span>
+                    <p className="text-[10px] text-white/40 uppercase tracking-wide font-semibold">
+                      Products
+                    </p>
+                  </div>
                 )}
               </div>
 
               {/* Country, founded, website */}
-              <div className="flex items-center gap-3 flex-wrap text-[12px] text-white/40 mb-2">
+              <div className="flex items-center gap-2 flex-wrap text-[11px] sm:text-[12px] text-white/40 mb-1.5">
                 {brand.country && <span>{brand.country}</span>}
                 {brand.founded && (
                   <>
@@ -114,7 +129,7 @@ export default function BrandHero({ brand, breadcrumbs, categoryFacets, productC
                       href={brand.website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="hover:text-white/70 transition-colors underline underline-offset-2"
+                      className="hover:text-white/70 transition-colors underline underline-offset-2 truncate max-w-[140px] sm:max-w-none"
                     >
                       {brand.website.replace(/^https?:\/\/(www\.)?/, "")}
                     </a>
@@ -124,23 +139,11 @@ export default function BrandHero({ brand, breadcrumbs, categoryFacets, productC
 
               {/* Description */}
               {(brand.shortDescription || brand.description) && (
-                <p className="text-sm text-white/50 max-w-2xl leading-relaxed line-clamp-2">
+                <p className="text-[12px] sm:text-sm text-white/50 max-w-2xl leading-relaxed line-clamp-2">
                   {brand.shortDescription || brand.description}
                 </p>
               )}
             </div>
-
-            {/* Product count */}
-            {productCount > 0 && (
-              <div className="shrink-0 text-right">
-                <span className="text-2xl font-bold text-white">
-                  {productCount.toLocaleString()}
-                </span>
-                <p className="text-[11px] text-white/40 uppercase tracking-wide font-semibold mt-0.5">
-                  Products
-                </p>
-              </div>
-            )}
           </div>
         </div>
       </div>

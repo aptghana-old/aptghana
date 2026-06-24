@@ -80,16 +80,16 @@ async function getHomeData() {
       shortDescription: p.shortDescription,
       image: { url: p.images?.main?.url ?? "", alt: p.images?.main?.alt ?? p.name },
       pricing: {
-        listPrice:       p.pricing?.listPrice       ?? 0,
-        tradePrice:      p.pricing?.tradePrice,
-        currency:        p.pricing?.currency        ?? "USD",
+        listPrice: p.pricing?.listPrice ?? 0,
+        tradePrice: p.pricing?.tradePrice,
+        currency: p.pricing?.currency ?? "USD",
         minimumOrderQty: p.pricing?.minimumOrderQty,
       },
       inStock: (p.inventory?.quantity ?? 0) > (p.inventory?.reservedQuantity ?? 0),
       isClearance: p.isClearance ?? false,
-      isNew:       p.isNew       ?? false,
-      isFeatured:  p.isFeatured  ?? false,
-      discount:    p.discount    ?? 0,
+      isNew: p.isNew ?? false,
+      isFeatured: p.isFeatured ?? false,
+      discount: p.discount ?? 0,
     }));
 
     return {
@@ -258,24 +258,24 @@ function QuickAccessBar() {
     <div className="bg-theme-base border-b border-theme">
       <div className="container-store py-4">
         <div className="overflow-x-auto -mx-4 sm:mx-0">
-        <div className="grid grid-cols-5 gap-2 px-4 sm:px-0 min-w-[320px]">
-          {links.map((link) => (
-            <Link
-              key={link.href + link.label}
-              href={link.href}
-              className="group flex flex-col items-center gap-2 py-3.5 px-2 bg-theme-surface border border-theme rounded-2xl hover:border-navy-500/30 hover:shadow-md transition-all duration-150"
-            >
-              <div className="w-8 h-8 rounded-lg bg-theme-raised flex items-center justify-center group-hover:bg-navy-50 dark:group-hover:bg-navy-900/30 transition-colors">
-                <svg className="w-4 h-4 text-theme-3 group-hover:text-navy-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d={link.d} />
-                </svg>
-              </div>
-              <span className="text-[11px] sm:text-xs font-semibold text-theme-2 group-hover:text-navy-500 transition-colors text-center leading-snug">
-                {link.label}
-              </span>
-            </Link>
-          ))}
-        </div>
+          <div className="grid grid-cols-5 gap-2 px-4 sm:px-0 min-w-[320px]">
+            {links.map((link) => (
+              <Link
+                key={link.href + link.label}
+                href={link.href}
+                className="group flex flex-col items-center gap-2 py-3.5 px-2 bg-theme-surface border border-theme rounded-2xl hover:border-navy-500/30 hover:shadow-md transition-all duration-150"
+              >
+                <div className="w-8 h-8 rounded-lg bg-theme-raised flex items-center justify-center group-hover:bg-navy-50 dark:group-hover:bg-navy-900/30 transition-colors">
+                  <svg className="w-4 h-4 text-theme-3 group-hover:text-navy-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d={link.d} />
+                  </svg>
+                </div>
+                <span className="text-[11px] sm:text-xs font-semibold text-theme-2 group-hover:text-navy-500 transition-colors text-center leading-snug">
+                  {link.label}
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </div>
@@ -341,7 +341,7 @@ function FeaturedProductsSection({ products, cfg }: { products: ProductCardData[
             </svg>
           </Link>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} layout="grid" />
           ))}

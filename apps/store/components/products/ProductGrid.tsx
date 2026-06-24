@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import ProductCard, {
   type ProductCardData,
   type ProductCardLayout,
@@ -8,7 +7,7 @@ import ProductCard, {
   ProductCardEmpty,
 } from "./ProductCard";
 
-/* ─── DB product shape (what page.tsx passes down) ───────────────────────── */
+/* ─── DB product shape ────────────────────────────────────────────────────── */
 export interface DBProduct {
   _id: string;
   name: string;
@@ -50,134 +49,41 @@ export function toProductCardData(p: DBProduct): ProductCardData {
   };
 }
 
-/* ─── Layout toggle icons ─────────────────────────────────────────────────── */
-function GridIcon({ active }: { active: boolean }) {
-  return (
-    <svg width={16} height={16} viewBox="0 0 16 16" fill="none" aria-hidden>
-      <rect x="1" y="1" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth={1.5} fill={active ? "currentColor" : "none"} fillOpacity={active ? .15 : 0} />
-      <rect x="9" y="1" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth={1.5} fill={active ? "currentColor" : "none"} fillOpacity={active ? .15 : 0} />
-      <rect x="1" y="9" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth={1.5} fill={active ? "currentColor" : "none"} fillOpacity={active ? .15 : 0} />
-      <rect x="9" y="9" width="6" height="6" rx="1.5" stroke="currentColor" strokeWidth={1.5} fill={active ? "currentColor" : "none"} fillOpacity={active ? .15 : 0} />
-    </svg>
-  );
-}
-
-function ListIcon({ active }: { active: boolean }) {
-  return (
-    <svg width={16} height={16} viewBox="0 0 16 16" fill="none" aria-hidden>
-      <rect x="1" y="1" width="4" height="4" rx="1" stroke="currentColor" strokeWidth={1.5} fill={active ? "currentColor" : "none"} fillOpacity={active ? .15 : 0} />
-      <line x1="7" y1="3" x2="15" y2="3" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
-      <rect x="1" y="7" width="4" height="4" rx="1" stroke="currentColor" strokeWidth={1.5} fill={active ? "currentColor" : "none"} fillOpacity={active ? .15 : 0} />
-      <line x1="7" y1="9" x2="15" y2="9" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
-      <rect x="1" y="13" width="4" height="4" rx="1" stroke="currentColor" strokeWidth={1.5} fill={active ? "currentColor" : "none"} fillOpacity={active ? .15 : 0} />
-      <line x1="7" y1="15" x2="15" y2="15" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" />
-    </svg>
-  );
-}
-
 /* ─── ProductGrid ─────────────────────────────────────────────────────────── */
 interface ProductGridProps {
   products:          DBProduct[];
   loading?:          boolean;
+  /** @deprecated list view has been removed — ignored */
   showLayoutToggle?: boolean;
+  /** @deprecated list view has been removed — ignored */
   defaultLayout?:    ProductCardLayout;
 }
 
 export default function ProductGrid({
   products,
   loading = false,
-  showLayoutToggle = true,
-  defaultLayout = "grid",
 }: ProductGridProps) {
-  const [layout, setLayout] = useState<ProductCardLayout>(defaultLayout);
+  const gridCls = "grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4";
 
-  /* Loading state */
   if (loading) {
     return (
-      <div>
-        {showLayoutToggle && <LayoutToggleBar layout={layout} onChange={setLayout} />}
-        {layout === "grid" ? (
-          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <ProductCardSkeleton key={i} layout="grid" />
-            ))}
-          </div>
-        ) : (
-          <div className="flex flex-col gap-3">
-            {Array.from({ length: 8 }).map((_, i) => (
-              <ProductCardSkeleton key={i} layout="list" />
-            ))}
-          </div>
-        )}
+      <div className={gridCls}>
+        {Array.from({ length: 12 }).map((_, i) => (
+          <ProductCardSkeleton key={i} />
+        ))}
       </div>
     );
   }
 
-  /* Empty state */
   if (products.length === 0) {
-    return (
-      <div>
-        {showLayoutToggle && <LayoutToggleBar layout={layout} onChange={setLayout} />}
-        <ProductCardEmpty />
-      </div>
-    );
+    return <ProductCardEmpty />;
   }
 
-  const items = products.map(toProductCardData);
-
   return (
-    <div>
-      {showLayoutToggle && <LayoutToggleBar layout={layout} onChange={setLayout} />}
-
-      {layout === "grid" ? (
-        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
-          {items.map((p) => (
-            <ProductCard key={p.id} product={p} layout="grid" />
-          ))}
-        </div>
-      ) : (
-        <div className="flex flex-col gap-3">
-          {items.map((p) => (
-            <ProductCard key={p.id} product={p} layout="list" />
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-/* ─── Layout toggle bar ───────────────────────────────────────────────────── */
-function LayoutToggleBar({
-  layout, onChange,
-}: {
-  layout: ProductCardLayout; onChange: (l: ProductCardLayout) => void;
-}) {
-  return (
-    <div className="flex items-center justify-end gap-1 mb-4">
-      <button
-        onClick={() => onChange("grid")}
-        aria-label="Grid view"
-        aria-pressed={layout === "grid"}
-        className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-colors ${
-          layout === "grid"
-            ? "border-navy-500/40 bg-navy-50 text-navy-500 dark:bg-navy-900/40 dark:text-navy-300"
-            : "border-(--border) text-(--text-3) hover:border-navy-300 hover:text-navy-400"
-        }`}
-      >
-        <GridIcon active={layout === "grid"} />
-      </button>
-      <button
-        onClick={() => onChange("list")}
-        aria-label="List view"
-        aria-pressed={layout === "list"}
-        className={`w-8 h-8 flex items-center justify-center rounded-lg border transition-colors ${
-          layout === "list"
-            ? "border-navy-500/40 bg-navy-50 text-navy-500 dark:bg-navy-900/40 dark:text-navy-300"
-            : "border-(--border) text-(--text-3) hover:border-navy-300 hover:text-navy-400"
-        }`}
-      >
-        <ListIcon active={layout === "list"} />
-      </button>
+    <div className={gridCls}>
+      {products.map(toProductCardData).map((p) => (
+        <ProductCard key={p.id} product={p} />
+      ))}
     </div>
   );
 }
