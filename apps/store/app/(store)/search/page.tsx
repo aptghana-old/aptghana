@@ -66,21 +66,39 @@ function Breadcrumb({ query }: { query: string }) {
   );
 }
 
-/* ─── Result grid ─────────────────────────────────────────────────────────── */
-function ResultsGrid({ hits }: { hits: ProductSearchHit[] }) {
+/* ─── Result grid — grid on mobile, list or grid on sm+ ──────────────────── */
+function ResultsGrid({ hits, view }: { hits: ProductSearchHit[]; view: string }) {
+  if (view === "list") {
+    return (
+      <div className="space-y-3">
+        {hits.map((hit) => (
+          <ProductCard key={hit.id} product={hitToCard(hit)} layout="list" />
+        ))}
+      </div>
+    );
+  }
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
       {hits.map((hit) => (
-        <ProductCard key={hit.id} product={hitToCard(hit)} />
+        <ProductCard key={hit.id} product={hitToCard(hit)} layout="grid" />
       ))}
     </div>
   );
 }
 
 /* ─── Skeleton ────────────────────────────────────────────────────────────── */
-function SkeletonGrid() {
+function SkeletonGrid({ view }: { view: string }) {
+  if (view === "list") {
+    return (
+      <div className="space-y-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="h-28 rounded-2xl animate-pulse" style={{ background: "var(--bg-raised)" }} />
+        ))}
+      </div>
+    );
+  }
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
       {Array.from({ length: 12 }).map((_, i) => (
         <div key={i} className="aspect-[3/4] rounded-2xl animate-pulse" style={{ background: "var(--bg-raised)" }} />
       ))}
@@ -95,6 +113,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
   const q = sp(p.q).trim();
   const pageNum = Math.max(1, parseInt(sp(p.page) || "1", 10));
   const per = [ 12, 24, 48 ].includes(parseInt(sp(p.per) || "24", 10)) ? parseInt(sp(p.per) || "24", 10) : 24;
+  const view = sp(p.view) === "list" ? "list" : "grid";
   const rawSort = sp(p.sort);
   const sort: SearchSort = ([ "relevance", "price_asc", "price_desc", "name_asc" ] as SearchSort[]).includes(rawSort as SearchSort)
     ? rawSort as SearchSort
@@ -195,7 +214,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
               {/* Hits */}
               {results && results.hits.length > 0 && (
-                <ResultsGrid hits={results.hits} />
+                <ResultsGrid hits={results.hits} view={view} />
               )}
 
               {/* Zero results */}
@@ -204,7 +223,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
               )}
 
               {/* Skeleton while loading */}
-              {!results && !error && <SkeletonGrid />}
+              {!results && !error && <SkeletonGrid view={view} />}
 
               {/* Pagination */}
               {results && totalPages > 1 && (

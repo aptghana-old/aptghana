@@ -32,19 +32,41 @@ function hitToCard(hit: ProductSearchHit): ProductCardData {
   };
 }
 
-function ResultsGrid({ hits }: { hits: ProductSearchHit[] }) {
+function ResultsGrid({ hits, view }: { hits: ProductSearchHit[]; view: string }) {
+  if (view === "list") {
+    return (
+      <div className="space-y-3">
+        {hits.map((hit) => (
+          <ProductCard key={hit.id} product={hitToCard(hit)} layout="list" />
+        ))}
+      </div>
+    );
+  }
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
       {hits.map((hit) => (
-        <ProductCard key={hit.id} product={hitToCard(hit)} />
+        <ProductCard key={hit.id} product={hitToCard(hit)} layout="grid" />
       ))}
     </div>
   );
 }
 
-function SkeletonGrid() {
+function SkeletonGrid({ view }: { view: string }) {
+  if (view === "list") {
+    return (
+      <div className="space-y-3">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-28 rounded-2xl animate-pulse"
+            style={{ background: "var(--bg-raised)" }}
+          />
+        ))}
+      </div>
+    );
+  }
   return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
       {Array.from({ length: 12 }).map((_, i) => (
         <div
           key={i}
@@ -91,7 +113,7 @@ export default async function BrandDetailPage({
   const data = await fetchBrandData(slug, sp);
   if (!data) notFound();
 
-  const { brand, breadcrumbs, categoryFacets, results, error, pageNum, basePath } = data;
+  const { brand, breadcrumbs, categoryFacets, results, error, pageNum, view, basePath } = data;
   const totalHits = results?.totalHits ?? 0;
   const totalPages = results?.totalPages ?? 0;
   const facets = results?.facets;
@@ -160,14 +182,14 @@ export default async function BrandDetailPage({
             </Suspense>
 
             {results && results.hits.length > 0 && (
-              <ResultsGrid hits={results.hits} />
+              <ResultsGrid hits={results.hits} view={view} />
             )}
 
             {results && results.hits.length === 0 && !error && (
               <ZeroResults query={brand.name} />
             )}
 
-            {!results && !error && <SkeletonGrid />}
+            {!results && !error && <SkeletonGrid view={view} />}
 
             {results && totalPages > 1 && (
               <Suspense fallback={null}>

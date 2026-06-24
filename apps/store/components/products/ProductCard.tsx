@@ -35,8 +35,8 @@ export interface ProductCardData {
 }
 
 interface ProductCardProps {
-  product:  ProductCardData;
-  layout?:  ProductCardLayout;
+  product:   ProductCardData;
+  layout?:   ProductCardLayout;
   priority?: boolean;
 }
 
@@ -174,6 +174,7 @@ function WishlistBtn({
 
   const isLoading = status === "syncing";
 
+  /* 40px on mobile for tap target, 32px on sm+ */
   const smCls = `absolute top-1.5 right-1.5 w-10 h-10 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow transition-all ${
     inWishlist
       ? "bg-red-500 text-white"
@@ -196,7 +197,7 @@ function WishlistBtn({
       >
         {isLoading
           ? <span className="w-3.5 h-3.5 rounded-full border-2 border-current border-t-transparent animate-spin" />
-          : <Ico d={inWishlist ? D.heartFill : D.heart} size={size === "sm" ? 14 : 14} sw={2} fill={inWishlist ? "currentColor" : "none"} />
+          : <Ico d={inWishlist ? D.heartFill : D.heart} size={14} sw={2} fill={inWishlist ? "currentColor" : "none"} />
         }
       </button>
       <SignInNudge visible={nudge} />
@@ -437,7 +438,7 @@ function QuickViewModal({
 }
 
 /* ─── ProductCard ─────────────────────────────────────────────────────────── */
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, layout = "grid" }: ProductCardProps) {
   const [quickView, setQuickView] = useState(false);
 
   const handleQV = useCallback((e: React.MouseEvent) => {
@@ -450,6 +451,95 @@ export default function ProductCard({ product }: ProductCardProps) {
   const minQty     = product.pricing.minimumOrderQty ?? 1;
   const brandLabel = formatBrand(product.brandSlug, product.brandName);
 
+  /* ── List layout (shown on sm+ only; mobile always uses grid) ──────────── */
+  if (layout === "list") {
+    return (
+      <>
+        <article className="group/card card-product flex gap-4 p-4">
+          {/* Thumbnail */}
+          <Link href={`/products/${product.slug}`} tabIndex={-1} aria-hidden
+            className="shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-xl overflow-hidden bg-(--bg-raised) block">
+            <ProductImg url={product.image.url} alt={product.image.alt || product.name} className="w-full h-full" />
+          </Link>
+
+          {/* Body */}
+          <div className="flex-1 min-w-0 flex flex-col">
+            {/* Top row */}
+            <div className="flex items-start justify-between gap-2">
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 flex-wrap mb-0.5">
+                  <span className="text-[11px] font-bold text-navy-500 uppercase tracking-wide">{brandLabel}</span>
+                  {product.isNew       && <span className="px-1.5 py-px text-[9px] font-bold bg-navy-500 text-white rounded uppercase tracking-wide">New</span>}
+                  {product.isClearance && <span className="px-1.5 py-px text-[9px] font-bold bg-se-green text-white rounded uppercase tracking-wide">Clearance</span>}
+                  {hasDisc             && <span className="px-1.5 py-px text-[9px] font-bold bg-red-500 text-white rounded uppercase tracking-wide">-{product.discount}%</span>}
+                </div>
+                <Link href={`/products/${product.slug}`}>
+                  <h3 className="text-sm font-semibold text-(--text-1) line-clamp-1 group-hover/card:text-navy-500 transition-colors leading-snug">
+                    {product.name}
+                  </h3>
+                </Link>
+                {(product.sku || product.mpn) && (
+                  <div className="flex items-center gap-3 mt-0.5">
+                    {product.sku && <span className="text-[10px] font-mono text-(--text-4)">SKU {product.sku}</span>}
+                    {product.mpn && <span className="text-[10px] font-mono text-(--text-4)">MPN {product.mpn}</span>}
+                  </div>
+                )}
+              </div>
+              <StockBadge inStock={product.inStock} />
+            </div>
+
+            {product.shortDescription && (
+              <p className="text-xs text-(--text-3) leading-relaxed line-clamp-2 mt-1.5">{product.shortDescription}</p>
+            )}
+
+            {product.specs && product.specs.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {product.specs.slice(0, 4).map((s) => (
+                  <span key={s.name} className="px-2 py-px text-[10px] font-medium rounded-md bg-(--bg-raised) text-(--text-2) border border-(--border)">
+                    {s.name}: {s.value}{s.unit ? ` ${s.unit}` : ""}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Bottom row: price + actions */}
+            <div className="flex items-center gap-2 mt-auto pt-2.5 flex-wrap">
+              <div className="flex-1 min-w-[80px]">
+                {hasPrice ? (
+                  <span className="text-sm font-bold text-(--text-1)">{formatPrice(product.pricing.listPrice, product.pricing.currency)}</span>
+                ) : (
+                  <span className="text-sm font-bold text-se-green">Price on Request</span>
+                )}
+                {minQty > 1 && <span className="text-[10px] text-(--text-4) ml-2">Min {minQty}</span>}
+              </div>
+
+              <div className="flex items-center gap-1.5">
+                <CartBtn product={product} size="md" />
+                <Link href={rfqHref(product)}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold border border-(--border) text-(--text-2) hover:border-navy-500/40 hover:text-navy-500 transition-colors">
+                  <Ico d={D.rfq} size={13} sw={2} />
+                  RFQ
+                </Link>
+                <WishlistBtn productId={product.id} size="md" />
+                <CompareBtn  product={product}      size="md" />
+                <button onClick={handleQV} aria-label="Quick view"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center border border-(--border) text-(--text-3) hover:border-navy-300 hover:text-navy-400 transition-colors">
+                  <Ico d={D.eye} size={14} sw={2} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        {quickView && createPortal(
+          <QuickViewModal product={product} onClose={() => setQuickView(false)} />,
+          document.body,
+        )}
+      </>
+    );
+  }
+
+  /* ── Grid layout (default, always used on mobile) ──────────────────────── */
   return (
     <>
       <article className="group/card card-product flex flex-col overflow-hidden">
@@ -476,7 +566,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Content */}
         <div className="p-2.5 sm:p-3 flex flex-col flex-1">
 
-          {/* Brand row + secondary actions (compare/quickview on tablet+ only) */}
+          {/* Brand row + secondary actions (compare/quickview on sm+ only) */}
           <div className="flex items-center justify-between mb-1 gap-1 min-h-[18px]">
             <span className="text-[10px] font-bold text-navy-500 uppercase tracking-wide truncate">{brandLabel}</span>
             <div className="hidden sm:flex items-center gap-0.5 shrink-0">
@@ -551,7 +641,25 @@ export default function ProductCard({ product }: ProductCardProps) {
 }
 
 /* ─── Skeleton ────────────────────────────────────────────────────────────── */
-export function ProductCardSkeleton({ layout: _layout }: { layout?: ProductCardLayout }) {
+export function ProductCardSkeleton({ layout = "grid" }: { layout?: ProductCardLayout }) {
+  if (layout === "list") {
+    return (
+      <div className="card-product flex gap-4 p-4 animate-pulse">
+        <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-xl bg-(--bg-raised) shrink-0" />
+        <div className="flex-1 space-y-2.5 py-0.5">
+          <div className="h-3 w-20 bg-(--bg-raised) rounded" />
+          <div className="h-4 w-3/4 bg-(--bg-raised) rounded" />
+          <div className="h-3 w-1/3 bg-(--bg-raised) rounded" />
+          <div className="h-3 w-5/6 bg-(--bg-raised) rounded" />
+          <div className="h-3 w-2/3 bg-(--bg-raised) rounded" />
+          <div className="flex gap-2 pt-1">
+            <div className="h-8 w-24 bg-(--bg-raised) rounded-lg" />
+            <div className="h-8 w-14 bg-(--bg-raised) rounded-lg" />
+          </div>
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="card-product overflow-hidden animate-pulse">
       <div className="aspect-square bg-(--bg-raised)" />
