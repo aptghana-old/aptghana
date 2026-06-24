@@ -4,8 +4,9 @@ import { Suspense } from "react";
 import { SearchTracker } from "@/components/search/SearchTracker";
 import { searchProducts, type ProductSearchHit, type SearchSort } from "@apt/search";
 import type { SearchFilters } from "@apt/types";
-import ProductCard, { type ProductCardData } from "@/components/products/ProductCard";
+import type { ProductCardData } from "@/components/products/ProductCard";
 import SearchResultsLayout from "@/components/search/SearchResultsLayout";
+import AnimatedProductGrid from "@/components/search/AnimatedProductGrid";
 import SearchPagination from "@/components/search/SearchPagination";
 import ZeroResults from "@/components/search/ZeroResults";
 
@@ -75,25 +76,6 @@ function Breadcrumb({ query }: { query: string }) {
 }
 
 /* ─── Result grid — grid on mobile, list or grid on sm+ ──────────────────── */
-function ResultsGrid({ hits, view }: { hits: ProductSearchHit[]; view: string }) {
-  if (view === "list") {
-    return (
-      <div className="space-y-3">
-        {hits.map((hit) => (
-          <ProductCard key={hit.id} product={hitToCard(hit)} layout="list" />
-        ))}
-      </div>
-    );
-  }
-  return (
-    <div className="grid sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
-      {hits.map((hit) => (
-        <ProductCard key={hit.id} product={hitToCard(hit)} layout="grid" />
-      ))}
-    </div>
-  );
-}
-
 /* ─── Skeleton ────────────────────────────────────────────────────────────── */
 
 /* ─── Page ────────────────────────────────────────────────────────────────── */
@@ -186,7 +168,10 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             query={q}
           >
             {results.hits.length > 0 && (
-              <ResultsGrid hits={results.hits} view={view} />
+              <AnimatedProductGrid
+                products={results.hits.map(hitToCard)}
+                view={view}
+              />
             )}
 
             {results.hits.length === 0 && (

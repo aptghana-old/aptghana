@@ -459,21 +459,26 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
       <>
         <article className="group/card card-product flex gap-3 sm:gap-4 p-3 sm:p-4">
           {/* Thumbnail */}
-          <div className="relative shrink-0 w-24 h-24 sm:w-36 sm:h-36 rounded-xl overflow-hidden bg-white">
+          <div className="relative shrink-0 w-24 h-24 sm:w-36 sm:h-36 rounded-xl overflow-hidden bg-(--bg-raised)">
             <Link href={`/products/${product.slug}`} tabIndex={-1} aria-hidden className="block w-full h-full">
               <ProductImg url={product.image.url} alt={product.image.alt || product.name} className="w-full h-full" />
             </Link>
-            {product.brandImage && (
-              <div className="absolute bottom-1.5 right-1.5 bg-white/95 rounded px-1.5 py-0.5 border border-black/5 shadow-sm pointer-events-none">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
+            {/* Brand stamp — always visible; logo if indexed, brand name text otherwise */}
+            <div className="absolute bottom-1.5 right-1.5 bg-white/95 rounded px-1.5 py-0.5 border border-black/5 shadow-sm pointer-events-none flex items-center justify-center min-w-[28px]">
+              {product.brandImage ? (
+                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={product.brandImage}
                   alt={`${brandLabel} logo`}
                   className="max-h-4 sm:max-h-5 max-w-10 sm:max-w-12 object-contain"
                   loading="lazy"
                 />
-              </div>
-            )}
+              ) : (
+                <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-(--text-3) leading-none whitespace-nowrap max-w-12 truncate">
+                  {brandLabel}
+                </span>
+              )}
+            </div>
           </div>
 
           {/* Body */}
@@ -596,18 +601,22 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
             </div>
           )}
 
-          {/* Brand logo stamp — bottom-right of image */}
-          {product.brandImage && (
-            <div className="absolute bottom-2 right-2 bg-white/95 rounded px-1.5 py-0.5 border border-black/5 shadow-sm pointer-events-none z-1">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
+          {/* Brand stamp — always visible; logo if indexed, brand name text otherwise */}
+          <div className="absolute bottom-2 right-2 bg-white/95 rounded px-1.5 py-0.5 border border-black/5 shadow-sm pointer-events-none z-1 flex items-center justify-center min-w-[28px]">
+            {product.brandImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={product.brandImage}
                 alt={`${brandLabel} logo`}
                 className="max-h-4 sm:max-h-5 max-w-10 sm:max-w-12 object-contain"
                 loading="lazy"
               />
-            </div>
-          )}
+            ) : (
+              <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-(--text-3) leading-none whitespace-nowrap max-w-12 truncate">
+                {brandLabel}
+              </span>
+            )}
+          </div>
 
           {/* Wishlist — 40px tap target on mobile, 32px on sm+ */}
           <WishlistBtn productId={product.id} size="sm" />
