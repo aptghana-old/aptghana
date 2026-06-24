@@ -82,10 +82,10 @@ function FilterSection({
 }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   const [ open, setOpen ] = useState(defaultOpen);
   return (
-    <div className="border-b last:border-b-0 pb-4 last:pb-0" style={{ borderColor: "var(--border)" }}>
+    <div className="border-b border-l-4 border-l-gray-800 last:border-b-0 pb-1 last:pb-0" style={{ borderColor: "var(--border)" }}>
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center text-left justify-between mb-2.5 min-h-[44px] sm:min-h-[36px] group"
+        className="pl-1 w-full flex items-center text-left justify-between mb-1 min-h-[44px] sm:min-h-[36px] group"
         aria-expanded={open}
       >
         <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: "var(--text-4)" }}>
