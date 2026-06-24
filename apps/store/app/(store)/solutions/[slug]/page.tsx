@@ -80,9 +80,13 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
             </svg>
             All Solutions
           </Link>
-          <div className="w-2 h-10 rounded-full mb-4" style={{ backgroundColor: sol.accent }} />
-          <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-tight mb-3">{sol.name}</h1>
-          <p className="text-lg font-semibold mb-4" style={{ color: sol.accent }}>{sol.headline}</p>
+          <div className="flex flex-wrap gap-2 mb-4">
+            <div className="w-2 h-10 rounded-full" style={{ backgroundColor: sol.accent }} />
+            <div>
+              <h1 className="text-3xl sm:text-5xl font-bold text-white tracking-tight mb-3">{sol.name}</h1>
+              <p className="text-lg font-semibold" style={{ color: sol.accent }}>{sol.headline}</p>
+            </div>
+          </div>
           <p className="text-white/50 max-w-2xl leading-relaxed">{sol.desc}</p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link href="/rfq" className="inline-flex items-center gap-2 h-11 px-7 bg-[#3DCD58] hover:bg-[#2AA347] text-white font-semibold text-sm rounded-xl transition-colors">

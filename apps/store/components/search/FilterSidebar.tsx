@@ -80,12 +80,12 @@ function Chevron({ open }: { open: boolean }) {
 function FilterSection({
   title, children, defaultOpen = true,
 }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
-  const [open, setOpen] = useState(defaultOpen);
+  const [ open, setOpen ] = useState(defaultOpen);
   return (
     <div className="border-b last:border-b-0 pb-4 last:pb-0" style={{ borderColor: "var(--border)" }}>
       <button
         onClick={() => setOpen(!open)}
-        className="w-full flex items-center justify-between mb-2.5 min-h-[44px] sm:min-h-[36px] group"
+        className="w-full flex items-center text-left justify-between mb-2.5 min-h-[44px] sm:min-h-[36px] group"
         aria-expanded={open}
       >
         <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: "var(--text-4)" }}>
@@ -107,9 +107,8 @@ function CheckRow({
   return (
     <label className="flex items-center gap-2.5 cursor-pointer min-h-[44px] sm:min-h-[36px] group">
       <span
-        className={`w-4 h-4 rounded flex items-center justify-center shrink-0 transition-colors border ${
-          checked ? "bg-[#3DCD58] border-[#3DCD58]" : "border-current"
-        }`}
+        className={`w-4 h-4 rounded flex items-center justify-center shrink-0 transition-colors border ${checked ? "bg-[#3DCD58] border-[#3DCD58]" : "border-current"
+          }`}
         style={{ color: checked ? undefined : "var(--border-hi)" }}
       >
         {checked && (
@@ -135,11 +134,11 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
   const { applyFilter, isActive } = useFilterURL(basePath);
 
   /* Availability */
-  const inStockCount = facets?.["inStock"]?.["true"] ?? 0;
-  const clearanceCount = facets?.["isClearance"]?.["true"] ?? 0;
+  const inStockCount = facets?.[ "inStock" ]?.[ "true" ] ?? 0;
+  const clearanceCount = facets?.[ "isClearance" ]?.[ "true" ] ?? 0;
 
   /* Hierarchical categories — collect each level that has > 1 distinct value */
-  type HierLevel = { key: string; label: string; entries: [string, number][] };
+  type HierLevel = { key: string; label: string; entries: [ string, number ][] };
   const hierLevels: HierLevel[] = [];
   const levelLabels: Record<string, string> = {
     "hierarchicalCategories.lvl0": "Product Group",
@@ -147,40 +146,40 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
     "hierarchicalCategories.lvl2": "Subcategory",
     "hierarchicalCategories.lvl3": "Range",
   };
-  for (const [key, label] of Object.entries(levelLabels)) {
-    const raw = facets?.[key] ?? {};
-    const entries = Object.entries(raw).sort(([, a], [, b]) => b - a);
+  for (const [ key, label ] of Object.entries(levelLabels)) {
+    const raw = facets?.[ key ] ?? {};
+    const entries = Object.entries(raw).sort(([ , a ], [ , b ]) => b - a);
     // Skip levels with only 1 value (already locked/filtered) unless it's currently active
-    const hasActiveFilter = entries.some(([v]) => isActive("cats", v));
+    const hasActiveFilter = entries.some(([ v ]) => isActive("cats", v));
     if (entries.length > 1 || hasActiveFilter) {
       hierLevels.push({ key, label, entries: entries.slice(0, 15) });
     }
   }
 
   /* Brands */
-  const brandEntries = Object.entries(facets?.["brandSlug"] ?? {})
-    .sort(([, a], [, b]) => b - a)
+  const brandEntries = Object.entries(facets?.[ "brandSlug" ] ?? {})
+    .sort(([ , a ], [ , b ]) => b - a)
     .slice(0, 20);
 
   /* Spec values — group by name, pick top groups by total count */
-  type SpecGroup = { name: string; values: [string, number][] };
-  const specMap = new Map<string, [string, number][]>();
-  for (const [raw, count] of Object.entries(facets?.["specValues"] ?? {})) {
+  type SpecGroup = { name: string; values: [ string, number ][] };
+  const specMap = new Map<string, [ string, number ][]>();
+  for (const [ raw, count ] of Object.entries(facets?.[ "specValues" ] ?? {})) {
     const sep = raw.indexOf("::");
     if (sep < 1) continue;
     const name = raw.slice(0, sep);
     const value = raw.slice(sep + 2);
     if (!specMap.has(name)) specMap.set(name, []);
-    specMap.get(name)!.push([value, count]);
+    specMap.get(name)!.push([ value, count ]);
   }
   const specGroups: SpecGroup[] = Array.from(specMap.entries())
-    .map(([name, values]) => ({
+    .map(([ name, values ]) => ({
       name,
-      values: values.sort(([, a], [, b]) => b - a).slice(0, 8),
+      values: values.sort(([ , a ], [ , b ]) => b - a).slice(0, 8),
     }))
     .sort((a, b) => {
-      const sumA = a.values.reduce((s, [, c]) => s + c, 0);
-      const sumB = b.values.reduce((s, [, c]) => s + c, 0);
+      const sumA = a.values.reduce((s, [ , c ]) => s + c, 0);
+      const sumB = b.values.reduce((s, [ , c ]) => s + c, 0);
       return sumB - sumA;
     })
     .slice(0, 10);
@@ -196,7 +195,7 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-1">
       {/* Availability */}
       {(inStockCount > 0 || clearanceCount > 0) && (
         <FilterSection title="Availability">
@@ -225,7 +224,7 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
       {hierLevels.map(({ key, label, entries }) => (
         <FilterSection key={key} title={label}>
           <div className="space-y-1">
-            {entries.map(([name, count]) => (
+            {entries.map(([ name, count ]) => (
               <CheckRow
                 key={name}
                 checked={isActive("cats", name)}
@@ -242,7 +241,7 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
       {brandEntries.length > 0 && (
         <FilterSection title="Brand">
           <div className="space-y-1">
-            {brandEntries.map(([brand, count]) => (
+            {brandEntries.map(([ brand, count ]) => (
               <CheckRow
                 key={brand}
                 checked={isActive("brands", brand)}
@@ -259,7 +258,7 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
       {specGroups.map(({ name, values }) => (
         <FilterSection key={name} title={name} defaultOpen={false}>
           <div className="space-y-1">
-            {values.map(([value, count]) => (
+            {values.map(([ value, count ]) => (
               <CheckRow
                 key={value}
                 checked={isActive("specs", `${name}::${value}`)}

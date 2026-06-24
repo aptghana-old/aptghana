@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import Header from "@/components/navigation/Header";
 import Footer from "@/components/navigation/Footer";
-import { SITE_URL } from "@apt/config";
+import { SITE_URL, STORE_URL } from "@apt/config";
 import { connectDB, IndustryModel } from "@apt/db";
 
 export const revalidate = 3600;
@@ -29,8 +29,8 @@ const staticIndustryData: Record<string, IndustryData> = {
     tagline: "Powering Ghana's Mining Industry",
     shortDescription: "ATEX-rated equipment and conveyor systems for gold, bauxite, and manganese operations.",
     challenge: "Mining operations demand ruggedized equipment that performs in harsh environments — extreme heat, dust, vibration, and potentially explosive atmospheres. Standard industrial equipment often fails within months; only purpose-rated components survive the demands of a working mine.",
-    solutions: ["ATEX/IECEx explosion-proof motors", "Heavy-duty variable frequency drives", "Mining conveyor systems & belts", "Protection relays & switchgear", "Mine shaft hoisting controls", "Dewatering pump drives"],
-    brands: ["WEG", "Schneider Electric", "Provulco", "ABB"],
+    solutions: [ "ATEX/IECEx explosion-proof motors", "Heavy-duty variable frequency drives", "Mining conveyor systems & belts", "Protection relays & switchgear", "Mine shaft hoisting controls", "Dewatering pump drives" ],
+    brands: [ "WEG", "Schneider Electric", "Provulco", "ABB" ],
     clients: "Active in Ghana's gold, bauxite, and manganese sectors",
     icon: "⛏", accentColor: "#F59E0B", stats: [],
   },
@@ -39,8 +39,8 @@ const staticIndustryData: Record<string, IndustryData> = {
     tagline: "Instrumentation for Upstream & Downstream",
     shortDescription: "Intrinsically safe instruments and ATEX/IECEx certified equipment for oil & gas operations.",
     challenge: "Offshore and onshore oil & gas facilities require intrinsically safe and explosion-proof certified equipment meeting ATEX and IECEx standards. Non-compliant equipment in hazardous areas creates serious risk of ignition and places operations outside regulatory requirements.",
-    solutions: ["Intrinsically safe instruments", "Ex-rated motors & drives", "Process control valves", "Pipeline monitoring systems", "Emergency shutdown systems", "SCADA integration"],
-    brands: ["Schneider Electric", "ABB", "ifm electronic", "Endress+Hauser"],
+    solutions: [ "Intrinsically safe instruments", "Ex-rated motors & drives", "Process control valves", "Pipeline monitoring systems", "Emergency shutdown systems", "SCADA integration" ],
+    brands: [ "Schneider Electric", "ABB", "ifm electronic", "Endress+Hauser" ],
     clients: "Supporting West Africa's upstream and downstream operations",
     icon: "🛢", accentColor: "#6366F1", stats: [],
   },
@@ -49,8 +49,8 @@ const staticIndustryData: Record<string, IndustryData> = {
     tagline: "Automation for Modern Production",
     shortDescription: "PLC automation, VFDs, and energy management for production plants.",
     challenge: "Manufacturers in Ghana face pressure to increase throughput, reduce waste, and maintain quality while controlling energy costs. Many production lines operate on manual processes or ageing electromechanical controls that limit productivity.",
-    solutions: ["PLC-based production line control", "Variable speed conveyor drives", "Pneumatic pick-and-place systems", "Quality inspection sensors", "Energy management systems", "Compressed air optimization"],
-    brands: ["Schneider Electric", "Camozzi", "Omron", "Festo", "Sick AG"],
+    solutions: [ "PLC-based production line control", "Variable speed conveyor drives", "Pneumatic pick-and-place systems", "Quality inspection sensors", "Energy management systems", "Compressed air optimization" ],
+    brands: [ "Schneider Electric", "Camozzi", "Omron", "Festo", "Sick AG" ],
     clients: "Serving FMCG, textile, plastics and food processing plants",
     icon: "🏭", accentColor: "#0EA5E9", stats: [],
   },
@@ -59,8 +59,8 @@ const staticIndustryData: Record<string, IndustryData> = {
     tagline: "Grid Protection & Power Quality",
     shortDescription: "MV/LV switchgear, protection relays, and power quality solutions for utilities and IPPs.",
     challenge: "Ghana's energy sector requires reliable switchgear, monitoring systems, and protection equipment for generation, transmission, and distribution assets. Grid instability and ageing infrastructure create significant operational and safety challenges.",
-    solutions: ["MV/LV switchgear & panelboards", "Protection relays & IEDs", "Power quality analysers", "Capacitor banks for PF correction", "Energy monitoring systems", "UPS for critical loads"],
-    brands: ["Schneider Electric", "ABB", "Socomec", "Eaton"],
+    solutions: [ "MV/LV switchgear & panelboards", "Protection relays & IEDs", "Power quality analysers", "Capacitor banks for PF correction", "Energy monitoring systems", "UPS for critical loads" ],
+    brands: [ "Schneider Electric", "ABB", "Socomec", "Eaton" ],
     clients: "Supporting power utilities, IPPs, and large industrials",
     icon: "⚡", accentColor: "#84CC16", stats: [],
   },
@@ -69,8 +69,8 @@ const staticIndustryData: Record<string, IndustryData> = {
     tagline: "SCADA-Ready Water Solutions",
     shortDescription: "Variable speed pump drives, dosing controls, and SCADA for water treatment facilities.",
     challenge: "Water utilities need reliable variable speed drives, chemical dosing systems, and remote monitoring to manage treatment plants efficiently. Manual operation leads to inconsistent water quality and high energy consumption.",
-    solutions: ["Pump variable frequency drives", "Chemical dosing pump controls", "SCADA & telemetry systems", "Level & flow instrumentation", "Water quality sensors", "Remote monitoring panels"],
-    brands: ["Schneider Electric", "Omron", "ifm electronic", "Endress+Hauser", "WAGO"],
+    solutions: [ "Pump variable frequency drives", "Chemical dosing pump controls", "SCADA & telemetry systems", "Level & flow instrumentation", "Water quality sensors", "Remote monitoring panels" ],
+    brands: [ "Schneider Electric", "Omron", "ifm electronic", "Endress+Hauser", "WAGO" ],
     clients: "Supporting municipal and industrial water treatment facilities",
     icon: "💧", accentColor: "#06B6D4", stats: [],
   },
@@ -79,8 +79,8 @@ const staticIndustryData: Record<string, IndustryData> = {
     tagline: "Heavy-Duty Port Electrification",
     shortDescription: "Container crane drives, conveyor controls, and port electrical infrastructure.",
     challenge: "Port operations require heavy-duty crane drives, reliable conveyor systems, and robust electrical infrastructure for 24/7 operations. Equipment failures cause vessel delays, demurrage costs, and supply chain disruption.",
-    solutions: ["Container crane hoist & travel drives", "Ship-to-shore crane electrics", "Conveyor & stacker drives", "Vessel power supply systems", "Port lighting systems", "Maintenance & predictive monitoring"],
-    brands: ["WEG", "ABB", "Schneider Electric", "NORD Drivesystems"],
+    solutions: [ "Container crane hoist & travel drives", "Ship-to-shore crane electrics", "Conveyor & stacker drives", "Vessel power supply systems", "Port lighting systems", "Maintenance & predictive monitoring" ],
+    brands: [ "WEG", "ABB", "Schneider Electric", "NORD Drivesystems" ],
     clients: "Active at Tema Port and Takoradi Port",
     icon: "🚢", accentColor: "#8B5CF6", stats: [],
   },
@@ -89,8 +89,8 @@ const staticIndustryData: Record<string, IndustryData> = {
     tagline: "Hygienic Automation Solutions",
     shortDescription: "IP69K-rated components, washdown sensors, and CIP automation for food processing.",
     challenge: "Food processing demands IP69K-rated hygienic components, clean-in-place compatibility, and compliance with food safety standards. Standard industrial equipment harbours bacteria and fails under high-pressure washdown conditions.",
-    solutions: ["IP69K-rated drives & motors", "Stainless steel pneumatic cylinders", "Hygienic valve manifolds", "Clean-in-place automation", "Temperature & flow monitoring", "Washdown-rated sensors"],
-    brands: ["Festo", "Camozzi", "WEG", "ifm electronic", "Sick AG"],
+    solutions: [ "IP69K-rated drives & motors", "Stainless steel pneumatic cylinders", "Hygienic valve manifolds", "Clean-in-place automation", "Temperature & flow monitoring", "Washdown-rated sensors" ],
+    brands: [ "Festo", "Camozzi", "WEG", "ifm electronic", "Sick AG" ],
     clients: "Serving Ghana's FMCG and food processing sector",
     icon: "🍶", accentColor: "#EC4899", stats: [],
   },
@@ -99,8 +99,8 @@ const staticIndustryData: Record<string, IndustryData> = {
     tagline: "Power for Large-Scale Projects",
     shortDescription: "Temporary power distribution, tower crane electrification, and site safety.",
     challenge: "Construction projects need flexible temporary power distribution, robust site safety systems, and reliable electrical infrastructure. Inadequate site power leads to project delays and safety incidents.",
-    solutions: ["Temporary power distribution boards", "Site power generation & distribution", "Tower crane electrification", "Portable switchgear & transformers", "Site lighting systems", "Earthing & surge protection"],
-    brands: ["Schneider Electric", "Legrand", "Eaton", "Rittal"],
+    solutions: [ "Temporary power distribution boards", "Site power generation & distribution", "Tower crane electrification", "Portable switchgear & transformers", "Site lighting systems", "Earthing & surge protection" ],
+    brands: [ "Schneider Electric", "Legrand", "Eaton", "Rittal" ],
     clients: "Supporting major infrastructure and real estate projects in Ghana",
     icon: "🏗", accentColor: "#F97316", stats: [],
   },
@@ -143,14 +143,14 @@ async function getAllSlugs(): Promise<string[]> {
 
 export async function generateStaticParams() {
   const dbSlugs = await getAllSlugs();
-  const allSlugs = new Set([...Object.keys(staticIndustryData), ...dbSlugs]);
+  const allSlugs = new Set([ ...Object.keys(staticIndustryData), ...dbSlugs ]);
   return Array.from(allSlugs).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
   const dbIndustry = await getIndustry(slug);
-  const industry = dbIndustry ?? staticIndustryData[slug];
+  const industry = dbIndustry ?? staticIndustryData[ slug ];
   if (!industry) return { title: "Industry Not Found | APT Ghana" };
   return {
     title: `${industry.name} Solutions | APT Ghana`,
@@ -167,13 +167,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function IndustryDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const dbIndustry = await getIndustry(slug);
-  const industry = dbIndustry ?? staticIndustryData[slug];
+  const industry = dbIndustry ?? staticIndustryData[ slug ];
 
   if (!industry) notFound();
 
   const allSlugs = await getAllSlugs();
   const otherSlugs = allSlugs.filter((s) => s !== slug);
-  const allStaticEntries = Object.entries(staticIndustryData).filter(([s]) => s !== slug);
+  const allStaticEntries = Object.entries(staticIndustryData).filter(([ s ]) => s !== slug);
 
   return (
     <>
@@ -338,7 +338,7 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
-                <Link href="/contact" className="inline-flex items-center gap-2 h-12 px-7 bg-[#84CC16] text-[#0A0F1E] font-bold text-sm rounded-xl hover:bg-[#78B800] transition-colors whitespace-nowrap">
+                <Link href={STORE_URL + "/rfq"} className="inline-flex items-center gap-2 h-12 px-7 bg-[#84CC16] text-[#0A0F1E] font-bold text-sm rounded-xl hover:bg-[#78B800] transition-colors whitespace-nowrap">
                   Request a Quote →
                 </Link>
                 <Link href="/solutions" className="inline-flex items-center gap-2 h-12 px-7 border border-white/20 text-white font-bold text-sm rounded-xl hover:bg-white/10 transition-colors whitespace-nowrap">
@@ -359,8 +359,8 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
               <Link href="/industries" className="text-sm font-semibold text-[#84CC16] hover:underline">View all →</Link>
             </div>
             <div className="flex flex-wrap gap-3">
-              {(otherSlugs.length > 0 ? otherSlugs : allStaticEntries.map(([s]) => s)).map((s) => {
-                const label = staticIndustryData[s]?.name ?? s;
+              {(otherSlugs.length > 0 ? otherSlugs : allStaticEntries.map(([ s ]) => s)).map((s) => {
+                const label = staticIndustryData[ s ]?.name ?? s;
                 return (
                   <Link
                     key={s}

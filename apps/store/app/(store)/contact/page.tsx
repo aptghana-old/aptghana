@@ -68,7 +68,7 @@ export default async function ContactPage() {
     <>
       <main>
         {/* Hero */}
-        <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] pt-16 sm:pt-20 lg:pt-32 pb-12 sm:pb-16 lg:pb-20">
+        <section className="bg-[#0A0F1E] pt-16 sm:pt-20 lg:pt-32 pb-12 sm:pb-16 lg:pb-20">
           <div className="container-apt">
             <div className="max-w-2xl">
               <div className="flex items-center gap-3 mb-4">
@@ -185,7 +185,7 @@ export default async function ContactPage() {
         </section>
 
         {/* Form + Hours + Map */}
-        <section className="section-py bg-white dark:bg-[#0A0F1E]">
+        <section className="section-py bg-white dark:bg-[#0A0F1E] py-14 sm:py-16 lg:py-20">
           <div className="container-apt">
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
               {/* Form */}

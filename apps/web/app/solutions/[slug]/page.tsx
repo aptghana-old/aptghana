@@ -315,7 +315,7 @@ function SolutionCTA({ name }: { name: string }) {
           </div>
           <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
             <Link
-              href="/contact"
+              href={STORE_URL + "/rfq"}
               className="inline-flex items-center gap-2 h-12 px-7 bg-[#84CC16] text-[#0A0F1E] font-bold text-sm rounded-xl hover:bg-[#78B800] transition-colors whitespace-nowrap"
             >
               Request a Quote →

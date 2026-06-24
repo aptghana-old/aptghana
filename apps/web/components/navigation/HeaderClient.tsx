@@ -325,7 +325,7 @@ const SUPPORT_GROUP: ResourceGroup = {
   accent: "text-purple-500",
   items: [
     { label: "Technical Support", desc: "Speak with a certified product specialist", href: "/contact?type=technical", icon: <IcoHeadphones /> },
-    { label: "Request a Quote", desc: "Formal quotation with pricing & lead times", href: "/contact?type=quote", icon: <IcoClipboard /> },
+    { label: "Request a Quote", desc: "Formal quotation with pricing & lead times", href: STORE_URL + "/rfq", icon: <IcoClipboard /> },
     { label: "WhatsApp Us", desc: "+233 30 396 4346 — instant response", href: "https://wa.me/233303964346", icon: <IcoMessageCircle /> },
   ],
 };
@@ -436,7 +436,7 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
             <div className="hidden md:flex items-center gap-6">
               <a href="tel:+233303964346" className="hover:text-[#0F172A] dark:hover:text-white/70 transition-colors">+233 30 396 4346</a>
               <a href={`mailto:${EMAIL_SALES}`} className="hover:text-[#0F172A] dark:hover:text-white/70 transition-colors">{EMAIL_SALES}</a>
-              <Link href="/contact" className="text-[#84CC16] hover:text-[#78B800] font-medium transition-colors">Get a Quote</Link>
+              <Link href={STORE_URL + "/rfq"} className="text-[#84CC16] hover:text-[#78B800] font-medium transition-colors">Get a Quote</Link>
             </div>
           </div>
         </div>
@@ -476,7 +476,7 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
 
             {/* Desktop CTAs */}
             <div className="hidden lg:flex items-center gap-2">
-              <Link href="/contact" className="px-4 py-2 text-sm font-semibold text-[#0A0F1E] bg-[#84CC16] rounded-lg hover:bg-[#78B800] transition-colors">Request Quote</Link>
+              <Link href={STORE_URL + "/rfq"} className="px-4 py-2 text-sm font-semibold text-[#0A0F1E] bg-[#84CC16] rounded-lg hover:bg-[#78B800] transition-colors">Request Quote</Link>
               <Link href={STORE_URL} className="px-4 py-2 text-sm font-semibold text-[#475569] dark:text-white border border-[#E2E8F0] dark:border-white/20 rounded-lg hover:bg-[#F1F5F9] dark:hover:bg-white/5 hover:border-[#CBD5E0] dark:hover:border-white/40 transition-all">Shop Online →</Link>
             </div>
 
@@ -618,7 +618,7 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
                     Contact Sales
                   </Link>
                   <Link
-                    href="/contact?type=quote"
+                    href={STORE_URL + "/rfq"}
                     className="flex items-center gap-2 px-4 py-1.5 text-[12px] font-semibold text-white bg-[#0057b8] hover:bg-[#0046a0] rounded-lg transition-colors"
                     onClick={() => setActiveMenu(null)}
                   >
@@ -1007,7 +1007,7 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
 
             {/* Primary CTAs */}
             <div className="pt-5 flex flex-col gap-3">
-              <Link href="/contact" className="w-full py-3.5 text-center font-bold text-[#0A0F1E] bg-[#84CC16] rounded-xl hover:bg-[#78B800] transition-colors" onClick={() => setMobileOpen(false)}>
+              <Link href={STORE_URL + "/rfq"} className="w-full py-3.5 text-center font-bold text-[#0A0F1E] bg-[#84CC16] rounded-xl hover:bg-[#78B800] transition-colors" onClick={() => setMobileOpen(false)}>
                 Request Quote
               </Link>
               <Link href={STORE_URL} className="w-full py-3.5 text-center font-semibold text-[#475569] dark:text-white border border-[#E2E8F0] dark:border-white/15 rounded-xl hover:bg-[#F1F5F9] dark:hover:bg-white/5 transition-colors" onClick={() => setMobileOpen(false)}>

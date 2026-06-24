@@ -222,7 +222,7 @@ function ServicesBar({ cfg }: { cfg?: ServicesBarConfig }) {
   return (
     <div className="bg-theme-surface border-y border-theme">
       <div className="container-store">
-        <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-theme">
+        <div className="grid grid-cols-2 lg:grid-cols-4 divide-x divide-y lg:divide-y-0 divide-gray-200">
           {items.map((item) => (
             <div key={item.id} className="flex items-center gap-3 py-4 px-5">
               <div className="shrink-0 w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: item.color + "14" }}>
@@ -256,9 +256,35 @@ function QuickAccessBar() {
 
   return (
     <div className="bg-theme-base border-b border-theme">
-      <div className="container-store py-4">
-        <div className="overflow-x-auto -mx-4 sm:mx-0">
-          <div className="grid grid-cols-5 gap-2 px-4 sm:px-0 min-w-[320px]">
+      <div className="container-store">
+
+        {/* ── Mobile: flat ServicesBar-style row ── */}
+        <div className="lg:hidden grid grid-cols-5 divide-x divide-gray-200">
+          {links.map((link) => (
+            <Link
+              key={link.href + link.label}
+              href={link.href}
+              className="group flex flex-col items-center gap-1.5 py-3 px-1"
+            >
+              <svg
+                className="w-[18px] h-[18px] text-theme-3 group-hover:text-navy-500 transition-colors shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={1.75}
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d={link.d} />
+              </svg>
+              <span className="text-[10px] font-semibold text-theme-2 group-hover:text-navy-500 transition-colors text-center leading-snug">
+                {link.label}
+              </span>
+            </Link>
+          ))}
+        </div>
+
+        {/* ── Desktop: original card-style grid ── */}
+        <div className="hidden lg:block py-4">
+          <div className="grid grid-cols-5 gap-2">
             {links.map((link) => (
               <Link
                 key={link.href + link.label}
@@ -266,17 +292,24 @@ function QuickAccessBar() {
                 className="group flex flex-col items-center gap-2 py-3.5 px-2 bg-theme-surface border border-theme rounded-2xl hover:border-navy-500/30 hover:shadow-md transition-all duration-150"
               >
                 <div className="w-8 h-8 rounded-lg bg-theme-raised flex items-center justify-center group-hover:bg-navy-50 dark:group-hover:bg-navy-900/30 transition-colors">
-                  <svg className="w-4 h-4 text-theme-3 group-hover:text-navy-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.75}>
+                  <svg
+                    className="w-4 h-4 text-theme-3 group-hover:text-navy-500 transition-colors"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={1.75}
+                  >
                     <path strokeLinecap="round" strokeLinejoin="round" d={link.d} />
                   </svg>
                 </div>
-                <span className="text-[11px] sm:text-xs font-semibold text-theme-2 group-hover:text-navy-500 transition-colors text-center leading-snug">
+                <span className="text-xs font-semibold text-theme-2 group-hover:text-navy-500 transition-colors text-center leading-snug">
                   {link.label}
                 </span>
               </Link>
             ))}
           </div>
         </div>
+
       </div>
     </div>
   );
@@ -363,7 +396,7 @@ function FeaturedProductsSection({ products, cfg }: { products: ProductCardData[
 function FullWidthPromoBanner({ cfg }: { cfg?: FullWidthBannerConfig }) {
   const desktop = cfg?.desktopImage || "/images/home/TeSys_100_-_Desktop_-_1920_448.jpg";
   const mobile = cfg?.mobileImage || "/images/home/TeSys_100_-_Mobile_-_375_245.jpg";
-  const href = cfg?.href || "/search/contactors-and-protection-relays";
+  const href = cfg?.href || "/catalog/electrical-solutions/contactors-and-protection-relays";
   const alt = cfg?.altText || "TeSys 100 — Next-Generation Motor Control";
   const aspectD = cfg?.aspectDesktop?.replace("/", "/") || "1920/448";
   const aspectM = cfg?.aspectMobile?.replace("/", "/") || "375/245";

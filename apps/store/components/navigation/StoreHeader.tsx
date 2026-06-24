@@ -64,6 +64,7 @@ function adaptNavGroups(navGroups: import("@/app/layout").NavGroup[]): DisplayGr
     id: g.id,
     label: g.label,
     color: g.color,
+    iconImage: g.iconImage,
     href: g.href,
     iconPath: g.iconPath,
     img: g.img,
@@ -132,13 +133,6 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
         ref={headerRef}
         className={`sticky top-0 z-50 transition-shadow duration-200 ${scrolled ? "shadow-[0_4px_24px_rgba(0,0,0,0.4)]" : ""}`}
       >
-        {/* Announcement bar */}
-        <div className="bg-gray-800 text-white text-center text-[11px] font-medium py-1.5 tracking-wide">
-          Free technical support with every order &nbsp;·&nbsp;
-          <a href="tel:+233303964346" className="underline underline-offset-2 hover:no-underline">+233 30 396 4346</a>
-          &nbsp;·&nbsp; Same-day quotation before 3 PM
-        </div>
-
         {/* ── Desktop header row (lg+): Logo · Search · Actions ── */}
         <div className="hidden lg:block bg-navy-900">
           <div className="container-store">
@@ -197,14 +191,6 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
 
               <div className="ml-auto flex items-center gap-0.5">
                 <UserAccountButton />
-
-                <Link
-                  href="/wishlist"
-                  className="p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition-all"
-                  aria-label="Wishlist"
-                >
-                  <Icon d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 4.875 7.502 9.875 8.932 10.717.448.264.992.264 1.44 0C15.498 18.125 21 13.125 21 8.25z" size={20} />
-                </Link>
 
                 <Link
                   href="/cart"

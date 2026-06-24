@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { EMAIL_SALES } from "@apt/config";
+import { EMAIL_SALES, STORE_URL } from "@apt/config";
 
 const CONTACT_CARDS = [
   {
@@ -98,7 +98,7 @@ export default function ContactSection() {
             <p className="text-white/40 text-sm">Our sales engineers respond within 4 business hours.</p>
           </div>
           <Link
-            href="/contact"
+            href={STORE_URL + "/rfq"}
             className="shrink-0 inline-flex items-center gap-2 h-12 px-8 bg-[#84CC16] text-[#0A0F1E] font-bold text-sm rounded-xl hover:bg-[#78B800] transition-colors"
           >
             Request a Quote

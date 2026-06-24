@@ -21,29 +21,29 @@ interface HeroCarouselProps {
 }
 
 export default function HeroCarousel({ slides, sidePanels = [] }: HeroCarouselProps) {
-  const [current, setCurrent] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [ current, setCurrent ] = useState(0);
+  const [ paused, setPaused ] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const next = useCallback(() => setCurrent((c) => (c + 1) % slides.length), [slides.length]);
-  const prev = useCallback(() => setCurrent((c) => (c - 1 + slides.length) % slides.length), [slides.length]);
+  const next = useCallback(() => setCurrent((c) => (c + 1) % slides.length), [ slides.length ]);
+  const prev = useCallback(() => setCurrent((c) => (c - 1 + slides.length) % slides.length), [ slides.length ]);
 
   useEffect(() => {
     if (paused) return;
     timerRef.current = setInterval(next, 5000);
     return () => { if (timerRef.current) clearInterval(timerRef.current); };
-  }, [next, paused]);
+  }, [ next, paused ]);
 
-  const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[0].clientX; };
+  const handleTouchStart = (e: React.TouchEvent) => { touchStartX.current = e.touches[ 0 ].clientX; };
   const handleTouchEnd = (e: React.TouchEvent) => {
     if (touchStartX.current === null) return;
-    const delta = e.changedTouches[0].clientX - touchStartX.current;
+    const delta = e.changedTouches[ 0 ].clientX - touchStartX.current;
     if (Math.abs(delta) > 40) { delta < 0 ? next() : prev(); }
     touchStartX.current = null;
   };
 
-  const slide = slides[current];
+  const slide = slides[ current ];
   const alignClass = slide.align === "right" ? "items-end text-right" : slide.align === "center" ? "items-center text-center" : "items-start text-left";
 
   return (
@@ -100,12 +100,12 @@ export default function HeroCarousel({ slides, sidePanels = [] }: HeroCarouselPr
                     {s.badge}
                   </span>
                 )}
-                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white leading-tight">{s.title}</h2>
-                {s.subtitle && <p className="text-xs sm:text-sm text-white/70 leading-relaxed">{s.subtitle}</p>}
+                <h2 className="text-lg sm:text-2xl lg:text-3xl font-bold text-white leading-tight">{s.title}</h2>
+                {s.subtitle && <p className="hidden sm:block text-xs sm:text-sm text-white/70 leading-relaxed">{s.subtitle}</p>}
                 <div className="flex flex-wrap gap-2 pt-1">
                   <Link
                     href={s.cta.href}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 bg-white text-navy-900 font-bold text-sm rounded-xl hover:bg-navy-50 transition-colors shadow-lg"
+                    className="inline-flex items-center gap-2 px-3.5 sm:px-5 py-1.5 sm:py-2.5 bg-white text-navy-900 font-medium sm:font-bold text-xs sm:text-sm rounded-xl hover:bg-navy-50 transition-colors shadow-lg"
                   >
                     {s.cta.label}
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -115,7 +115,7 @@ export default function HeroCarousel({ slides, sidePanels = [] }: HeroCarouselPr
                   {s.ctaSecondary && (
                     <Link
                       href={s.ctaSecondary.href}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white font-semibold text-sm rounded-xl border border-white/20 backdrop-blur-sm transition-colors"
+                      className="inline-flex items-center gap-2 px-3.5 sm:px-5 py-1.5 sm:py-2.5 bg-white/10 hover:bg-white/20 text-white font-semibold text-xs sm:text-sm rounded-xl border border-white/20 backdrop-blur-sm transition-colors"
                     >
                       {s.ctaSecondary.label}
                     </Link>
