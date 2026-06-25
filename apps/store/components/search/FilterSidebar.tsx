@@ -92,17 +92,21 @@ function FilterSection({
     <div className="border-b last:border-b-0 pb-1 last:pb-0" style={{ borderColor: "var(--border)" }}>
       <button
         onClick={() => setOpen(!open)}
-        className="w-full border-l-4 border-l-gray-800 pl-1.5 flex items-center text-left justify-between mb-1 min-h-[44px] sm:min-h-[36px] group"
+        className="w-full border-l-4 border-l-gray-800 px-1.5 flex items-center text-left justify-between mb-1 min-h-[44px] sm:min-h-[36px] group"
         aria-expanded={open}
       >
         <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: "var(--text-4)" }}>
           {title}
         </span>
         <span style={{ color: "var(--text-4)" }}>
-          <Chevron open={open} />
+          {open ? (
+            <RemoveIcon className="w-6 h-6" />
+          ) : (
+            <AddIcon className="w-6 h-6" />
+          )}
         </span>
       </button>
-      {open && children}
+      {open && <div className="px-1.5">{children}</div>}
     </div>
   );
 }
@@ -202,7 +206,7 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
   }
 
   return (
-    <div className="space-y-1">
+    <div>
       <div className="grow shadow-xs border border-gray-300 p-2.5 flex items-center justify-between">
         <IconLabel
           icon={FilterIcon}
