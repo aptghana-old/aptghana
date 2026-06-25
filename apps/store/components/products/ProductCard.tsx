@@ -444,22 +444,6 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
             <Link href={`/products/${product.slug}`} tabIndex={-1} aria-hidden className="block w-full h-full">
               <ProductImg url={product.image.url} alt={product.image.alt || product.name} className="w-full h-full" />
             </Link>
-            {/* Brand stamp — always visible; logo if indexed, brand name text otherwise */}
-            <div className="absolute top-2 right-2 shadow-sm pointer-events-none flex items-center justify-center min-w-[28px]">
-              {product.brandImage ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={product.brandImage}
-                  alt={`${brandLabel} logo`}
-                  className="max-h-4 sm:max-h-5 max-w-10 sm:max-w-12 object-contain"
-                  loading="lazy"
-                />
-              ) : (
-                <span className="text-[7px] sm:text-[8px] font-black uppercase tracking-widest text-(--text-3) leading-none whitespace-nowrap max-w-12 truncate">
-                  {brandLabel}
-                </span>
-              )}
-            </div>
           </div>
 
           {/* Body */}
@@ -468,7 +452,19 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
             {/* Brand + badges + stock */}
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-1.5 flex-wrap min-w-0">
-                <span className="text-[11px] font-bold text-navy-500 uppercase tracking-wide shrink-0">{brandLabel}</span>
+                <div className="shadow-sm pointer-events-none flex items-center justify-center min-w-[28px]">
+                  {product.brandImage ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={product.brandImage}
+                      alt={`${brandLabel} logo`}
+                      className="max-h-4 sm:max-h-5 max-w-10 shrink-0 sm:max-w-12 object-contain"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <span className="text-[11px] font-bold text-navy-500 uppercase tracking-wide shrink-0">{brandLabel}</span>
+                  )}
+                </div>
                 {product.isNew && <span className="px-1.5 py-px text-[9px] font-bold bg-navy-500 text-white rounded uppercase tracking-wide">New</span>}
                 {product.isFeatured && <span className="px-1.5 py-px text-[9px] font-bold bg-apt-orange text-white rounded uppercase tracking-wide">Featured</span>}
                 {product.isClearance && <span className="px-1.5 py-px text-[9px] font-bold bg-se-green text-white rounded uppercase tracking-wide">Clearance</span>}
@@ -562,8 +558,8 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
       <article className="group/card card-product flex flex-col overflow-hidden">
 
         {/* Image + overlays */}
-        <div className="relative h-48 bg-white overflow-hidden">
-          <Link href={`/products/${product.slug}`} className="block w-full h-full" tabIndex={-1} aria-hidden>
+        <div className="relative h-40 bg-white overflow-hidden">
+          <Link href={`/products/${product.slug}`} className="block w-full h-full p-3" tabIndex={-1} aria-hidden>
             <ProductImg url={product.image.url} alt={product.image.alt || product.name} className="w-full h-full" />
           </Link>
 

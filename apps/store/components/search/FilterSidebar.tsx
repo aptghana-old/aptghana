@@ -2,6 +2,13 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Button, IconLabel } from "@apt/ui";
+import {
+  X as CloseIcon,
+  PlusIcon as AddIcon,
+  FilterIcon,
+  MinusIcon as RemoveIcon,
+} from "lucide-react";
 
 interface FilterSidebarProps {
   facets?: Record<string, Record<string, number>>;
@@ -82,10 +89,10 @@ function FilterSection({
 }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   const [ open, setOpen ] = useState(defaultOpen);
   return (
-    <div className="border-b border-l-4 border-l-gray-800 last:border-b-0 pb-1 last:pb-0" style={{ borderColor: "var(--border)" }}>
+    <div className="border-b border-l-4 border-l-gray-800 pl-1.5 last:border-b-0 pb-1 last:pb-0" style={{ borderColor: "var(--border)",borderLeftColor: "var(--color-gray-800)" }}>
       <button
         onClick={() => setOpen(!open)}
-        className="pl-1 w-full flex items-center text-left justify-between mb-1 min-h-[44px] sm:min-h-[36px] group"
+        className="w-full flex items-center text-left justify-between mb-1 min-h-[44px] sm:min-h-[36px] group"
         aria-expanded={open}
       >
         <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: "var(--text-4)" }}>
@@ -196,6 +203,29 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
 
   return (
     <div className="space-y-1">
+      <div className="grow shadow-xs border border-gray-300 p-2.5 flex items-center justify-between">
+        <IconLabel
+          icon={FilterIcon}
+          label="Filters"
+          labelPosition="right"
+          classNameLabel="text-[16px]"
+          className="gap-1 heading-5"
+          classNameIcon="w-5 h-5"
+        />
+
+        <Button
+          className="text-neutral-darkest"
+          onClick={() => { }}
+        >
+          <IconLabel
+            icon={true ? RemoveIcon : AddIcon}
+            label={`${true ? "Collapse" : "Expand"
+              } all`}
+            labelPosition="left"
+            classNameLabel="text-[16px]"
+          />
+        </Button>
+      </div>
       {/* Availability */}
       {(inStockCount > 0 || clearanceCount > 0) && (
         <FilterSection title="Availability">

@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import UserAccountButton from "./UserAccountButton";
 import { SearchAutocomplete } from "@/components/search/SearchAutocomplete";
+import { useCart } from "@/lib/store/cart";
 
 /* ─── Mega menu types ────────────────────────────────────────────────────── */
 interface DisplayGroup {
@@ -88,7 +89,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
   const [ mobileGroup, setMobileGroup ] = useState<number | null>(null);
   const [ drawerSearch, setDrawerSearch ] = useState("");
   const [ scrolled, setScrolled ] = useState(false);
-  const [ cartCount ] = useState(0);
+  const { count: cartCount } = useCart();
   const megaCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const headerRef = useRef<HTMLElement>(null);
 
