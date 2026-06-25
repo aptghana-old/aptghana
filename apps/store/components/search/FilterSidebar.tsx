@@ -89,10 +89,10 @@ function FilterSection({
 }: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
   const [ open, setOpen ] = useState(defaultOpen);
   return (
-    <div className="border-b last:border-b-0 pb-1 last:pb-0" style={{ borderColor: "var(--border)" }}>
+    <div className="border-b last:border-b-0" style={{ borderColor: "var(--border)" }}>
       <button
         onClick={() => setOpen(!open)}
-        className="w-full border-l-4 border-l-gray-600 px-1.5 flex items-center text-left justify-between mb-1 min-h-[44px] sm:min-h-[36px] group"
+        className="w-full border-l-4 border-l-gray-600 px-1.5 flex items-center text-left justify-between pb-1 min-h-[44px] sm:min-h-[36px] group"
         aria-expanded={open}
       >
         <span className="text-[11px] font-bold uppercase tracking-widest" style={{ color: "var(--text-4)" }}>
@@ -233,7 +233,7 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
       {/* Availability */}
       {(inStockCount > 0 || clearanceCount > 0) && (
         <FilterSection title="Availability">
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {inStockCount > 0 && (
               <CheckRow
                 checked={isActive("instock", "1")}
@@ -257,7 +257,7 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
       {/* Hierarchical categories */}
       {hierLevels.map(({ key, label, entries }) => (
         <FilterSection key={key} title={label}>
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {entries.map(([ name, count ]) => (
               <CheckRow
                 key={name}
@@ -274,7 +274,7 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
       {/* Brands */}
       {brandEntries.length > 0 && (
         <FilterSection title="Brand">
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {brandEntries.map(([ brand, count ]) => (
               <CheckRow
                 key={brand}
@@ -291,7 +291,7 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
       {/* Specifications */}
       {specGroups.map(({ name, values }) => (
         <FilterSection key={name} title={name} defaultOpen={false}>
-          <div className="space-y-1">
+          <div className="space-y-0.5">
             {values.map(([ value, count ]) => (
               <CheckRow
                 key={value}

@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, m, useReducedMotion } from "framer-motion";
 import ProductCard, { type ProductCardData } from "@/components/products/ProductCard";
 
 interface Props {
@@ -8,59 +8,46 @@ interface Props {
   view: "grid" | "list";
 }
 
+const listItemTransition = {
+  ease: [0.16, 1, 0.3, 1] as const,
+  duration: 0.6,
+};
+
+const listItemVariants = {
+  hidden: { opacity: 0 },
+  show: (i: number) => ({
+    opacity: 1,
+    transition: {
+      delay: i * 0.06,
+      duration: 1,
+      ease: [0.16, 1, 0.3, 1] as const,
+    },
+  }),
+};
+
 /* ─── AnimatedProductGrid ─────────────────────────────────────────────────── */
 export default function AnimatedProductGrid({ products, view }: Props) {
+  const shouldReduceMotion = useReducedMotion();
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      {view === "list" ? (
-        <motion.div
-          key="list-view"
-          className="space-y-3"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1, transition: { duration: 0.18, staggerChildren: 0 } }}
-          exit={{ opacity: 0, transition: { duration: 0.12 } }}
-        >
-          {products.map((product, i) => (
-            <motion.div
-              key={product.id}
-              layout="position"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{
-                opacity: 1,
-                y: 0,
-                transition: { duration: 0.2, ease: "easeOut", delay: i * 0.03 },
-              }}
-              exit={{ opacity: 0, transition: { duration: 0.1 } }}
-            >
-              <ProductCard product={product} layout="list" />
-            </motion.div>
-          ))}
-        </motion.div>
-      ) : (
-        <motion.div
-          key="grid-view"
-          className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1, transition: { duration: 0.18 } }}
-          exit={{ opacity: 0, transition: { duration: 0.12 } }}
-        >
-          {products.map((product, i) => (
-            <motion.div
-              key={product.id}
-              layout="position"
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{
-                opacity: 1,
-                scale: 1,
-                transition: { duration: 0.2, ease: "easeOut", delay: i * 0.025 },
-              }}
-              exit={{ opacity: 0, transition: { duration: 0.1 } }}
-            >
-              <ProductCard product={product} layout="grid" />
-            </motion.div>
-          ))}
-        </motion.div>
-      )}
-    </AnimatePresence>
+    <m.ol
+      className={view === "list" ? "space-y-3" : "grid sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 md:gap-4"}
+      initial="hidden"
+      animate="show"
+      exit="hidden"
+    >
+      <AnimatePresence>
+        {products.map((product, i) => (
+          <m.li
+            key={product.mpn}
+            layout={shouldReduceMotion || "position"}
+            transition={listItemTransition}
+            variants={listItemVariants}
+            custom={i % (products.length ?? 20)}
+          >
+            <ProductCard product={product} layout="list" />
+          </m.li>
+        ))}
+      </AnimatePresence>
+    </m.ol>
   );
 }
