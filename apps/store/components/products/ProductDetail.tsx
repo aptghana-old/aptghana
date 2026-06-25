@@ -4,6 +4,7 @@ import { useState, useMemo } from "react";
 import Link from "next/link";
 import ProductGallery from "./ProductGallery";
 import { useCart } from "@/lib/store/cart";
+import { DetailPriceBlock } from "./PriceBlock";
 
 /* ──────────────────────────────────────────────────────────────────────────────
    TYPES
@@ -86,9 +87,7 @@ const IC = {
 /* ──────────────────────────────────────────────────────────────────────────────
    UTILITIES
 ────────────────────────────────────────────────────────────────────────────── */
-function fmt(n: number, cur: string) {
-  return `${cur} ${n.toLocaleString("en-GH", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-}
+
 function brandLabel(slug: string) {
   return slug.split("-").map((w) => w[ 0 ].toUpperCase() + w.slice(1)).join(" ");
 }
@@ -115,8 +114,7 @@ function PurchasePanel({ product }: { product: ProductFull }) {
 
   const inStock = (product.inventory?.quantity ?? 0) > 0;
   const minQty = Math.max(1, product.pricing.minimumOrderQty || 1);
-  const hasPricing = product.pricing.listPrice > 0;
-  const showDiscount = product.discount > 0;
+
   const brandName = product.brand?.name ?? brandLabel(product.brandSlug);
 
   function handleAddToCart() {
@@ -203,35 +201,17 @@ function PurchasePanel({ product }: { product: ProductFull }) {
       </dl>
 
       {/* Pricing */}
-      <div>
-        {hasPricing ? (
-          <div className="flex items-baseline gap-3 flex-wrap">
-            <span className="text-[32px] font-bold tracking-tight" style={{ color: "var(--text-1)" }}>
-              {fmt(product.pricing.listPrice, product.pricing.currency)}
-            </span>
-            {showDiscount && (
-              <span
-                className="text-[13px] font-bold px-2 py-0.5 rounded-full"
-                style={{ background: "#fef2f2", color: "#dc2626" }}
-              >
-                {product.discount}% off
-              </span>
-            )}
-          </div>
-        ) : (
-          <div>
-            <span className="text-[22px] font-bold" style={{ color: "#15803d" }}>Price on Request</span>
-            <p className="text-[13px] mt-1" style={{ color: "var(--text-3)" }}>
-              Submit an RFQ for a personalised quote.
-            </p>
-          </div>
-        )}
-        {product.pricing.minimumOrderQty > 1 && (
-          <p className="text-[12px] mt-1" style={{ color: "var(--text-4)" }}>
-            Min. order: {product.pricing.minimumOrderQty} units
-          </p>
-        )}
-      </div>
+      <DetailPriceBlock
+        pricing={{
+          listPrice: product.pricing.listPrice,
+          tradePrice: product.pricing.tradePrice,
+          currency: product.pricing.currency,
+          minimumOrderQty: product.pricing.minimumOrderQty,
+          leadTime: product.pricing.leadTime,
+        }}
+        discount={product.discount}
+        rfqHref={`/rfq?product=${product.slug}&sku=${product.sku}`}
+      />
 
       {/* Availability */}
       <div className="flex items-center justify-between">

@@ -6,7 +6,8 @@ import Link from "next/link";
 import { useCart, type CartProductInput } from "@/lib/store/cart";
 import { useWishlist } from "@/lib/store/wishlist";
 import { useCompare, type CompareItem } from "@/lib/store/compare";
-import { PriceBlock } from "./PriceBlock";
+import { CompactPriceBlock, ListPriceBlock, DetailPriceBlock } from "./PriceBlock";
+import type { PricingData } from "./PriceBlock";
 
 /* ─── Types ───────────────────────────────────────────────────────────────── */
 export type ProductCardLayout = "grid" | "list";
@@ -21,18 +22,7 @@ export interface ProductCardData {
   brandName?: string;
   shortDescription?: string;
   image: { url: string; alt?: string };
-  pricing: {
-    listPrice: number;
-    tradePrice?: number;
-    currency: string;
-    minimumOrderQty?: number;
-    /** Tax label shown beneath price. Defaults to "exc. VAT". Pass "" to hide. */
-    taxLabel?: string;
-    /** VAT/tax rate as a decimal, e.g. 0.15 for 15%. Used to show inc-tax price in quick view. */
-    taxRate?: number;
-    /** Per-unit label, e.g. "each", "per m", "per pack of 10". */
-    unit?: string;
-  };
+  pricing: PricingData;
   inStock: boolean;
   isClearance?: boolean;
   isNew?: boolean;
@@ -398,7 +388,7 @@ function QuickViewModal({
 
           <div className="mt-auto pt-3 border-t border-(--border)">
             <div className="flex items-start justify-between gap-3 mb-3">
-              <PriceBlock pricing={product.pricing} discount={product.discount} size="lg" />
+              <DetailPriceBlock pricing={product.pricing} discount={product.discount} rfqHref={rfqHref(product)} />
               <StockBadge inStock={product.inStock} />
             </div>
 
@@ -438,7 +428,6 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
   }, []);
 
   const hasDisc = (product.discount ?? 0) > 0;
-  const minQty = product.pricing.minimumOrderQty ?? 1;
   const brandLabel = formatBrand(product.brandSlug, product.brandName);
 
   /* ── List layout (shown on sm+ only; mobile always uses grid) ──────────── */
@@ -538,7 +527,7 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
             {/* Bottom row: price + actions */}
             <div className="flex items-center gap-2 mt-auto pt-2 flex-wrap">
               <div className="flex-1 min-w-20">
-                <PriceBlock pricing={product.pricing} discount={product.discount} size="md" />
+                <ListPriceBlock pricing={product.pricing} discount={product.discount} />
               </div>
 
               <div className="flex items-center gap-1.5">
@@ -614,7 +603,8 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
 
           {/* Brand row + secondary actions (compare/quickview on sm+ only) */}
           <div className="flex items-center justify-between mb-1 gap-1 min-h-[18px]">
-            <span className="text-[10px] font-bold text-navy-500 uppercase tracking-wide truncate">{brandLabel}</span>
+            <StockBadge inStock={product.inStock} />
+            {/* <span className="text-[10px] font-bold text-navy-500 uppercase tracking-wide truncate">{brandLabel}</span> */}
             <div className="hidden sm:flex items-center gap-0.5 shrink-0">
               <CompareBtn product={product} size="sm" />
               <button
@@ -649,15 +639,9 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
               )}
             </div>
           )}
-
-          {/* Availability */}
-          <div className="mt-2">
-            <StockBadge inStock={product.inStock} />
-          </div>
-
           {/* Price + CTAs */}
           <div className="mt-2 pt-2 border-t border-(--border)">
-            <PriceBlock pricing={product.pricing} discount={product.discount} size="sm" className="mb-1.5" />
+            <CompactPriceBlock pricing={product.pricing} discount={product.discount} className="mb-1.5" />
 
             {/* Action buttons */}
             <div className="flex items-center gap-1.5">
