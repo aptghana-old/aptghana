@@ -41,13 +41,12 @@ export default function SearchResultsLayout({
           hidden: { opacity: 0 },
         }}
       >
-        <div className="flex gap-6 xl:gap-8 items-start">
+        <div className="flex items-start">
 
           {/* Desktop filter sidebar */}
           {sidebarOpen && (
-            <aside className="hidden lg:block w-60 xl:w-72 shrink-0 sticky top-24 self-start">
+            <aside className="hidden lg:block w-72 xl:w-80 shrink-0 sticky top-24 self-start">
               <div
-                className="p-4"
                 style={{ background: "var(--bg-surface)", border: "1px solid var(--border)" }}
               >
                 <Suspense fallback={null}>
@@ -58,7 +57,7 @@ export default function SearchResultsLayout({
           )}
 
           {/* Results column */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 border-l border-l-transparent lg:border-l-gray-800 lg:pl-5 xl:pl-6 divide-y divide-gray-400" style={{ borderColor: "var(--border)" }}>
             <Suspense fallback={null}>
               <ActiveFilters basePath={basePath} />
             </Suspense>
