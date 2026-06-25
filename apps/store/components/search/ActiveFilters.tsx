@@ -47,7 +47,7 @@ export default function ActiveFilters({ basePath = "/search" }: Props) {
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2 py-2.5 border-t border-t-gray-400">
+    <div className="flex flex-wrap items-center gap-2 p-2.5 border-t border-t-gray-400">
       <span className="text-[11px] font-semibold uppercase tracking-wide shrink-0" style={{ color: "var(--text-4)" }}>
         Filters:
       </span>

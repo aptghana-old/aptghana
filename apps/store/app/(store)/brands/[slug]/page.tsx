@@ -4,9 +4,7 @@ import { STORE_URL } from "@apt/config";
 import { Suspense } from "react";
 import { fetchBrandData } from "@/lib/brand";
 import BrandHero from "@/components/brands/BrandHero";
-import FilterSidebar from "@/components/search/FilterSidebar";
-import SearchControls from "@/components/search/SearchControls";
-import ActiveFilters from "@/components/search/ActiveFilters";
+import BrowseLayout from "@/components/search/BrowseLayout";
 import SearchPagination from "@/components/search/SearchPagination";
 import ProductCard, { type ProductCardData } from "@/components/products/ProductCard";
 import ZeroResults from "@/components/search/ZeroResults";
@@ -143,74 +141,36 @@ export default async function BrandDetailPage({
           </div>
         )}
 
-        <div className="flex gap-8 items-start">
-          {/* Desktop filter sidebar */}
-          <aside className="hidden lg:block w-64 xl:w-72 shrink-0 sticky top-24 self-start">
-            <div
-              className="rounded-2xl p-4"
-              style={{
-                background: "var(--bg-surface)",
-                border: "1px solid var(--border)",
-              }}
-            >
-              <Suspense fallback={null}>
-                <FilterSidebar facets={facets} basePath={basePath} />
-              </Suspense>
-            </div>
-          </aside>
+        <BrowseLayout totalHits={totalHits} facets={facets} query="" basePath={basePath}>
+          {results && results.hits.length > 0 && (
+            <ResultsGrid hits={results.hits} view={view} />
+          )}
 
-          {/* Results column */}
-          <div className="flex-1 min-w-0">
+          {results && results.hits.length === 0 && !error && (
+            <ZeroResults query={brand.name} />
+          )}
+
+          {!results && !error && <SkeletonGrid view={view} />}
+
+          {results && totalPages > 1 && (
             <Suspense fallback={null}>
-              <ActiveFilters basePath={basePath} />
-            </Suspense>
-
-            <Suspense
-              fallback={
-                <div
-                  className="h-10 rounded-xl animate-pulse mb-5"
-                  style={{ background: "var(--bg-raised)" }}
-                />
-              }
-            >
-              <SearchControls
-                total={totalHits}
-                query=""
-                facets={facets}
+              <SearchPagination
+                totalPages={totalPages}
+                currentPage={pageNum}
                 basePath={basePath}
               />
             </Suspense>
+          )}
 
-            {results && results.hits.length > 0 && (
-              <ResultsGrid hits={results.hits} view={view} />
-            )}
-
-            {results && results.hits.length === 0 && !error && (
-              <ZeroResults query={brand.name} />
-            )}
-
-            {!results && !error && <SkeletonGrid view={view} />}
-
-            {results && totalPages > 1 && (
-              <Suspense fallback={null}>
-                <SearchPagination
-                  totalPages={totalPages}
-                  currentPage={pageNum}
-                  basePath={basePath}
-                />
-              </Suspense>
-            )}
-
-            {results && results.processingTimeMs > 0 && (
-              <p
-                className="text-center text-[11px] mt-4"
-                style={{ color: "var(--text-4)" }}
-              >
-                {totalHits.toLocaleString()} products in {results.processingTimeMs}ms
-              </p>
-            )}
-          </div>
-        </div>
+          {results && results.processingTimeMs > 0 && (
+            <p
+              className="text-center text-[11px] mt-4"
+              style={{ color: "var(--text-4)" }}
+            >
+              {totalHits.toLocaleString()} products in {results.processingTimeMs}ms
+            </p>
+          )}
+        </BrowseLayout>
       </main>
     </>
   );

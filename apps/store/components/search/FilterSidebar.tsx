@@ -85,13 +85,12 @@ function Chevron({ open }: { open: boolean }) {
 
 /* ─── Section wrapper ──────────────────────────────────────────────────────── */
 function FilterSection({
-  title, children, defaultOpen = true,
-}: { title: string; children: React.ReactNode; defaultOpen?: boolean }) {
-  const [ open, setOpen ] = useState(defaultOpen);
+  title, children, open, onToggle,
+}: { title: string; children: React.ReactNode; open: boolean; onToggle: () => void }) {
   return (
     <div className="border-b last:border-b-0" style={{ borderColor: "var(--border)" }}>
       <button
-        onClick={() => setOpen(!open)}
+        onClick={onToggle}
         className="w-full border-l-4 border-l-gray-600 px-1.5 flex items-center text-left justify-between pb-1 min-h-[44px] sm:min-h-[36px] group"
         aria-expanded={open}
       >
@@ -143,6 +142,7 @@ function CheckRow({
 /* ─── Main component ────────────────────────────────────────────────────────── */
 export default function FilterSidebar({ facets, basePath = "/search" }: FilterSidebarProps) {
   const { applyFilter, isActive } = useFilterURL(basePath);
+  const [ openSections, setOpenSections ] = useState<Record<string, boolean>>({});
 
   /* Availability */
   const inStockCount = facets?.[ "inStock" ]?.[ "true" ] ?? 0;
@@ -160,7 +160,6 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
   for (const [ key, label ] of Object.entries(levelLabels)) {
     const raw = facets?.[ key ] ?? {};
     const entries = Object.entries(raw).sort(([ , a ], [ , b ]) => b - a);
-    // Skip levels with only 1 value (already locked/filtered) unless it's currently active
     const hasActiveFilter = entries.some(([ v ]) => isActive("cats", v));
     if (entries.length > 1 || hasActiveFilter) {
       hierLevels.push({ key, label, entries: entries.slice(0, 15) });
@@ -197,6 +196,32 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
 
   const hasAnyFilter = inStockCount > 0 || clearanceCount > 0 || hierLevels.length > 0 || brandEntries.length > 0 || specGroups.length > 0;
 
+  /* Section open state helpers */
+  type SectionDef = { key: string; def: boolean };
+  const sectionDefs: SectionDef[] = [
+    ...(inStockCount > 0 || clearanceCount > 0 ? [ { key: "availability", def: true } ] : []),
+    ...hierLevels.map((l) => ({ key: l.key, def: true })),
+    ...(brandEntries.length > 0 ? [ { key: "brands", def: true } ] : []),
+    ...specGroups.map((g) => ({ key: g.name, def: false })),
+  ];
+
+  function isSectionOpen(key: string, def: boolean): boolean {
+    return key in openSections ? openSections[ key ] : def;
+  }
+
+  function toggleSection(key: string, def: boolean) {
+    setOpenSections((prev) => ({ ...prev, [ key ]: !isSectionOpen(key, def) }));
+  }
+
+  const allCollapsed = sectionDefs.every((s) => !isSectionOpen(s.key, s.def));
+
+  function toggleAll() {
+    const nextOpen = allCollapsed;
+    const map: Record<string, boolean> = {};
+    sectionDefs.forEach((s) => { map[ s.key ] = nextOpen; });
+    setOpenSections(map);
+  }
+
   if (!hasAnyFilter) {
     return (
       <p className="text-[12px] py-4 text-center" style={{ color: "var(--text-4)" }}>
@@ -206,7 +231,7 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
   }
 
   return (
-    <div className="overflow-y-auto">
+    <div>
       <div className="grow shadow-xs border border-gray-300 p-2.5 flex items-center justify-between">
         <IconLabel
           icon={FilterIcon}
@@ -219,20 +244,24 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
 
         <Button
           className="text-neutral-darkest"
-          onClick={() => { }}
+          onClick={toggleAll}
         >
           <IconLabel
-            icon={true ? RemoveIcon : AddIcon}
-            label={`${true ? "Collapse" : "Expand"
-              } all`}
+            icon={allCollapsed ? AddIcon : RemoveIcon}
+            label={allCollapsed ? "Expand all" : "Collapse all"}
             labelPosition="left"
             classNameLabel="text-[16px]"
           />
         </Button>
       </div>
+
       {/* Availability */}
       {(inStockCount > 0 || clearanceCount > 0) && (
-        <FilterSection title="Availability">
+        <FilterSection
+          title="Availability"
+          open={isSectionOpen("availability", true)}
+          onToggle={() => toggleSection("availability", true)}
+        >
           <div className="space-y-0.5">
             {inStockCount > 0 && (
               <CheckRow
@@ -256,7 +285,12 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
 
       {/* Hierarchical categories */}
       {hierLevels.map(({ key, label, entries }) => (
-        <FilterSection key={key} title={label}>
+        <FilterSection
+          key={key}
+          title={label}
+          open={isSectionOpen(key, true)}
+          onToggle={() => toggleSection(key, true)}
+        >
           <div className="space-y-0.5">
             {entries.map(([ name, count ]) => (
               <CheckRow
@@ -273,7 +307,11 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
 
       {/* Brands */}
       {brandEntries.length > 0 && (
-        <FilterSection title="Brand">
+        <FilterSection
+          title="Brand"
+          open={isSectionOpen("brands", true)}
+          onToggle={() => toggleSection("brands", true)}
+        >
           <div className="space-y-0.5">
             {brandEntries.map(([ brand, count ]) => (
               <CheckRow
@@ -290,7 +328,12 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
 
       {/* Specifications */}
       {specGroups.map(({ name, values }) => (
-        <FilterSection key={name} title={name} defaultOpen={false}>
+        <FilterSection
+          key={name}
+          title={name}
+          open={isSectionOpen(name, false)}
+          onToggle={() => toggleSection(name, false)}
+        >
           <div className="space-y-0.5">
             {values.map(([ value, count ]) => (
               <CheckRow
