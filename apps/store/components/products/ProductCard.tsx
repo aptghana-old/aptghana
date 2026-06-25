@@ -555,7 +555,7 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
   /* ── Grid layout (default, always used on mobile) ──────────────────────── */
   return (
     <>
-      <article className="group/card card-product flex flex-col overflow-hidden">
+      <article className="group/card card-product rounded-xs flex flex-col overflow-hidden">
 
         {/* Image + overlays */}
         <div className="relative h-40 bg-white overflow-hidden">

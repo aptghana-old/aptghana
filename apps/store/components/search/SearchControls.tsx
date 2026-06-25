@@ -16,7 +16,7 @@ export default function SearchControls({
   total, query, facets, basePath = "/search", filtersOpen, onToggleFilters,
 }: Props) {
   return (
-    <div className="flex items-center gap-2 mb-5">
+    <div className="flex items-center gap-2 pb-5 border-b border-b-gray-400">
       {/* Filter button — mobile/tablet only; desktop uses sidebar toggle in SortViewBar */}
       <MobileFilterDrawer facets={facets} total={total} basePath={basePath} />
       <SortViewBar
