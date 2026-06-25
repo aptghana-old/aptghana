@@ -30,7 +30,7 @@ export default function AnimatedProductGrid({ products, view }: Props) {
   const shouldReduceMotion = useReducedMotion();
   return (
     <m.ol
-      className={view === "list" ? "space-y-3" : "grid sm:grid-cols-2 lg:grid-cols-3 gap-2"}
+      className={view === "list" ? "space-y-3" : "grid sm:grid-cols-2 lg:grid-cols-3 gap-2.5"}
       initial="hidden"
       animate="show"
       exit="hidden"

@@ -206,7 +206,7 @@ export default function FilterSidebar({ facets, basePath = "/search" }: FilterSi
   }
 
   return (
-    <div>
+    <div className="overflow-y-auto">
       <div className="grow shadow-xs border border-gray-300 p-2.5 flex items-center justify-between">
         <IconLabel
           icon={FilterIcon}

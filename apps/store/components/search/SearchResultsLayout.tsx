@@ -57,7 +57,7 @@ export default function SearchResultsLayout({
           )}
 
           {/* Results column */}
-          <div className="flex-1 min-w-0 py-2.5 border-t pl-2.5 border-t-gray-400">
+          <div className="flex-1 min-w-0">
             <Suspense fallback={null}>
               <ActiveFilters basePath={basePath} />
             </Suspense>
