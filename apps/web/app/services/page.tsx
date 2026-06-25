@@ -34,7 +34,7 @@ const ICONS: Record<string, LucideIcon> = {
 };
 
 function ServiceIcon({ name, className = "w-6 h-6" }: { name: string; className?: string }) {
-  const Icon = ICONS[name];
+  const Icon = ICONS[ name ];
   if (!Icon) return null;
   return <Icon className={className} strokeWidth={1.5} />;
 }
@@ -82,9 +82,9 @@ const fallbackPreSales = [
 ];
 
 const fallbackAssembly = [
-  { title: "Quality Control",    description: "IEC-compliant assembly and testing at our Accra facility before delivery." },
-  { title: "Short Lead Times",   description: "Local assembly reduces lead times vs importing pre-built panels from Europe." },
-  { title: "Made for Ghana",     description: "Panels are designed and rated for Ghana's specific voltage and climate conditions." },
+  { title: "Quality Control", description: "IEC-compliant assembly and testing at our Accra facility before delivery." },
+  { title: "Short Lead Times", description: "Local assembly reduces lead times vs importing pre-built panels from Europe." },
+  { title: "Made for Ghana", description: "Panels are designed and rated for Ghana's specific voltage and climate conditions." },
   { title: "Full Documentation", description: "Every assembly ships with complete wiring diagrams, component lists, and test records." },
 ];
 
@@ -100,22 +100,22 @@ async function getServices() {
 
     type RawService = { _id: unknown; title: string; description?: string; section: string; iconName?: string; displayOrder?: number };
     const items = (docs as unknown as RawService[]).map((d) => ({
-      _id:          String(d._id),
-      title:        d.title,
-      description:  d.description ?? "",
-      section:      d.section,
-      iconName:     d.iconName ?? "",
+      _id: String(d._id),
+      title: d.title,
+      description: d.description ?? "",
+      section: d.section,
+      iconName: d.iconName ?? "",
       displayOrder: d.displayOrder ?? 0,
     }));
 
     const bySection = (section: string) => items.filter((i) => i.section === section);
 
     return {
-      pillars:    bySection("pillars"),
-      technical:  bySection("technical"),
-      whatWeOffer:bySection("what-we-offer"),
-      preSales:   bySection("pre-sales"),
-      assembly:   bySection("assembly"),
+      pillars: bySection("pillars"),
+      technical: bySection("technical"),
+      whatWeOffer: bySection("what-we-offer"),
+      preSales: bySection("pre-sales"),
+      assembly: bySection("assembly"),
     };
   } catch {
     return null;
@@ -127,18 +127,18 @@ async function getServices() {
 export default async function ServicesPage() {
   const db = await getServices();
 
-  const pillars     = db?.pillars.length     ? db.pillars     : fallbackPillars;
-  const technical   = db?.technical.length   ? db.technical   : fallbackTechnical;
-  const whatWeOffer = db?.whatWeOffer.length  ? db.whatWeOffer : fallbackWhatWeOffer;
+  const pillars = db?.pillars.length ? db.pillars : fallbackPillars;
+  const technical = db?.technical.length ? db.technical : fallbackTechnical;
+  const whatWeOffer = db?.whatWeOffer.length ? db.whatWeOffer : fallbackWhatWeOffer;
   const preSalesBullets = db?.preSales.length ? db.preSales.map((i) => i.title) : fallbackPreSales;
-  const assembly    = db?.assembly.length     ? db.assembly    : fallbackAssembly;
+  const assembly = db?.assembly.length ? db.assembly : fallbackAssembly;
 
   return (
     <>
       <Header />
       <main>
         {/* ── Hero ── */}
-        <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] pt-32 pb-20">
+        <section className="bg-white dark:bg-[#0A0F1E] pt-32 pb-20">
           <div className="container-apt">
             <div className="max-w-2xl">
               <div className="flex items-center gap-3 mb-4">

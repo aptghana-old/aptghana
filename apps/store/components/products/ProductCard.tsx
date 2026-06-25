@@ -440,7 +440,7 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
       <>
         <article className="group/card card-product flex gap-3 sm:gap-4 p-3 sm:p-4">
           {/* Thumbnail */}
-          <div className="relative shrink-0 w-24 h-24 sm:w-36 sm:h-36 rounded-xl overflow-hidden bg-(--bg-raised)">
+          <div className="relative shrink-0 w-24 h-24 sm:w-36 sm:h-36 rounded-xl overflow-hidden bg-white">
             <Link href={`/products/${product.slug}`} tabIndex={-1} aria-hidden className="block w-full h-full">
               <ProductImg url={product.image.url} alt={product.image.alt || product.name} className="w-full h-full" />
             </Link>
@@ -562,7 +562,7 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
       <article className="group/card card-product flex flex-col overflow-hidden">
 
         {/* Image + overlays */}
-        <div className="relative h-32 bg-(--bg-raised) overflow-hidden">
+        <div className="relative h-48 bg-white overflow-hidden">
           <Link href={`/products/${product.slug}`} className="block w-full h-full" tabIndex={-1} aria-hidden>
             <ProductImg url={product.image.url} alt={product.image.alt || product.name} className="w-full h-full" />
           </Link>
