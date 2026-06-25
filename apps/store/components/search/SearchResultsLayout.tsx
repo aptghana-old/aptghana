@@ -57,7 +57,7 @@ export default function SearchResultsLayout({
           )}
 
           {/* Results column */}
-          <div className="flex-1 min-w-0 border-l border-l-transparent lg:border-l-gray-800 lg:pl-5 xl:pl-6 divide-y divide-gray-400" style={{ borderColor: "var(--border)" }}>
+          <div className="flex-1 min-w-0 py-2.5 border-t border-b pl-1 divide-y" style={{ borderColor: "var(--border)" }}>
             <Suspense fallback={null}>
               <ActiveFilters basePath={basePath} />
             </Suspense>
