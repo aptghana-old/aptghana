@@ -47,7 +47,7 @@ export default function ActiveFilters({ basePath = "/search" }: Props) {
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-2 mb-4">
+    <div className="flex flex-wrap items-center gap-2 mb-4 border-b" style={{ borderColor: "var(--border)" }}>
       <span className="text-[11px] font-semibold uppercase tracking-wide shrink-0" style={{ color: "var(--text-4)" }}>
         Filters:
       </span>
@@ -63,7 +63,7 @@ export default function ActiveFilters({ basePath = "/search" }: Props) {
         />
       ))}
       {specs.map((spec) => {
-        const value = spec.includes("::") ? spec.split("::")[1] : spec;
+        const value = spec.includes("::") ? spec.split("::")[ 1 ] : spec;
         return <Chip key={spec} label={value} onRemove={() => removeMulti("specs", spec)} />;
       })}
       {instock && <Chip label="In Stock" onRemove={() => removeKey("instock")} />}

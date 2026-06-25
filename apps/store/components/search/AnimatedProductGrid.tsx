@@ -9,7 +9,7 @@ interface Props {
 }
 
 const listItemTransition = {
-  ease: [0.16, 1, 0.3, 1] as const,
+  ease: [ 0.16, 1, 0.3, 1 ] as const,
   duration: 0.6,
 };
 
@@ -20,7 +20,7 @@ const listItemVariants = {
     transition: {
       delay: i * 0.06,
       duration: 1,
-      ease: [0.16, 1, 0.3, 1] as const,
+      ease: [ 0.16, 1, 0.3, 1 ] as const,
     },
   }),
 };
@@ -44,9 +44,10 @@ export default function AnimatedProductGrid({ products, view }: Props) {
             variants={listItemVariants}
             custom={i % (products.length ?? 20)}
           >
-            <ProductCard product={product} layout="list" />
+            <ProductCard product={product} layout={view} />
           </m.li>
         ))}
+
       </AnimatePresence>
     </m.ol>
   );

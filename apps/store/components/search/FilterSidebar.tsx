@@ -116,7 +116,7 @@ function CheckRow({
   checked, onChange, label, count,
 }: { checked: boolean; onChange: () => void; label: string; count?: number }) {
   return (
-    <label className="flex items-center gap-2.5 cursor-pointer min-h-[44px] sm:min-h-[36px] group">
+    <label className="flex items-center gap-2.5 cursor-pointer group">
       <span
         className={`w-4 h-4 rounded flex items-center justify-center shrink-0 transition-colors border ${checked ? "bg-[#3DCD58] border-[#3DCD58]" : "border-current"
           }`}
