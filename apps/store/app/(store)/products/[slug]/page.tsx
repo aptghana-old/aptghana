@@ -25,30 +25,61 @@ async function getProductFull(slug: string): Promise<ProductFull | null> {
 
   const brandSlug = String(raw.brandSlug ?? "");
 
-  // Parallel: brand + related/accessory products
-  const relatedIds = [
-    ...((raw.relatedProducts as string[]) ?? []),
-    ...((raw.accessories as string[]) ?? []),
-  ].slice(0, 8);
+  const relatedIds   = ((raw.relatedProducts as string[])  ?? []).slice(0, 6);
+  const accessoryIds = ((raw.accessories     as string[])  ?? []).slice(0, 6);
+  const replaceIds   = ((raw.replacements    as string[])  ?? []).slice(0, 4);
+  const allCrossIds  = [...new Set([...relatedIds, ...accessoryIds, ...replaceIds])];
 
-  const [ brand, relatedRaw ] = await Promise.all([
+  const CROSS_SELECT = "name slug sku brandSlug brandName images.main pricing.listPrice pricing.currency inventory.quantity discount isClearance isNew";
+
+  const [ brand, crossSellRaw ] = await Promise.all([
     brandSlug
       ? BrandModel.findOne({ slug: brandSlug })
         .select("slug name logo website country shortDescription productCount isPartner")
         .lean()
       : null,
-    relatedIds.length > 0
-      ? ProductModel.find({ _id: { $in: relatedIds }, status: "active" })
-        .select("name slug sku brandSlug images.main pricing.listPrice pricing.currency inventory.quantity discount isClearance isNew")
-        .limit(6)
+    allCrossIds.length > 0
+      ? ProductModel.find({ _id: { $in: allCrossIds }, status: "active" })
+        .select(CROSS_SELECT)
+        .limit(16)
         .lean()
-      : [],
+      : Promise.resolve([]),
   ]);
+
+  const toStr = (id: unknown) => (id && typeof (id as any).toString === "function") ? (id as any).toString() : String(id);
+  const crossMap = new Map((crossSellRaw as any[]).map((p: any) => [toStr(p._id), p]));
+
+  const relatedProducts = relatedIds.map(id => crossMap.get(toStr(id))).filter(Boolean);
+  const accessories     = accessoryIds.map(id => crossMap.get(toStr(id))).filter(Boolean);
+  const replacements    = replaceIds.map(id => crossMap.get(toStr(id))).filter(Boolean);
+
+  // Fallback: if no cross-sell data at all, fetch products from same primary category then brand
+  let fallbackProducts: unknown[] = [];
+  if (allCrossIds.length === 0) {
+    const primaryCategoryId = raw.primaryCategoryId as string | undefined;
+    if (primaryCategoryId) {
+      fallbackProducts = await ProductModel.find({
+        primaryCategoryId,
+        _id: { $ne: raw._id },
+        status: "active",
+      }).select(CROSS_SELECT).limit(8).lean();
+    }
+    if (fallbackProducts.length === 0) {
+      fallbackProducts = await ProductModel.find({
+        brandSlug: raw.brandSlug,
+        _id: { $ne: raw._id },
+        status: "active",
+      }).select(CROSS_SELECT).limit(8).lean();
+    }
+  }
 
   return JSON.parse(JSON.stringify({
     ...raw,
     brand: brand ?? null,
-    relatedProducts: relatedRaw ?? [],
+    relatedProducts,
+    accessories,
+    replacements,
+    fallbackProducts,
   })) as ProductFull;
 }
 

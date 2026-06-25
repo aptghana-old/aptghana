@@ -27,6 +27,7 @@ function hitToCard(hit: ProductSearchHit): ProductCardData {
     inStock: hit.inStock,
     isClearance: hit.isClearance,
     discount: hit.discount,
+    brandImage: hit.brandLogoUrl,
   };
 }
 
