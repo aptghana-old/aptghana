@@ -12,13 +12,21 @@
  * Usage:
  *   npx tsx scripts/sync-legacy-products.ts
  *   npx tsx scripts/sync-legacy-products.ts --dry-run   (preview without writing)
+ *
+ * Required env vars (set in root .env — never commit real values):
+ *   LEGACY_MONGODB_URI  — source Atlas DB
+ *   MONGODB_URI         — target aptghana_v2 on VPS
  */
 
+import "dotenv/config";
 import { MongoClient, ObjectId } from "mongodb";
 
-// ── Connection strings ────────────────────────────────────────────────────────
-const SOURCE_URI = "mongodb+srv://fbenson185_db_user:rRRSrOQ5YL9La56i@cluster0.d9bnrnt.mongodb.net/database";
-const TARGET_URI = "mongodb://aptghana_app:bb66ed9c1753dc0ee22e24ec0203162f8dc5a3da@167.233.36.110:27017/aptghana_v2?authSource=aptghana_v2";
+// ── Connection strings (read from env — never hardcode) ───────────────────────
+const SOURCE_URI = process.env.LEGACY_MONGODB_URI;
+const TARGET_URI = process.env.MONGODB_URI;
+
+if (!SOURCE_URI) throw new Error("Missing LEGACY_MONGODB_URI env var");
+if (!TARGET_URI) throw new Error("Missing MONGODB_URI env var");
 
 const SOURCE_DB  = "database";
 const TARGET_DB  = "aptghana_v2";
@@ -120,7 +128,7 @@ async function main() {
         { "drawings.0":   { $exists: true } },
         { relatedProducts: { $elemMatch: { "products.0": { $exists: true } } } },
         { videoGroups:    { $elemMatch: { "videos.0": { $exists: true } } } },
-        { image360Url:    { $exists: true, $ne: null, $type: "string" } },
+        { image360Url:    { $exists: true, $ne: null, $type: "string" as const } },
       ],
     };
 
