@@ -74,12 +74,16 @@ interface OldDocument { title?: string; url?: string }
 interface OldDrawing  { title?: string; content?: string }
 interface OldRelRef   { supplierRef?: string }
 interface OldRelGroup { label?: string; title?: string; products?: OldRelRef[] }
+interface OldVideo    { title?: string; videoUrl?: string; thumbnailUrl?: string; language?: string }
+interface OldVideoGroup { label?: string; videos?: OldVideo[] }
 interface OldProduct  {
   _id: ObjectId;
   supplierRef?: string;
   documents?:      OldDocument[];
   drawings?:       OldDrawing[];
   relatedProducts?: OldRelGroup[];
+  videoGroups?:    OldVideoGroup[];
+  image360Url?:    string | null;
 }
 
 // ── Main ─────────────────────────────────────────────────────────────────────
@@ -115,6 +119,8 @@ async function main() {
         { "documents.0":  { $exists: true } },
         { "drawings.0":   { $exists: true } },
         { relatedProducts: { $elemMatch: { "products.0": { $exists: true } } } },
+        { videoGroups:    { $elemMatch: { "videos.0": { $exists: true } } } },
+        { image360Url:    { $exists: true, $ne: null, $type: "string" } },
       ],
     };
 
@@ -122,7 +128,7 @@ async function main() {
     console.log(`Found ${total} legacy products to process\n`);
 
     let processed = 0, updated = 0, skipped = 0, noMatch = 0;
-    const stats = { docs: 0, drawings: 0, related: 0, accessories: 0 };
+    const stats = { docs: 0, drawings: 0, related: 0, accessories: 0, videos: 0, view360: 0 };
 
     for (let offset = 0; offset < total; offset += BATCH_SIZE) {
       const batch = await srcCol.find(query).skip(offset).limit(BATCH_SIZE).toArray();
@@ -195,6 +201,30 @@ async function main() {
         if (relatedIds.length)   { $set.relatedProducts = relatedIds;  stats.related     += relatedIds.length; }
         if (accessoryIds.length) { $set.accessories     = accessoryIds; stats.accessories += accessoryIds.length; }
 
+        // ── Videos ───────────────────────────────────────────────────────────
+        if (Array.isArray(src.videoGroups)) {
+          const videos: object[] = [];
+          for (const group of src.videoGroups) {
+            if (!Array.isArray(group.videos)) continue;
+            for (const v of group.videos) {
+              if (!v.videoUrl) continue;
+              videos.push({
+                title:     v.title     ?? group.label ?? "Product Video",
+                url:       v.videoUrl,
+                thumbnail: v.thumbnailUrl ?? undefined,
+                language:  v.language  ?? "en",
+              });
+            }
+          }
+          if (videos.length) { $set.videos = videos; stats.videos += videos.length; }
+        }
+
+        // ── 360° viewer URL ───────────────────────────────────────────────────
+        if (src.image360Url && typeof src.image360Url === "string") {
+          $set.image360Url = src.image360Url;
+          stats.view360++;
+        }
+
         if (Object.keys($set).length === 0) { skipped++; continue; }
 
         ops.push({ updateOne: { filter: { _id: targetId }, update: { $set } } });
@@ -224,6 +254,8 @@ async function main() {
     console.log(`   Drawings   : ${stats.drawings}`);
     console.log(`   Related    : ${stats.related}`);
     console.log(`   Accessories: ${stats.accessories}`);
+    console.log(`   Videos     : ${stats.videos}`);
+    console.log(`   360° Views : ${stats.view360}`);
     console.log("─────────────────────────────────────────");
   } finally {
     await Promise.all([srcClient.close(), tgtClient.close()]);

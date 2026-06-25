@@ -40,6 +40,7 @@ export interface ProductFull {
   documents: DocItem[];
   images: { main: Media; gallery: Media[] };
   videos?: VideoItem[];
+  image360Url?: string;
   pricing: { listPrice: number; currency: string; minimumOrderQty: number; leadTime?: string; tradePrice?: number };
   inventory: { quantity: number; tracked?: boolean; warehouseLocation?: string };
   isClearance: boolean; discount: number; isNew: boolean; isFeatured: boolean;
@@ -628,6 +629,8 @@ const DOC_META: Record<string, { label: string; color: string; bg: string }> = {
   datasheet:   { label: "Datasheet",   color: "#dc2626", bg: "#fef2f2" },
   manual:      { label: "Manual",      color: "#0057b8", bg: "#ddeeff" },
   drawing:     { label: "Drawing",     color: "#7c3aed", bg: "#f5f3ff" },
+  catalogue:   { label: "Catalogue",   color: "#0891b2", bg: "#ecfeff" },
+  cad:         { label: "CAD",         color: "#0d9488", bg: "#f0fdfa" },
   certificate: { label: "Certificate", color: "#15803d", bg: "#f0fdf4" },
   compliance:  { label: "Compliance",  color: "#92400e", bg: "#fef3c7" },
   other:       { label: "Document",    color: "#374151", bg: "var(--bg-raised)" },
@@ -848,7 +851,7 @@ export default function ProductDetail({ product }: { product: ProductFull }) {
       {/* ── Hero: Gallery + Purchase Panel ── */}
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8 xl:gap-10 mb-2">
         <div>
-          <ProductGallery images={allImages} videos={product.videos} productName={product.name} sku={product.sku} />
+          <ProductGallery images={allImages} videos={product.videos} image360Url={product.image360Url} productName={product.name} sku={product.sku} />
         </div>
         <aside className="lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
           <PurchasePanel product={product} panelRef={panelRef} />

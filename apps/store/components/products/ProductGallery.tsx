@@ -15,10 +15,11 @@ export interface GalleryVideo {
   language?:  string;
 }
 interface Props {
-  images:      GalleryImage[];
-  videos?:     GalleryVideo[];
-  productName: string;
-  sku?:        string;
+  images:       GalleryImage[];
+  videos?:      GalleryVideo[];
+  image360Url?: string;
+  productName:  string;
+  sku?:         string;
 }
 
 /* ─── CDN high-res URL upgrade ──────────────────────────────────────────────── */
@@ -54,10 +55,11 @@ const I = {
   reset:   "M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99",
   image:   "M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z",
   film:    "M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0112 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM12 10.5h.008v.008H12V10.5zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z",
+  view360: "M12 9a3 3 0 100 6 3 3 0 000-6zm0 0V3m0 18v-6M3 12h6m12 0h-6M5.636 5.636l4.243 4.243m4.242 4.243l4.243 4.243M5.636 18.364l4.243-4.243m4.242-4.243l4.243-4.243",
 };
 
 /* ─── Fullscreen reducer ────────────────────────────────────────────────────── */
-type FsTab = "images" | "videos";
+type FsTab = "images" | "videos" | "360";
 interface FsState {
   open:    boolean;
   idx:     number;
@@ -172,15 +174,17 @@ function VideoThumb({ vid, active, onClick, small = false }: {
 }
 
 /* ─── Fullscreen modal ──────────────────────────────────────────────────────── */
-function FullscreenModal({ images, videos = [], productName, sku, state, dispatch }: {
+function FullscreenModal({ images, videos = [], image360Url, productName, sku, state, dispatch }: {
   images: GalleryImage[];
   videos?: GalleryVideo[];
+  image360Url?: string;
   productName: string;
   sku?: string;
   state: FsState;
   dispatch: React.Dispatch<FsAction>;
 }) {
   const hasVideos   = videos.length > 0;
+  const has360      = !!image360Url;
   const total       = images.length;
   const cur         = images[state.idx];
   const hiRes       = cur?.zoomUrl || toHiRes(cur?.url || "");
@@ -287,6 +291,7 @@ function FullscreenModal({ images, videos = [], productName, sku, state, dispatc
         <div className="flex items-center gap-2">
           {tabBtn("images", I.image, `Images${total > 1 ? ` (${total})` : ""}`)}
           {hasVideos && tabBtn("videos", I.film, `Videos (${videos.length})`)}
+          {has360 && tabBtn("360", I.view360, "360° View")}
         </div>
 
         {state.tab === "images" && (
@@ -396,7 +401,24 @@ function FullscreenModal({ images, videos = [], productName, sku, state, dispatc
         </div>
 
         {/* ── Main content area ── */}
-        {state.tab === "images" ? (
+        {state.tab === "360" ? (
+          <div className="flex-1 flex flex-col items-center justify-center p-4">
+            <div className="w-full max-w-4xl">
+              <div className="w-full rounded-xl overflow-hidden" style={{ aspectRatio: "16/9", background: "#000", boxShadow: "0 24px 80px rgba(0,0,0,0.6)" }}>
+                <iframe
+                  src={image360Url}
+                  title="360° product view"
+                  allowFullScreen
+                  className="w-full h-full border-0"
+                  aria-label="Interactive 360° product viewer"
+                />
+              </div>
+              <p className="mt-4 text-center text-[12px]" style={{ color: "rgba(255,255,255,0.35)" }}>
+                Drag to rotate · Scroll to zoom
+              </p>
+            </div>
+          </div>
+        ) : state.tab === "images" ? (
           <div className="flex-1 flex flex-col overflow-hidden">
             {/* Image stage */}
             <div className="flex-1 relative overflow-hidden flex items-center justify-center"
@@ -521,7 +543,7 @@ function FullscreenModal({ images, videos = [], productName, sku, state, dispatc
 }
 
 /* ─── Main gallery component ────────────────────────────────────────────────── */
-export default function ProductGallery({ images, videos = [], productName, sku }: Props) {
+export default function ProductGallery({ images, videos = [], image360Url, productName, sku }: Props) {
   const [activeIdx, setActiveIdx]   = useState(0);
   const [mainErr, setMainErr]       = useState(false);
   const [hovering, setHovering]     = useState(false);
@@ -609,12 +631,7 @@ export default function ProductGallery({ images, videos = [], productName, sku }
                   onClick={() => dispatch({ type: "open", idx: 0, tab: "videos" })}
                   aria-label="View videos"
                   className="shrink-0 rounded-lg overflow-hidden relative transition-all duration-150 focus-visible:outline-none"
-                  style={{
-                    width: 68, height: 68,
-                    background: "#111827",
-                    border: "2px solid var(--border)",
-                    opacity: 0.7,
-                  }}
+                  style={{ width: 68, height: 68, background: "#111827", border: "2px solid var(--border)", opacity: 0.7 }}
                   onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
                   onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.7")}
                 >
@@ -623,6 +640,22 @@ export default function ProductGallery({ images, videos = [], productName, sku }
                     <span className="text-[9px] font-bold uppercase tracking-wide" style={{ color: "rgba(255,255,255,0.5)" }}>
                       {videos.length} video{videos.length > 1 ? "s" : ""}
                     </span>
+                  </div>
+                </button>
+              )}
+              {/* 360° thumbnail */}
+              {image360Url && (
+                <button
+                  onClick={() => dispatch({ type: "open", idx: 0, tab: "360" })}
+                  aria-label="View 360° interactive model"
+                  className="shrink-0 rounded-lg overflow-hidden relative transition-all duration-150 focus-visible:outline-none"
+                  style={{ width: 68, height: 68, background: "#0a1628", border: "2px solid var(--border)", opacity: 0.7 }}
+                  onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
+                  onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.7")}
+                >
+                  <div className="w-full h-full flex flex-col items-center justify-center gap-1">
+                    <Ico d={I.view360} size={18} sw={1.5} style={{ color: "rgba(255,255,255,0.7)" }} />
+                    <span className="text-[9px] font-bold uppercase tracking-wide" style={{ color: "rgba(255,255,255,0.5)" }}>360°</span>
                   </div>
                 </button>
               )}
@@ -829,6 +862,16 @@ export default function ProductGallery({ images, videos = [], productName, sku }
             <VideoThumb vid={videos[0]} active={false}
               onClick={() => dispatch({ type: "open", idx: 0, tab: "videos" })} />
           )}
+          {image360Url && (
+            <button
+              onClick={() => dispatch({ type: "open", idx: 0, tab: "360" })}
+              aria-label="View 360°"
+              className="shrink-0 rounded-lg flex flex-col items-center justify-center gap-1 transition-all"
+              style={{ width: 48, height: 48, background: "#0a1628", border: "2px solid var(--border)" }}>
+              <Ico d={I.view360} size={14} sw={1.5} style={{ color: "rgba(255,255,255,0.7)" }} />
+              <span className="text-[8px] font-bold" style={{ color: "rgba(255,255,255,0.5)" }}>360°</span>
+            </button>
+          )}
         </div>
       )}
 
@@ -836,6 +879,7 @@ export default function ProductGallery({ images, videos = [], productName, sku }
       <FullscreenModal
         images={imgs}
         videos={videos}
+        image360Url={image360Url}
         productName={productName}
         sku={sku}
         state={fs}
