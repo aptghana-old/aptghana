@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { connectDB, ProductModel, BrandModel, CategoryModel, IndustryModel } from "@apt/db";
+import { connectDB, ProductModel, IndustryModel } from "@apt/db";
 import { STORE_URL, CONTACT_PHONE, SOCIAL_LINKS } from "@apt/config";
 import { safeJsonLd } from "@apt/auth";
 import type {
@@ -32,7 +32,6 @@ export const revalidate = 3600;
 /* ─── Types ───────────────────────────────────────────────────────────────── */
 
 interface Brand { _id: string; name: string; slug: string; }
-interface DBCategory { _id: string; name: string; slug: string; shortDescription?: string; }
 interface DBIndustry { _id: string; name: string; slug: string; shortDescription?: string; accentColor?: string; }
 
 /* Static brand fallback removed — brands section shows empty when DB has none */

@@ -555,16 +555,23 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
               </div>
             </div>
 
-            {/* Filter tags */}
+            {/* Filter tags — list layout only */}
             {product.filterTags && product.filterTags.length > 0 && (
               <div className="flex flex-wrap gap-1">
-                {product.filterTags.filter((t) => t.includes(":")).slice(0, 6).map((tag) => {
-                  const sep = tag.indexOf(":");
-                  const key = tag.slice(0, sep).trim();
-                  const val = tag.slice(sep + 1).trim();
+                {product.filterTags.slice(0, 5).map((tag) => {
+                  const colonIdx = tag.indexOf(":");
+                  if (colonIdx > 0) {
+                    const key = tag.slice(0, colonIdx).trim();
+                    const val = tag.slice(colonIdx + 1).trim();
+                    return (
+                      <span key={tag} className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] rounded-md bg-(--bg-raised) text-(--text-4) border border-(--border) whitespace-nowrap">
+                        {key}<span className="font-semibold text-(--text-1)">{val}</span>
+                      </span>
+                    );
+                  }
                   return (
-                    <span key={tag} className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium rounded-md bg-(--bg-raised) text-(--text-3) border border-(--border) whitespace-nowrap">
-                      {key}<span className="font-semibold text-(--text-1)">{val}</span>
+                    <span key={tag} className="px-2 py-0.5 text-[10px] font-medium rounded-md bg-(--bg-raised) text-(--text-3) border border-(--border) whitespace-nowrap">
+                      {tag}
                     </span>
                   );
                 })}

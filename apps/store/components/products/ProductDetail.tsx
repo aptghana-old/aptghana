@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef, useCallback } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
 import ProductGallery from "./ProductGallery";
 import ProductCard, { type ProductCardData } from "./ProductCard";
 import { useCart } from "@/lib/store/cart";
 import { useWishlist } from "@/lib/store/wishlist";
 import { useCompare, type CompareItem } from "@/lib/store/compare";
-import { DetailPriceBlock } from "./PriceBlock";
+import { computePricing, fmtPrice } from "./PriceBlock";
 
 /* ── Types ─────────────────────────────────────────────────────────────────── */
 interface Media { url: string; alt: string; width?: number; height?: number }
@@ -54,6 +54,7 @@ export interface ProductFull {
   accessories?: RelatedProduct[];
   replacements?: RelatedProduct[];
   fallbackProducts?: RelatedProduct[];
+  brandProducts?: RelatedProduct[];
 }
 
 /* ── Icon primitive ─────────────────────────────────────────────────────────── */
@@ -184,6 +185,28 @@ function PurchasePanel({ product, panelRef }: { product: ProductFull; panelRef?:
   const isCompared = inCompare(product._id);
   const bName = product.brand?.name ?? brandLabel(product.brandSlug);
 
+  const c = computePricing({
+    listPrice: product.pricing.listPrice,
+    tradePrice: product.pricing.tradePrice,
+    currency: product.pricing.currency,
+    minimumOrderQty: product.pricing.minimumOrderQty,
+    leadTime: product.pricing.leadTime,
+  }, product.discount);
+
+  const highlights = useMemo(() => {
+    const all: { label: string; val: string }[] = [];
+    for (const group of product.specifications ?? []) {
+      for (const attr of group.attributes) {
+        all.push({ label: attr.name, val: `${attr.value}${attr.unit ? ` ${attr.unit}` : ""}` });
+        if (all.length >= 4) break;
+      }
+      if (all.length >= 4) break;
+    }
+    return all;
+  }, [product.specifications]);
+
+  const datasheetDoc = (product.documents ?? []).find(d => d.type === "datasheet");
+
   function handleAddToCart() {
     add({ id: product._id, sku: product.sku, name: product.name, imageUrl: product.images.main?.url ?? "", price: product.pricing.listPrice, currency: product.pricing.currency, minQty }, qty);
     setAdded(true);
@@ -201,13 +224,20 @@ function PurchasePanel({ product, panelRef }: { product: ProductFull; panelRef?:
 
   return (
     <div ref={panelRef} className="space-y-4">
-      {/* Brand row + badges */}
-      <div className="flex items-center gap-2 flex-wrap">
+      {/* Brand badge row */}
+      <div className="flex items-center gap-2.5 flex-wrap">
         {product.brand?.logo?.url ? (
-          <img src={product.brand.logo.url} alt={bName} className="h-7 object-contain" style={{ maxWidth: 120 }} />
+          <img src={product.brand.logo.url} alt={bName} className="h-6 object-contain" style={{ maxWidth: 100 }} />
         ) : (
-          <span className="text-[11px] font-bold uppercase tracking-widest px-2.5 py-1 rounded" style={{ background: "var(--bg-raised)", color: "#0057b8", border: "1px solid var(--border)" }}>
+          <span className="text-[11px] font-bold uppercase tracking-widest px-2 py-1 rounded"
+            style={{ background: "var(--bg-raised)", color: "#0057b8", border: "1px solid var(--border)" }}>
             {bName}
+          </span>
+        )}
+        {product.brand?.isPartner && (
+          <span className="text-[10px] font-mono font-bold uppercase tracking-wide px-2 py-0.5 rounded"
+            style={{ background: "rgba(0,87,184,0.08)", color: "#0057b8", border: "1px solid rgba(0,87,184,0.2)" }}>
+            Authorised Partner
           </span>
         )}
         {product.isNew && <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded text-white" style={{ background: "#0057b8" }}>New</span>}
@@ -227,114 +257,173 @@ function PurchasePanel({ product, panelRef }: { product: ProductFull; panelRef?:
         </p>
       )}
 
-      {/* Identifiers */}
-      <div className="py-3 grid grid-cols-2 gap-x-6 gap-y-2 text-[12px]" style={{ borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
-        {[
-          { label: "APT SKU",    val: product.sku },
-          { label: "Mfr. Part", val: product.mpn },
-          ...(product.supplierRef ? [{ label: "Supplier Ref", val: product.supplierRef }] : []),
-        ].map(({ label, val }) => (
-          <div key={label}>
-            <dt className="mb-0.5 text-[11px] uppercase tracking-wide" style={{ color: "var(--text-4)" }}>{label}</dt>
-            <dd className="font-mono font-semibold" style={{ color: "var(--text-1)" }}>{val}</dd>
-          </div>
-        ))}
-      </div>
-
-      {/* Pricing */}
-      <DetailPriceBlock
-        pricing={{ listPrice: product.pricing.listPrice, tradePrice: product.pricing.tradePrice, currency: product.pricing.currency, minimumOrderQty: product.pricing.minimumOrderQty, leadTime: product.pricing.leadTime }}
-        discount={product.discount}
-        rfqHref={`/rfq?product=${product.slug}&sku=${product.sku}`}
-      />
-
-      {/* Stock status */}
-      <div className="flex items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
-          <span className="w-2.5 h-2.5 rounded-full shrink-0" style={{ background: inStock ? "#22c55e" : "#f59e0b", boxShadow: `0 0 0 3px ${inStock ? "rgba(34,197,94,.15)" : "rgba(245,158,11,.15)"}` }} />
-          <span className="text-[13px] font-semibold" style={{ color: inStock ? "#15803d" : "#b45309" }}>
-            {inStock ? `${product.inventory.quantity.toLocaleString()} in stock` : "Available on order"}
+      {/* Identifiers row */}
+      <div className="flex items-center flex-wrap gap-x-4 gap-y-1 py-2.5 text-[12px]"
+        style={{ borderTop: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+        <span style={{ color: "var(--text-4)" }}>
+          SKU <span className="font-mono font-semibold" style={{ color: "var(--text-1)" }}>{product.sku}</span>
+        </span>
+        {product.mpn && (
+          <span style={{ color: "var(--text-4)" }}>
+            MPN <span className="font-mono font-semibold" style={{ color: "var(--text-1)" }}>{product.mpn}</span>
           </span>
-        </div>
-        {inStock && product.inventory.warehouseLocation && (
-          <span className="text-[11px]" style={{ color: "var(--text-4)" }}>{product.inventory.warehouseLocation}</span>
         )}
-        {!inStock && (
-          <span className="text-[12px]" style={{ color: "var(--text-4)" }}>{product.pricing.leadTime ?? "2–6 weeks"}</span>
+        {product.supplierRef && (
+          <span style={{ color: "var(--text-4)" }}>
+            Ref <span className="font-mono font-semibold" style={{ color: "var(--text-1)" }}>{product.supplierRef}</span>
+          </span>
         )}
       </div>
 
-      {/* MOQ note */}
-      {minQty > 1 && (
-        <p className="text-[12px] font-medium" style={{ color: "var(--text-4)" }}>
-          Minimum order: {minQty} {minQty === 1 ? "unit" : "units"}
-        </p>
+      {/* Key spec highlights — 4-up grid */}
+      {highlights.length > 0 && (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          {highlights.map((h) => (
+            <div key={h.label} className="rounded-xl px-3 py-2.5"
+              style={{ background: "var(--bg-raised)", border: "1px solid var(--border)" }}>
+              <dt className="text-[10px] uppercase tracking-wide mb-0.5 truncate" style={{ color: "var(--text-4)" }}>{h.label}</dt>
+              <dd className="text-[13px] font-mono font-bold leading-tight truncate" style={{ color: "var(--text-1)" }}>{h.val}</dd>
+            </div>
+          ))}
+        </div>
       )}
 
-      {/* Actions */}
-      <div className="space-y-2.5">
-        {/* Qty + Add to Cart */}
-        <div className="flex items-stretch gap-2">
-          <div className="flex items-stretch rounded-xl overflow-hidden shrink-0" style={{ border: "1.5px solid var(--border-hi)" }}>
-            <button onClick={() => handleQty(-1)} disabled={qty <= minQty}
-              className="w-10 flex items-center justify-center text-lg font-medium transition-colors disabled:opacity-30"
-              style={{ color: "var(--text-2)", background: "var(--bg-raised)" }} aria-label="Decrease quantity">−</button>
-            <input type="number" value={qty} min={minQty} step={minQty}
-              onChange={(e) => setQty(Math.max(minQty, parseInt(e.target.value) || minQty))}
-              className="w-14 text-center text-[14px] font-bold focus:outline-none"
-              style={{ background: "var(--bg-surface)", color: "var(--text-1)" }} aria-label="Quantity" />
-            <button onClick={() => handleQty(1)}
-              className="w-10 flex items-center justify-center text-lg font-medium transition-colors"
-              style={{ color: "var(--text-2)", background: "var(--bg-raised)" }} aria-label="Increase quantity">+</button>
+      {/* ── Buy Box ── */}
+      <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid var(--border)" }}>
+        {/* Main: Price column + Actions column */}
+        <div className="p-4 flex flex-col sm:flex-row gap-4">
+          {/* Price column */}
+          <div className="flex-1 min-w-0">
+            {!c.hasPricing ? (
+              <div>
+                <span className="text-[22px] font-bold" style={{ color: "var(--text-1)" }}>Request Pricing</span>
+                <p className="text-[12px] mt-1" style={{ color: "var(--text-4)" }}>Contact sales for pricing</p>
+              </div>
+            ) : (
+              <div className="space-y-0.5">
+                <p className="text-[11px] uppercase tracking-wide" style={{ color: "var(--text-4)" }}>{c.taxLabel}</p>
+                <div className="flex items-baseline gap-3 flex-wrap">
+                  <span className="text-[26px] font-bold tabular-nums leading-none" style={{ color: "var(--text-1)" }}>
+                    {fmtPrice(c.effectivePrice, product.pricing.currency)}
+                  </span>
+                  {c.savingsAmt > 0 && (
+                    <span className="text-[13px] line-through tabular-nums" style={{ color: "var(--text-4)" }}>
+                      {fmtPrice(c.listRef, product.pricing.currency)}
+                    </span>
+                  )}
+                </div>
+                {c.inclPrice && (
+                  <p className="text-[12px]" style={{ color: "var(--text-3)" }}>
+                    inc. VAT {fmtPrice(c.inclPrice, product.pricing.currency)}
+                  </p>
+                )}
+                {c.savingsAmt > 0 && c.savingsAmt / c.listRef > 0.01 && (
+                  <p className="text-[12px] font-semibold" style={{ color: "#15803d" }}>
+                    Save {fmtPrice(c.savingsAmt, product.pricing.currency)} ({Math.round(c.savingsAmt / c.listRef * 100)}%)
+                  </p>
+                )}
+                <div className="flex items-center gap-2 text-[11px] mt-1 flex-wrap" style={{ color: "var(--text-4)" }}>
+                  {c.minQty > 1 && <span>MOQ {c.minQty} units</span>}
+                  {c.minQty > 1 && product.pricing.leadTime && <span>·</span>}
+                  {product.pricing.leadTime && <span>Lead {product.pricing.leadTime}</span>}
+                </div>
+              </div>
+            )}
           </div>
-          <button onClick={handleAddToCart}
-            className="flex-1 h-12 flex items-center justify-center gap-2 rounded-xl text-[14px] font-bold text-white transition-all active:scale-[0.97]"
-            style={{ background: added ? "#15803d" : "#0057b8", boxShadow: "0 2px 12px rgba(0,87,184,0.25)" }}>
-            <Icon d={added ? IC.check : IC.cart} size={17} sw={2} />
-            {added ? "Added to Cart" : "Add to Cart"}
-          </button>
+
+          {/* Actions column */}
+          <div className="flex flex-col gap-2 sm:w-[200px]">
+            <div className="flex items-stretch gap-2 h-11">
+              <div className="flex items-stretch rounded-xl overflow-hidden shrink-0"
+                style={{ border: "1.5px solid var(--border-hi)" }}>
+                <button onClick={() => handleQty(-1)} disabled={qty <= minQty}
+                  className="w-9 flex items-center justify-center text-lg font-medium transition-colors disabled:opacity-30"
+                  style={{ color: "var(--text-2)", background: "var(--bg-raised)" }}
+                  aria-label="Decrease quantity">−</button>
+                <input type="number" value={qty} min={minQty} step={minQty}
+                  onChange={(e) => setQty(Math.max(minQty, parseInt(e.target.value) || minQty))}
+                  className="w-12 text-center text-[14px] font-bold focus:outline-none"
+                  style={{ background: "var(--bg-surface)", color: "var(--text-1)" }}
+                  aria-label="Quantity" />
+                <button onClick={() => handleQty(1)}
+                  className="w-9 flex items-center justify-center text-lg font-medium transition-colors"
+                  style={{ color: "var(--text-2)", background: "var(--bg-raised)" }}
+                  aria-label="Increase quantity">+</button>
+              </div>
+              <button onClick={handleAddToCart}
+                className="flex-1 flex items-center justify-center gap-1.5 rounded-xl text-[13px] font-bold text-white transition-all active:scale-[0.97]"
+                style={{ background: added ? "#15803d" : "#0057b8", boxShadow: "0 2px 12px rgba(0,87,184,0.25)" }}>
+                <Icon d={added ? IC.check : IC.cart} size={15} sw={2} />
+                {added ? "Added!" : "Add to basket"}
+              </button>
+            </div>
+            <Link href={`/rfq?product=${product.slug}&sku=${product.sku}`}
+              className="flex items-center justify-center gap-1.5 h-11 rounded-xl text-[13px] font-bold border-2 transition-colors hover:bg-(--text-1) hover:text-(--bg-surface)"
+              style={{ borderColor: "var(--text-1)", color: "var(--text-1)" }}>
+              <Icon d={IC.quote} size={15} sw={2} />
+              Add to quote
+            </Link>
+          </div>
         </div>
 
-        {/* Request Quote */}
-        <Link href={`/rfq?product=${product.slug}&sku=${product.sku}`}
-          className="flex items-center justify-center gap-2 w-full h-12 rounded-xl text-[14px] font-bold border-2 transition-colors hover:bg-(--text-1) hover:text-(--bg-surface)"
-          style={{ borderColor: "var(--text-1)", color: "var(--text-1)" }}>
-          <Icon d={IC.quote} size={17} sw={2} />
-          Request a Quote
-        </Link>
+        {/* Footer strip: stock + delivery */}
+        <div className="px-4 py-3 flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-4 text-[12px]"
+          style={{ borderTop: "1px solid var(--border)", background: "var(--bg-raised)" }}>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full shrink-0"
+              style={{
+                background: inStock ? "#22c55e" : "#f59e0b",
+                boxShadow: `0 0 0 3px ${inStock ? "rgba(34,197,94,.15)" : "rgba(245,158,11,.15)"}`,
+              }} />
+            <span className="font-semibold" style={{ color: inStock ? "#15803d" : "#b45309" }}>
+              {inStock ? `${product.inventory.quantity.toLocaleString()} in stock` : "Available on order"}
+            </span>
+          </div>
+          <div className="flex items-center gap-1.5" style={{ color: "var(--text-4)" }}>
+            <Icon d={IC.info} size={12} sw={2} />
+            {inStock ? "Dispatch: 1–2 working days" : `Lead time: ${product.pricing.leadTime ?? "2–6 weeks"}`}
+          </div>
+          {inStock && product.inventory.warehouseLocation && (
+            <span className="font-mono text-[11px]" style={{ color: "var(--text-4)" }}>
+              {product.inventory.warehouseLocation}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Secondary actions */}
-      <div className="flex items-center gap-0.5 pt-1">
-        {[
-          { label: isWishlisted ? "Saved" : "Save",    icon: isWishlisted ? IC.heartF : IC.heart, fill: isWishlisted ? "currentColor" : "none", active: isWishlisted, color: isWishlisted ? "#dc2626" : undefined, onClick: handleWishlist },
-          { label: isCompared  ? "Remove" : "Compare", icon: IC.compare, active: isCompared, onClick: handleCompare, disabled: isAtMax && !isCompared },
-          { label: copied ? "Copied!" : "Share",       icon: IC.share, active: false, onClick: handleShare },
-        ].map(({ label, icon, fill, active, onClick, color, disabled }) => (
-          <button key={label} onClick={onClick as () => void} disabled={disabled}
-            className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-[12px] font-medium transition-colors hover:opacity-80 disabled:opacity-40 disabled:cursor-not-allowed"
-            style={{ color: color ?? (active ? "#0057b8" : "var(--text-3)"), background: active ? "rgba(0,87,184,0.07)" : "transparent" }}>
-            <Icon d={icon} size={14} sw={2} fill={fill ?? "none"} />
-            {label}
-          </button>
-        ))}
-      </div>
-
-      {/* Delivery info */}
-      <div className="rounded-xl p-3.5 text-[13px] space-y-1.5" style={{ background: "var(--bg-raised)", border: "1px solid var(--border)" }}>
-        <p className="font-semibold flex items-center gap-2" style={{ color: "var(--text-1)" }}>
-          <Icon d={IC.info} size={14} sw={2} />
-          Shipping & Availability
-        </p>
-        <p style={{ color: "var(--text-3)" }}>
-          {inStock
-            ? "Ready to dispatch. Delivery within Accra: 1–2 days. Regional: 3–5 days."
-            : `Lead time: ${product.pricing.leadTime ?? "2–6 weeks"}. Contact us for expedited options.`}
-        </p>
+      <div className="flex items-center gap-1 flex-wrap">
+        <button onClick={handleWishlist}
+          className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-[12px] font-medium transition-colors"
+          style={{ color: isWishlisted ? "#dc2626" : "var(--text-3)", background: isWishlisted ? "rgba(220,38,38,0.07)" : "transparent" }}>
+          <Icon d={isWishlisted ? IC.heartF : IC.heart} size={13} sw={2} fill={isWishlisted ? "currentColor" : "none"} />
+          {isWishlisted ? "Saved" : "Save"}
+        </button>
+        <button onClick={handleCompare} disabled={isAtMax && !isCompared}
+          className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-[12px] font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          style={{ color: isCompared ? "#0057b8" : "var(--text-3)", background: isCompared ? "rgba(0,87,184,0.07)" : "transparent" }}>
+          <Icon d={IC.compare} size={13} sw={2} />
+          {isCompared ? "Remove" : "Compare"}
+        </button>
+        <button onClick={handleShare}
+          className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-[12px] font-medium transition-colors"
+          style={{ color: "var(--text-3)" }}>
+          <Icon d={IC.share} size={13} sw={2} />
+          {copied ? "Copied!" : "Share"}
+        </button>
+        {datasheetDoc && (
+          <a href={datasheetDoc.url} target="_blank" rel="noopener noreferrer"
+            className="flex items-center gap-1.5 px-2.5 py-2 rounded-lg text-[12px] font-medium transition-colors ml-auto"
+            style={{ color: "#dc2626", background: "rgba(220,38,38,0.06)" }}>
+            <Icon d={IC.pdf} size={13} sw={1.75} />
+            Datasheet
+          </a>
+        )}
       </div>
 
       {/* Technical support */}
-      <div className="rounded-xl p-3.5 text-[13px]" style={{ background: "rgba(0,87,184,0.05)", border: "1px solid rgba(0,87,184,0.18)" }}>
+      <div className="rounded-xl p-3.5 text-[13px]"
+        style={{ background: "rgba(0,87,184,0.05)", border: "1px solid rgba(0,87,184,0.18)" }}>
         <p className="font-semibold mb-1" style={{ color: "var(--text-1)" }}>Need technical assistance?</p>
         <p className="mb-2" style={{ color: "var(--text-3)" }}>Our engineers are available Mon–Fri, 8:00–17:00 GMT.</p>
         <a href="tel:+233302123456" className="inline-flex items-center gap-1.5 font-semibold hover:opacity-80 transition-opacity" style={{ color: "#0057b8" }}>
@@ -727,34 +816,38 @@ function BrandSection({ product }: { product: ProductFull }) {
   const name = brand?.name ?? brandLabel(product.brandSlug);
 
   return (
-    <div className="rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center gap-5 my-8"
-      style={{ border: "1px solid var(--border)", background: "var(--bg-surface)" }}>
-      <div className="w-20 h-16 shrink-0 rounded-xl flex items-center justify-center p-2" style={{ background: "var(--bg-raised)", border: "1px solid var(--border)" }}>
+    <div className="rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5 my-8"
+      style={{ background: "#0e1b24" }}>
+      <div className="w-20 h-16 shrink-0 rounded-xl flex items-center justify-center p-2.5"
+        style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}>
         {brand?.logo?.url
-          ? <img src={brand.logo.url} alt={name} className="w-full h-full object-contain" />
-          : <span className="text-[11px] font-bold uppercase tracking-wider text-center leading-tight" style={{ color: "var(--text-3)" }}>{name}</span>}
+          ? <img src={brand.logo.url} alt={name} className="w-full h-full object-contain" style={{ filter: "brightness(0) invert(1)" }} />
+          : <span className="text-[11px] font-bold uppercase tracking-wider text-center leading-tight" style={{ color: "rgba(255,255,255,0.7)" }}>{name}</span>}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1">
-          <h3 className="text-[15px] font-bold" style={{ color: "var(--text-1)" }}>{name}</h3>
+        <div className="flex items-center gap-2 mb-1 flex-wrap">
+          <h3 className="text-[16px] font-bold text-white">{name}</h3>
           {brand?.isPartner && (
-            <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full" style={{ background: "rgba(0,87,184,0.1)", color: "#0057b8" }}>Authorised Partner</span>
+            <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
+              style={{ background: "rgba(61,205,88,0.2)", color: "#3dcd58" }}>
+              Authorised Partner
+            </span>
           )}
         </div>
-        {brand?.country && <p className="text-[12px] mb-1" style={{ color: "var(--text-4)" }}>{brand.country}</p>}
-        {brand?.shortDescription && <p className="text-[13px] line-clamp-2" style={{ color: "var(--text-3)" }}>{brand.shortDescription}</p>}
-        {brand?.productCount && <p className="text-[12px] mt-1" style={{ color: "var(--text-4)" }}>{brand.productCount.toLocaleString()} products available</p>}
+        {brand?.country && <p className="text-[12px] mb-1" style={{ color: "rgba(255,255,255,0.5)" }}>{brand.country}</p>}
+        {brand?.shortDescription && <p className="text-[13px] line-clamp-2" style={{ color: "rgba(255,255,255,0.7)" }}>{brand.shortDescription}</p>}
+        {brand?.productCount && <p className="text-[12px] mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>{brand.productCount.toLocaleString()} products available</p>}
       </div>
       <div className="flex flex-col gap-2 shrink-0">
         <Link href={`/brands/${product.brandSlug}`}
-          className="flex items-center gap-1.5 h-9 px-4 rounded-xl text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
+          className="flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
           style={{ background: "#0057b8" }}>
           All {name} Products
         </Link>
         {brand?.website && (
           <a href={brand.website} target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1.5 h-9 px-4 rounded-xl text-[13px] font-medium transition-colors"
-            style={{ border: "1px solid var(--border)", color: "var(--text-2)", background: "var(--bg-raised)" }}>
+            className="flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl text-[13px] font-medium transition-colors"
+            style={{ border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.8)", background: "rgba(255,255,255,0.05)" }}>
             <Icon d={IC.external} size={12} sw={1.75} />
             {name} Website
           </a>
@@ -764,46 +857,85 @@ function BrandSection({ product }: { product: ProductFull }) {
   );
 }
 
-/* ── Product Rail (cross-sell, accessories, replacements, related) ────────────── */
-const RAIL_ICONS: Record<string, string> = {
-  accessories:  IC.wrench,
-  replacements: IC.swap,
-  related:      IC.tag,
-};
+/* ── Tabbed Related Section (Related | Accessories | Replacements) ───────────── */
+function TabbedRelatedSection({ product }: { product: ProductFull }) {
+  const relatedProducts = (product.relatedProducts?.length ?? 0) > 0
+    ? product.relatedProducts!
+    : (product.fallbackProducts ?? []);
+  const isRelatedFallback = (product.relatedProducts?.length ?? 0) === 0 && relatedProducts.length > 0;
 
-function ProductRail({ id, title, products, viewAllHref }: {
-  id: string; title: string; products: RelatedProduct[]; viewAllHref?: string;
-}) {
-  if (!products.length) return null;
-  const cards = products.slice(0, 12);
+  const tabs = [
+    { key: "related",      label: isRelatedFallback ? "Similar Products" : "Related Products", products: relatedProducts },
+    { key: "accessories",  label: "Accessories",  products: product.accessories  ?? [] },
+    { key: "replacements", label: "Replacements", products: product.replacements ?? [] },
+  ].filter(t => t.products.length > 0);
+
+  const [activeKey, setActiveKey] = useState(tabs[0]?.key ?? "related");
+
+  if (tabs.length === 0) return null;
+
+  const activeProducts = (tabs.find(t => t.key === activeKey)?.products ?? []).slice(0, 12);
 
   return (
-    <section id={id} className="py-8" style={{ borderBottom: "1px solid var(--border)" }}>
-      <div className="flex items-center justify-between gap-4 mb-5">
-        <h2 className="text-[17px] font-bold flex items-center gap-2" style={{ color: "var(--text-1)" }}>
-          {RAIL_ICONS[id] && <Icon d={RAIL_ICONS[id]} size={18} sw={1.75} style={{ color: "#0057b8" }} />}
-          {title}
-          <span className="text-[13px] font-normal" style={{ color: "var(--text-4)" }}>({cards.length})</span>
-        </h2>
-        {viewAllHref && (
-          <Link href={viewAllHref} className="text-[13px] font-semibold shrink-0 hover:underline" style={{ color: "#0057b8" }}>
-            View all →
-          </Link>
-        )}
+    <section id="related" className="py-8" style={{ borderBottom: "1px solid var(--border)" }}>
+      <div className="flex items-center gap-2 mb-5 flex-wrap">
+        {tabs.map(tab => (
+          <button key={tab.key} onClick={() => setActiveKey(tab.key)}
+            className="flex items-center gap-2 h-9 px-4 rounded-full text-[13px] font-semibold border transition-all"
+            style={{
+              background:  activeKey === tab.key ? "#0057b8"  : "var(--bg-surface)",
+              color:       activeKey === tab.key ? "#fff"      : "var(--text-2)",
+              borderColor: activeKey === tab.key ? "#0057b8"   : "var(--border)",
+            }}>
+            {tab.label}
+            <span className="text-[11px] tabular-nums opacity-70">{tab.products.length}</span>
+          </button>
+        ))}
       </div>
-
-      {/* Mobile: horizontal carousel */}
       <div className="sm:hidden flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4">
-        {cards.map((p) => (
+        {activeProducts.map(p => (
           <div key={p._id} className="shrink-0 w-[185px]">
             <ProductCard product={relatedToCard(p)} layout="grid" />
           </div>
         ))}
       </div>
+      <div className="hidden sm:grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3">
+        {activeProducts.map(p => (
+          <ProductCard key={p._id} product={relatedToCard(p)} layout="grid" />
+        ))}
+      </div>
+    </section>
+  );
+}
 
-      {/* Tablet+: responsive grid */}
-      <div className="hidden sm:grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-        {cards.map((p) => (
+/* ── More from Brand (8–12 product carousel/grid) ───────────────────────────── */
+function MoreFromBrandSection({ product }: { product: ProductFull }) {
+  const brandName = product.brand?.name ?? brandLabel(product.brandSlug);
+  const products = (product.brandProducts ?? []).slice(0, 12);
+  if (products.length === 0) return null;
+
+  return (
+    <section id="more-from-brand" className="py-8" style={{ borderBottom: "1px solid var(--border)" }}>
+      <div className="flex items-center justify-between gap-4 mb-5">
+        <h2 className="text-[17px] font-bold" style={{ color: "var(--text-1)" }}>
+          More from {brandName}
+          <span className="text-[14px] font-normal ml-2" style={{ color: "var(--text-4)" }}>({products.length})</span>
+        </h2>
+        <Link href={`/brands/${product.brandSlug}`}
+          className="text-[13px] font-semibold shrink-0 hover:underline"
+          style={{ color: "#0057b8" }}>
+          View all →
+        </Link>
+      </div>
+      <div className="sm:hidden flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4">
+        {products.map(p => (
+          <div key={p._id} className="shrink-0 w-[185px]">
+            <ProductCard product={relatedToCard(p)} layout="grid" />
+          </div>
+        ))}
+      </div>
+      <div className="hidden sm:grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+        {products.map(p => (
           <ProductCard key={p._id} product={relatedToCard(p)} layout="grid" />
         ))}
       </div>
@@ -828,20 +960,21 @@ export default function ProductDetail({ product }: { product: ProductFull }) {
 
   const allImages = [product.images?.main, ...(product.images?.gallery ?? [])].filter((img): img is Media => !!(img?.url));
 
-  const totalSpecs  = product.specifications?.reduce((s, g) => s + g.attributes.length, 0) ?? 0;
-  const hasAccessories  = (product.accessories?.length ?? 0) > 0;
-  const hasReplacements = (product.replacements?.length ?? 0) > 0;
-  const relatedAll      = (product.relatedProducts?.length ?? 0) > 0 ? product.relatedProducts! : (product.fallbackProducts ?? []);
-  const hasRelated      = relatedAll.length > 0;
+  const totalSpecs = product.specifications?.reduce((s, g) => s + g.attributes.length, 0) ?? 0;
+  const hasTabbedRelated =
+    (product.relatedProducts?.length ?? 0) > 0 ||
+    (product.accessories?.length ?? 0) > 0 ||
+    (product.replacements?.length ?? 0) > 0 ||
+    (product.fallbackProducts?.length ?? 0) > 0;
+  const hasBrandProducts = (product.brandProducts?.length ?? 0) > 0;
 
   const sections: SectionDef[] = [
-    { id: "overview",         label: "Overview" },
-    { id: "specifications",   label: "Specifications", count: totalSpecs },
-    { id: "documents",        label: "Documents", count: product.documents?.length ?? 0 },
+    { id: "overview",       label: "Overview" },
+    { id: "specifications", label: "Specifications", count: totalSpecs },
+    { id: "documents",      label: "Documents", count: product.documents?.length ?? 0 },
     ...(product.crossReferences?.length ? [{ id: "cross-references", label: "Cross-Refs", count: product.crossReferences.length }] : []),
-    ...(hasAccessories  ? [{ id: "accessories",  label: "Accessories",  count: product.accessories!.length }] : []),
-    ...(hasReplacements ? [{ id: "replacements", label: "Replacements", count: product.replacements!.length }] : []),
-    ...(hasRelated      ? [{ id: "related",      label: "Related" }] : []),
+    ...(hasTabbedRelated ? [{ id: "related",         label: "Related" }] : []),
+    ...(hasBrandProducts ? [{ id: "more-from-brand", label: "More from Brand" }] : []),
   ];
 
   return (
@@ -869,24 +1002,14 @@ export default function ProductDetail({ product }: { product: ProductFull }) {
         <CrossRefSection refs={product.crossReferences!} />
       )}
 
-      {/* ── Brand ── */}
+      {/* ── Brand block ── */}
       <BrandSection product={product} />
 
-      {/* ── Cross-sell rails ── */}
-      {hasAccessories && (
-        <ProductRail id="accessories" title="Accessories" products={product.accessories!} />
-      )}
-      {hasReplacements && (
-        <ProductRail id="replacements" title="Replacement Products" products={product.replacements!} />
-      )}
-      {hasRelated && (
-        <ProductRail
-          id="related"
-          title={product.relatedProducts?.length ? "Related Products" : `More from ${product.brand?.name ?? brandLabel(product.brandSlug)}`}
-          products={relatedAll}
-          viewAllHref={!product.relatedProducts?.length ? `/brands/${product.brandSlug}` : undefined}
-        />
-      )}
+      {/* ── Tabbed related (Related | Accessories | Replacements) ── */}
+      {hasTabbedRelated && <TabbedRelatedSection product={product} />}
+
+      {/* ── More from Brand carousel (8–12 products) ── */}
+      {hasBrandProducts && <MoreFromBrandSection product={product} />}
 
       {/* ── Mobile sticky CTA ── */}
       <MobileStickyBar product={product} visible={mobileCTAVisible} />

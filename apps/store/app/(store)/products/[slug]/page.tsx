@@ -32,7 +32,7 @@ async function getProductFull(slug: string): Promise<ProductFull | null> {
 
   const CROSS_SELECT = "name slug sku brandSlug brandName images.main pricing.listPrice pricing.currency inventory.quantity discount isClearance isNew";
 
-  const [ brand, crossSellRaw ] = await Promise.all([
+  const [ brand, crossSellRaw, brandProductsRaw ] = await Promise.all([
     brandSlug
       ? BrandModel.findOne({ slug: brandSlug })
         .select("slug name logo website country shortDescription productCount isPartner")
@@ -42,6 +42,12 @@ async function getProductFull(slug: string): Promise<ProductFull | null> {
       ? ProductModel.find({ _id: { $in: allCrossIds }, status: "active" })
         .select(CROSS_SELECT)
         .limit(16)
+        .lean()
+      : Promise.resolve([]),
+    brandSlug
+      ? ProductModel.find({ brandSlug, _id: { $ne: raw._id }, status: "active" })
+        .select(CROSS_SELECT)
+        .limit(12)
         .lean()
       : Promise.resolve([]),
   ]);
@@ -80,6 +86,7 @@ async function getProductFull(slug: string): Promise<ProductFull | null> {
     accessories,
     replacements,
     fallbackProducts,
+    brandProducts: brandProductsRaw,
   })) as ProductFull;
 }
 

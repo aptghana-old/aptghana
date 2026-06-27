@@ -38,6 +38,7 @@ function hitToCard(hit: ProductSearchHit): ProductCardData {
     isClearance: hit.isClearance,
     discount: hit.discount,
     brandImage: hit.brandLogoUrl,
+    filterTags: hit.filterTags ?? [],
   };
 }
 
