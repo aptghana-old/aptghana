@@ -374,7 +374,7 @@ function QuickViewModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4" role="dialog" aria-modal aria-label={`Quick view: ${product.name}`}>
+    <div className="fixed inset-0 z-200 flex items-center justify-center p-4" role="dialog" aria-modal aria-label={`Quick view: ${product.name}`}>
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
       <div className="relative w-full max-w-2xl max-h-[92vh] overflow-y-auto bg-(--bg-surface) rounded-2xl shadow-[0_24px_80px_rgba(0,0,0,0.35)] flex flex-col sm:flex-row">
 
@@ -458,11 +458,11 @@ function SpecsTable({
   specs: { name: string; value: string; unit?: string }[]; maxRows?: number;
 }) {
   return (
-    <div className="border border-(--border) rounded-[5px] overflow-hidden">
+    <div className="border border-(--border) rounded-md overflow-hidden">
       {specs.slice(0, maxRows).map((s, i) => (
         <div
           key={s.name}
-          className={`flex items-center justify-between gap-2 px-2.5 py-[5px] border-b border-(--border) last:border-b-0 ${i % 2 === 1 ? "bg-(--bg-raised)" : "bg-(--bg-surface)"}`}
+          className={`flex items-center justify-between gap-2 px-2.5 py-1.25 border-b border-(--border) last:border-b-0 ${i % 2 === 1 ? "bg-(--bg-raised)" : "bg-(--bg-surface)"}`}
         >
           <span className="text-[11px] text-(--text-3) shrink-0">{s.name}</span>
           <span className="font-mono text-[11px] font-medium text-(--text-1) text-right">
@@ -554,6 +554,22 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
                 <WishlistBtn productId={product.id} />
               </div>
             </div>
+
+            {/* Filter tags */}
+            {product.filterTags && product.filterTags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {product.filterTags.filter((t) => t.includes(":")).slice(0, 6).map((tag) => {
+                  const sep = tag.indexOf(":");
+                  const key = tag.slice(0, sep).trim();
+                  const val = tag.slice(sep + 1).trim();
+                  return (
+                    <span key={tag} className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-medium rounded-md bg-(--bg-raised) text-(--text-3) border border-(--border) whitespace-nowrap">
+                      {key}<span className="font-semibold text-(--text-1)">{val}</span>
+                    </span>
+                  );
+                })}
+              </div>
+            )}
 
             {/* Stock */}
             <StockDot inStock={product.inStock} note={product.stockNote} />
@@ -706,13 +722,13 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
           </div>
 
           {/* Brand stamp — bottom-left */}
-          <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-white/90 border border-white/50 rounded-[4px] px-1.5 py-0.5 shadow-sm pointer-events-none">
+          <div className="absolute bottom-2 left-2 flex items-center gap-1 bg-white/90 border border-white/50 rounded-sm px-1.5 py-0.5 shadow-sm pointer-events-none">
             {product.brandImage ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={product.brandImage} alt="" className="max-h-3.5 max-w-[48px] object-contain" loading="lazy" />
+              <img src={product.brandImage} alt="" className="max-h-3.5 max-w-12 object-contain" loading="lazy" />
             ) : (
               <>
-                <span className="w-1.5 h-1.5 rounded-[2px] bg-navy-500 shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-xs bg-navy-500 shrink-0" />
                 <span className="font-mono text-[9px] sm:text-[9.5px] font-semibold tracking-wide text-(--text-2)">{brandAbbr}</span>
               </>
             )}
