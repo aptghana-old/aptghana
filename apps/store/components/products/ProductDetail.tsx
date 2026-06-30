@@ -879,14 +879,16 @@ function TabbedRelatedSection({ product }: { product: ProductFull }) {
       </div>
       <div className="sm:hidden flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4">
         {activeProducts.map(p => (
-          <div key={p._id} className="shrink-0 w-[185px]">
+          <div key={p._id} className="shrink-0 min-w-72">
             <ProductCard product={relatedToCard(p)} layout="grid" />
           </div>
         ))}
       </div>
-      <div className="hidden sm:grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-3">
+      <div className="hidden sm:grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3">
         {activeProducts.map(p => (
-          <ProductCard key={p._id} product={relatedToCard(p)} layout="grid" />
+          <div key={p._id} className="shrink-0 min-w-72">
+            <ProductCard product={relatedToCard(p)} layout="grid" />
+          </div>
         ))}
       </div>
     </section>
@@ -1058,14 +1060,16 @@ function MoreFromBrandSection({ product }: { product: ProductFull }) {
       </div>
       <div className="sm:hidden flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4">
         {products.map(p => (
-          <div key={p._id} className="shrink-0 w-[185px]">
+          <div key={p._id} className="shrink-0 min-w-72">
             <ProductCard product={relatedToCard(p)} layout="grid" />
           </div>
         ))}
       </div>
-      <div className="hidden sm:grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+      <div className="hidden sm:grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3">
         {products.map(p => (
-          <ProductCard key={p._id} product={relatedToCard(p)} layout="grid" />
+          <div key={p._id} className="shrink-0 min-w-72">
+            <ProductCard product={relatedToCard(p)} layout="grid" />
+          </div>
         ))}
       </div>
     </section>

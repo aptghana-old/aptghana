@@ -37,7 +37,7 @@ function Skeleton() {
 
 /* ─── Section ─────────────────────────────────────────────────────────────── */
 export default function Recommendations({ currentSku }: { currentSku: string }) {
-  const [products, setProducts] = useState<ProductCardData[] | null>(null);
+  const [ products, setProducts ] = useState<ProductCardData[] | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,7 +62,7 @@ export default function Recommendations({ currentSku }: { currentSku: string }) 
 
     load();
     return () => { cancelled = true; };
-  }, [currentSku]);
+  }, [ currentSku ]);
 
   if (products === null) return <Skeleton />;
   if (products.length === 0) return null;
@@ -89,16 +89,18 @@ export default function Recommendations({ currentSku }: { currentSku: string }) 
       {/* Mobile */}
       <div className="sm:hidden flex gap-3 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4">
         {products.map((p) => (
-          <div key={p.id} className="shrink-0 w-[185px]">
+          <div key={p.id} className="shrink-0 min-w-72">
             <ProductCard product={p} layout="grid" />
           </div>
         ))}
       </div>
 
       {/* Desktop */}
-      <div className="hidden sm:grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
+      <div className="hidden sm:grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
         {products.map((p) => (
-          <ProductCard key={p.id} product={p} layout="grid" />
+          <div key={p.id} className="shrink-0 min-w-72">
+            <ProductCard product={p} layout="grid" />
+          </div>
         ))}
       </div>
     </section>

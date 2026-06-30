@@ -1,5 +1,6 @@
 import StoreHeader from "@/components/navigation/StoreHeader";
 import StoreFooter from "@/components/navigation/StoreFooter";
+import { StoreChat } from "@/components/chat";
 import { connectDB, CategoryModel } from "@apt/db";
 import type { NavGroup } from "@/app/layout";
 
@@ -113,6 +114,7 @@ export default async function StoreLayout({ children }: { children: React.ReactN
       <StoreHeader navGroups={navGroups} />
       {children}
       <StoreFooter />
+      <StoreChat />
     </>
   );
 }
