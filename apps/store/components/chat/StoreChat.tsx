@@ -122,11 +122,12 @@ export default function StoreChat() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const { messages, sendMessage, status, stop } = useChat({
+  const { messages, sendMessage, status, stop, clearError } = useChat({
     transport: new DefaultChatTransport({ api: "/api/chat" }),
   });
 
   const isLoading = status === "streaming" || status === "submitted";
+  const hasError = status === "error";
 
   const send = (text: string) => {
     const trimmed = text.trim();
@@ -375,6 +376,34 @@ export default function StoreChat() {
             {isLoading && (
               <div style={{ paddingLeft: 50 }}>
                 <TypingDots />
+              </div>
+            )}
+
+            {/* Error state */}
+            {hasError && (
+              <div style={{ padding: "0 14px 10px" }}>
+                <div style={{
+                  display: "flex",
+                  alignItems: "flex-start",
+                  gap: 10,
+                  padding: "10px 13px",
+                  borderRadius: 12,
+                  background: "rgba(220,38,38,0.06)",
+                  border: "1px solid rgba(220,38,38,0.2)",
+                }}>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#dc2626" strokeWidth={2} strokeLinecap="round" aria-hidden style={{ flexShrink: 0, marginTop: 1 }}>
+                    <circle cx="12" cy="12" r="10" /><path d="M12 8v4m0 4h.01" />
+                  </svg>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <p style={{ fontSize: 13, color: "var(--text-2)", margin: "0 0 6px", lineHeight: 1.5 }}>
+                      Something went wrong. Please try again.
+                    </p>
+                    <button onClick={clearError}
+                      style={{ fontSize: 12, fontWeight: 600, color: "#0057b8", background: "none", border: "none", padding: 0, cursor: "pointer" }}>
+                      Retry
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
 

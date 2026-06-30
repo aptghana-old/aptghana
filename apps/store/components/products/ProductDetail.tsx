@@ -299,10 +299,9 @@ function PurchasePanel({ product, panelRef }: { product: ProductFull; panelRef?:
 
       {/* ── Buy Box ── */}
       <div className="rounded-2xl overflow-hidden" style={{ border: "1px solid var(--border)" }}>
-        {/* Main: Price column + Actions column */}
-        <div className="p-4 flex flex-col sm:flex-row gap-4">
-          {/* Price column */}
-          <div className="flex-1 min-w-0">
+        <div className="p-4 flex flex-col gap-4">
+          {/* Price */}
+          <div>
             {!c.hasPricing ? (
               <div>
                 <span className="text-[22px] font-bold" style={{ color: "var(--text-1)" }}>Request Pricing</span>
@@ -340,8 +339,8 @@ function PurchasePanel({ product, panelRef }: { product: ProductFull; panelRef?:
             )}
           </div>
 
-          {/* Actions column */}
-          <div className="flex flex-col gap-2 sm:w-[200px]">
+          {/* Actions */}
+          <div className="flex flex-col gap-2">
             <div className="flex items-stretch gap-2 h-11">
               <div className="flex items-stretch rounded-xl overflow-hidden shrink-0"
                 style={{ border: "1.5px solid var(--border-hi)" }}>
@@ -1121,11 +1120,11 @@ export default function ProductDetail({ product }: { product: ProductFull }) {
         <Breadcrumb product={product} />
 
         {/* ── Hero: Gallery + Purchase Panel ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-10 mb-2">
-          <div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-10 mb-2 lg:items-start">
+          <div className="lg:sticky lg:top-20">
             <ImageZoomOnHover />
           </div>
-          <aside className="lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-5rem)] lg:col-span-2 lg:overflow-y-auto">
+          <aside className="lg:col-span-2">
             <PurchasePanel product={product} panelRef={panelRef} />
           </aside>
         </div>

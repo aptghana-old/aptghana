@@ -58,8 +58,6 @@ export async function POST(req: Request) {
     pageContext?: { pathname?: string } | null;
   };
 
-  await connectDB();
-
   const modelMessages = await convertToModelMessages(messages as any);
 
   const result = streamText({
@@ -87,6 +85,7 @@ export async function POST(req: Request) {
         }),
         execute: async ({ query, brand, limit = 5 }) => {
           try {
+            await connectDB();
             const filter: Record<string, unknown> = {
               status: "active",
               $text: { $search: query },
@@ -143,6 +142,7 @@ export async function POST(req: Request) {
         }),
         execute: async ({ slug }) => {
           try {
+            await connectDB();
             const brand = await (BrandModel as any)
               .findOne({ slug, status: "active" })
               .select(

@@ -7,10 +7,10 @@ import { useCart, type CartItem } from "@/lib/store/cart";
 import { EMAIL_SALES } from "@apt/config";
 
 /* ── Constants ──────────────────────────────────────────────────────────────── */
-const ACCENT       = "#0057b8";
-const ACCENT_DARK  = "#003d82";
+const ACCENT = "#0057b8";
+const ACCENT_DARK = "#003d82";
 const FREE_THRESHOLD = 500; // display currency units
-const VAT_RATE     = 0.15;
+const VAT_RATE = 0.15;
 
 /* ── Icon helper ─────────────────────────────────────────────────────────────── */
 function Ico({ d, size = 16, sw = 1.8 }: { d: string; size?: number; sw?: number }) {
@@ -23,20 +23,20 @@ function Ico({ d, size = 16, sw = 1.8 }: { d: string; size?: number; sw?: number
 }
 
 const IC = {
-  cart:    "M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z",
-  trash:   "M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13",
-  heart:   "M12 20s-7-4.4-9.4-8.8C1.1 8 2.6 4.6 6 4.6c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.4 0 4.9 3.4 3.4 6.6C19 15.6 12 20 12 20z",
-  chevL:   "M15 18l-6-6 6-6",
-  check:   "M4.5 12.75l6 6 9-13.5",
-  card:    "M3 7h18v10H3zM3 11h18M7 15h3",
-  dl:      "M9 11l3 3 3-3M12 4v9M5 20h14",
-  shield:  "M12 2l7 3v6c0 4.5-3 8-7 11-4-3-7-6.5-7-11V5z",
+  cart: "M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z",
+  trash: "M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13",
+  heart: "M12 20s-7-4.4-9.4-8.8C1.1 8 2.6 4.6 6 4.6c2 0 3.2 1.2 4 2.3.8-1.1 2-2.3 4-2.3 3.4 0 4.9 3.4 3.4 6.6C19 15.6 12 20 12 20z",
+  chevL: "M15 18l-6-6 6-6",
+  check: "M4.5 12.75l6 6 9-13.5",
+  card: "M3 7h18v10H3zM3 11h18M7 15h3",
+  dl: "M9 11l3 3 3-3M12 4v9M5 20h14",
+  shield: "M12 2l7 3v6c0 4.5-3 8-7 11-4-3-7-6.5-7-11V5z",
   refresh: "M3 12a9 9 0 1 0 3-6.7M3 4v4h4",
   invoice: "M3 7h18v10H3zM3 11h18M7 15h3",
-  box:     "M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z",
-  lock:    "M8 10V7a4 4 0 0 1 8 0v3M4 10h16v10H4z",
-  phone:   "M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z",
-  mail:    "M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75",
+  box: "M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z",
+  lock: "M8 10V7a4 4 0 0 1 8 0v3M4 10h16v10H4z",
+  phone: "M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z",
+  mail: "M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75",
 };
 
 /* ── Helpers ─────────────────────────────────────────────────────────────────── */
@@ -58,7 +58,7 @@ function relTime(ts: number) {
 }
 
 function itemStamp(item: CartItem) {
-  if (item.sku) return item.sku.split("-")[0].slice(0, 3);
+  if (item.sku) return item.sku.split("-")[ 0 ].slice(0, 3);
   return item.name.slice(0, 2).toUpperCase();
 }
 
@@ -82,7 +82,7 @@ function CartRow({ item, selected, onSelect, onSave, onRemove, onQtyChange }: {
   onRemove: () => void;
   onQtyChange: (qty: number) => void;
 }) {
-  const [imgFailed, setImgFailed] = useState(false);
+  const [ imgFailed, setImgFailed ] = useState(false);
   const lineTotal = item.price > 0 ? item.price * item.qty : null;
 
   return (
@@ -94,17 +94,17 @@ function CartRow({ item, selected, onSelect, onSave, onRemove, onQtyChange }: {
         style={{ background: selected ? ACCENT : "transparent" }} aria-hidden />
 
       {/* Checkbox */}
-      <div className="flex-none self-start mt-0.5 ml-2">
+      <div className="flex-none self-start mt-0.5 lg:ml-2">
         <Checkbox checked={selected} onChange={onSelect} />
       </div>
 
       {/* Product image */}
-      <div className="flex-none relative rounded-[6px] border border-[#eceff1] overflow-hidden"
-        style={{ width: 88, height: 88, background: "repeating-linear-gradient(45deg,#eef2f4 0 10px,#f7f9fa 10px 20px)" }}>
+      <div className="flex-none relative rounded-[6px] border border-[#eceff1] bg-white overflow-hidden"
+        style={{ width: 88, height: 88, }}>
         {item.imageUrl && !imgFailed ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={item.imageUrl} alt={item.name}
-            className="absolute inset-0 w-full h-full object-contain p-2"
+            className="absolute inset-0 w-full h-full object-contain"
             onError={() => setImgFailed(true)} />
         ) : (
           <span className="absolute inset-0 flex items-center justify-center font-mono text-[9px] tracking-wider text-[#9fb0b8]">no image</span>
@@ -276,10 +276,10 @@ function BulkBar({ live, selected, onSelectAll, onSaveSelected, onRemoveSelected
 /* ── Order summary panel ─────────────────────────────────────────────────────── */
 function OrderSummary({ items }: { items: CartItem[] }) {
   const router = useRouter();
-  const [pending, setPending] = useState(false);
-  const [promoCode, setPromoCode] = useState("");
+  const [ pending, setPending ] = useState(false);
+  const [ promoCode, setPromoCode ] = useState("");
 
-  const currency = items[0]?.currency ?? "GHS";
+  const currency = items[ 0 ]?.currency ?? "GHS";
   const unitCount = items.reduce((s, i) => s + i.qty, 0);
   const subtotalNet = items.reduce((s, i) => s + (i.price > 0 ? i.price * i.qty : 0), 0);
   const freeDelivery = subtotalNet === 0 || subtotalNet >= FREE_THRESHOLD;
@@ -374,13 +374,6 @@ function OrderSummary({ items }: { items: CartItem[] }) {
             {pending ? "✓ Proceeding…" : "Proceed to checkout"}
           </button>
 
-          {/* Secondary CTA */}
-          <Link href="/rfq"
-            className="w-full flex items-center justify-center gap-2 h-10 mt-2.5 border border-[#cfd8dc] rounded-[7px] bg-white text-[13.5px] font-semibold text-[#37474f] transition-colors hover:border-[#0057b8] hover:text-[#0057b8]">
-            <Ico d={IC.dl} size={14} sw={1.9} />
-            Convert to quote
-          </Link>
-
           {/* Contact */}
           <div className="mt-4 pt-4 border-t border-[#eceff1] flex flex-col gap-2">
             <a href="tel:+233302123456"
@@ -400,9 +393,9 @@ function OrderSummary({ items }: { items: CartItem[] }) {
       {/* Trust badges */}
       <div className="bg-white border border-[#e1e7ea] rounded-lg px-4 py-3.5 flex flex-col gap-3">
         {[
-          { icon: IC.refresh,  title: "Free returns within 30 days",      sub: "Unused stock, full refund" },
-          { icon: IC.invoice,  title: "Trade credit terms available",      sub: "30-day invoicing on approved accounts" },
-          { icon: IC.shield,   title: "Genuine, certified parts",          sub: "Direct from authorised brands" },
+          { icon: IC.refresh, title: "Free returns within 30 days", sub: "Unused stock, full refund" },
+          { icon: IC.invoice, title: "Trade credit terms available", sub: "30-day invoicing on approved accounts" },
+          { icon: IC.shield, title: "Genuine, certified parts", sub: "Direct from authorised brands" },
         ].map(({ icon, title, sub }) => (
           <div key={title} className="flex items-center gap-2.5 text-[#37474f]">
             <span className="flex-none w-7 h-7 rounded-[6px] flex items-center justify-center"
@@ -456,8 +449,8 @@ function EmptyCart() {
 /* ── Page ────────────────────────────────────────────────────────────────────── */
 export default function CartPage() {
   const { items, remove, setQty, add } = useCart();
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [savedItems, setSavedItems] = useState<CartItem[]>([]);
+  const [ selected, setSelected ] = useState<Set<string>>(new Set());
+  const [ savedItems, setSavedItems ] = useState<CartItem[]>([]);
 
   const unitCount = items.reduce((s, i) => s + i.qty, 0);
 
@@ -472,7 +465,7 @@ export default function CartPage() {
 
   function saveItem(item: CartItem) {
     remove(item.productId);
-    setSavedItems((prev) => [...prev.filter((s) => s.productId !== item.productId), item]);
+    setSavedItems((prev) => [ ...prev.filter((s) => s.productId !== item.productId), item ]);
     setSelected((prev) => { const n = new Set(prev); n.delete(item.productId); return n; });
   }
 
@@ -480,9 +473,9 @@ export default function CartPage() {
     const toSave = items.filter((i) => selected.has(i.productId));
     toSave.forEach((i) => { remove(i.productId); });
     setSavedItems((prev) => {
-      const map = new Map(prev.map((s) => [s.productId, s]));
+      const map = new Map(prev.map((s) => [ s.productId, s ]));
       toSave.forEach((i) => map.set(i.productId, i));
-      return [...map.values()];
+      return [ ...map.values() ];
     });
     setSelected(new Set());
   }
@@ -521,7 +514,7 @@ export default function CartPage() {
               </p>
             )}
           </div>
-          <Link href="/search"
+          <Link href="/catalog"
             className="flex items-center gap-1.5 text-[13px] font-semibold text-[#5b6b75] transition-colors hover:text-[#0057b8]">
             <Ico d={IC.chevL} size={15} sw={1.9} />
             Continue shopping
