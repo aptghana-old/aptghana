@@ -88,7 +88,7 @@ const D = {
 
 /* ─── Product image with fallback ─────────────────────────────────────────── */
 function ProductImg({ url, alt, className }: { url: string; alt: string; className?: string }) {
-  const [failed, setFailed] = useState(false);
+  const [ failed, setFailed ] = useState(false);
 
   if (failed || !url) {
     return (
@@ -202,7 +202,7 @@ function SignInNudge({ visible }: { visible: boolean }) {
 function WishlistBtn({ productId }: { productId: string }) {
   const { has, toggle, isAuth, status } = useWishlist();
   const inWishlist = has(productId);
-  const [nudge, setNudge] = useState(false);
+  const [ nudge, setNudge ] = useState(false);
   const nudgeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleClick = useCallback(async (e: React.MouseEvent) => {
@@ -213,7 +213,7 @@ function WishlistBtn({ productId }: { productId: string }) {
       if (nudgeTimer.current) clearTimeout(nudgeTimer.current);
       nudgeTimer.current = setTimeout(() => setNudge(false), 3000);
     }
-  }, [productId, toggle, isAuth]);
+  }, [ productId, toggle, isAuth ]);
 
   useEffect(() => () => { if (nudgeTimer.current) clearTimeout(nudgeTimer.current); }, []);
 
@@ -259,7 +259,7 @@ function CompareBtn({
       brandName: formatBrand(product.brandSlug, product.brandName),
     };
     toggle(item);
-  }, [product, toggle]);
+  }, [ product, toggle ]);
 
   if (showLabel) {
     return (
@@ -298,45 +298,6 @@ function CompareBtn({
   );
 }
 
-/* ─── Cart button (QuickView modal only) ──────────────────────────────────── */
-function CartBtn({
-  product, className = "",
-}: {
-  product: ProductCardData; className?: string;
-}) {
-  const { add } = useCart();
-  const [added, setAdded] = useState(false);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const handleClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault(); e.stopPropagation();
-    add({
-      id: product.id,
-      sku: product.sku,
-      name: product.name,
-      imageUrl: product.image.url,
-      price: product.pricing.listPrice,
-      currency: product.pricing.currency,
-      minQty: product.pricing.minimumOrderQty ?? 1,
-    }, product.pricing.minimumOrderQty ?? 1);
-    setAdded(true);
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => setAdded(false), 1800);
-  }, [product, add]);
-
-  useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
-
-  return (
-    <button
-      onClick={handleClick}
-      className={`${className} flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all ${added ? "bg-se-green text-white" : "bg-navy-500 hover:bg-navy-600 text-white"}`}
-    >
-      <Ico d={added ? D.check : D.cart} size={13} sw={2.5} />
-      {added ? "Added!" : "Add to Cart"}
-    </button>
-  );
-}
-
 /* ─── Quick View modal (portal) ───────────────────────────────────────────── */
 function QuickViewModal({
   product, onClose,
@@ -344,7 +305,7 @@ function QuickViewModal({
   product: ProductCardData; onClose: () => void;
 }) {
   const { add } = useCart();
-  const [added, setAdded] = useState(false);
+  const [ added, setAdded ] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -357,7 +318,7 @@ function QuickViewModal({
       document.removeEventListener("keydown", esc);
       if (timer.current) clearTimeout(timer.current);
     };
-  }, [onClose]);
+  }, [ onClose ]);
 
   const handleAdd = () => {
     add({
@@ -476,9 +437,9 @@ function SpecsTable({
 
 /* ─── ProductCard ─────────────────────────────────────────────────────────── */
 export default function ProductCard({ product, layout = "grid" }: ProductCardProps) {
-  const [quickView, setQuickView] = useState(false);
-  const [qty, setQty] = useState(product.pricing.minimumOrderQty ?? 1);
-  const [added, setAdded] = useState(false);
+  const [ quickView, setQuickView ] = useState(false);
+  const [ qty, setQty ] = useState(product.pricing.minimumOrderQty ?? 1);
+  const [ added, setAdded ] = useState(false);
   const addTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { add } = useCart();
@@ -487,7 +448,7 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
   const c = computePricing(product.pricing, product.discount);
   const hasDisc = (product.discount ?? 0) > 0;
   const brandLabel = formatBrand(product.brandSlug, product.brandName);
-  const brandAbbr = brandLabel.split(" ").filter(Boolean).map((w) => w[0]).join("").slice(0, 3).toUpperCase();
+  const brandAbbr = brandLabel.split(" ").filter(Boolean).map((w) => w[ 0 ]).join("").slice(0, 3).toUpperCase();
 
   const handleAdd = useCallback((e: React.MouseEvent) => {
     e.preventDefault(); e.stopPropagation();
@@ -503,7 +464,7 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
     setAdded(true);
     if (addTimer.current) clearTimeout(addTimer.current);
     addTimer.current = setTimeout(() => setAdded(false), 1700);
-  }, [product, add, qty, minQty, c.effectivePrice]);
+  }, [ product, add, qty, minQty, c.effectivePrice ]);
 
   useEffect(() => () => { if (addTimer.current) clearTimeout(addTimer.current); }, []);
 
@@ -545,7 +506,7 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
                 </Link>
                 {(product.sku || product.mpn) && (
                   <p className="font-mono text-[9px] sm:text-[10.5px] text-(--text-4) truncate">
-                    {[product.sku && `SKU ${product.sku}`, product.mpn && `MPN ${product.mpn}`].filter(Boolean).join("   ·   ")}
+                    {[ product.sku && `SKU ${product.sku}`, product.mpn && `MPN ${product.mpn}` ].filter(Boolean).join("   ·   ")}
                   </p>
                 )}
               </div>
@@ -744,14 +705,6 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
 
         {/* Content */}
         <div className="flex flex-col gap-2 sm:gap-2.5 p-2.5 sm:p-3 flex-1">
-
-          {/* Breadcrumb */}
-          {product.cataloguePath && (
-            <p className="font-mono text-[9px] sm:text-[10px] text-(--text-4) truncate leading-none">
-              {product.cataloguePath}
-            </p>
-          )}
-
           {/* Brand + name + SKU */}
           <div className="flex flex-col gap-0.5 sm:gap-1">
             <span className="text-[9.5px] sm:text-[10px] font-bold uppercase tracking-wide text-navy-500 truncate">
@@ -764,7 +717,7 @@ export default function ProductCard({ product, layout = "grid" }: ProductCardPro
             </Link>
             {(product.sku || product.mpn) && (
               <p className="font-mono text-[9px] sm:text-[10.5px] text-(--text-4) truncate">
-                {[product.sku && `SKU ${product.sku}`, product.mpn && `MPN ${product.mpn}`].filter(Boolean).join("   ·   ")}
+                {[ product.sku && `SKU ${product.sku}`, product.mpn && `MPN ${product.mpn}` ].filter(Boolean).join("   ·   ")}
               </p>
             )}
           </div>

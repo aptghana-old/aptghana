@@ -64,24 +64,24 @@
       0 12px 40px -8px rgba(0, 0, 0, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.06);
 
     /* ── apt-* aliases for shared packages/ui components ── */
-    --apt-bg:           var(--bg-surface);
-    --apt-bg-subtle:    var(--bg-base);
-    --apt-bg-raised:    var(--bg-raised);
-    --apt-bg-sunken:    var(--bg-sunken);
-    --apt-bg-error:     #FEF2F2;
-    --apt-bg-info:      #EFF6FF;
-    --apt-bg-success:   #F0FDF4;
-    --apt-bg-warning:   #FFFBEB;
-    --apt-border:       var(--border);
-    --apt-border-hi:    var(--border-hi);
-    --apt-text:         var(--text-1);
-    --apt-text-2:       var(--text-2);
-    --apt-text-3:       var(--text-3);
-    --apt-text-muted:   var(--text-4);
-    --apt-color-error:   #DC2626;
-    --apt-color-info:    #0057B8;
-    --apt-color-success: #16A34A;
-    --apt-color-warning: #D97706;
+    --apt-bg: var(--bg-surface);
+    --apt-bg-subtle: var(--bg-base);
+    --apt-bg-raised: var(--bg-raised);
+    --apt-bg-sunken: var(--bg-sunken);
+    --apt-bg-error: #fef2f2;
+    --apt-bg-info: #eff6ff;
+    --apt-bg-success: #f0fdf4;
+    --apt-bg-warning: #fffbeb;
+    --apt-border: var(--border);
+    --apt-border-hi: var(--border-hi);
+    --apt-text: var(--text-1);
+    --apt-text-2: var(--text-2);
+    --apt-text-3: var(--text-3);
+    --apt-text-muted: var(--text-4);
+    --apt-color-error: #dc2626;
+    --apt-color-info: #0057b8;
+    --apt-color-success: #16a34a;
+    --apt-color-warning: #d97706;
   }
 
   *,
@@ -206,7 +206,7 @@
     width: 100%;
     max-width: 1440px;
     margin: 0 auto;
-    padding: 0 1.5rem;
+    padding: 0 1rem;
   }
 
   .container-apt {
@@ -214,8 +214,16 @@
     max-width: 1280px;
     margin-left: auto;
     margin-right: auto;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  @media (min-width: 480px) {
+    .container-store,
+    .container-apt {
+      padding-left: 1.25rem;
+      padding-right: 1.25rem;
+    }
   }
 
   @media (min-width: 640px) {
@@ -419,7 +427,7 @@
   /* Compare table: responsive grid columns via CSS custom property --n-cols   */
   /* Must use @layer so Turbopack picks it up in dev mode                       */
   .compare-grid {
-    grid-template-columns: 96px repeat(var(--n-cols, 2), minmax(140px, 1fr));
+    grid-template-columns: 72px repeat(var(--n-cols, 2), minmax(120px, 1fr));
   }
   @media (min-width: 480px) {
     .compare-grid {

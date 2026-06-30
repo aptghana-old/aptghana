@@ -428,19 +428,6 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
         onMouseLeave={scheduleClose}
         onMouseEnter={() => { if (closeTimer.current) clearTimeout(closeTimer.current); }}
       >
-        {/* Top info bar */}
-        <div className="border-b border-[#E2E8F0] dark:border-white/5 bg-[#F8FAFC] dark:bg-[#0a0f1e]">
-          <div className="container-apt flex items-center justify-between h-9 text-xs text-[#64748B] dark:text-white/40">
-            <span className="hidden sm:block">West Africa&apos;s Leading Industrial Technology Platform</span>
-            <span className="sm:hidden">APT Ghana Industrial Solutions</span>
-            <div className="hidden md:flex items-center gap-6">
-              <a href="tel:+233303964346" className="hover:text-[#0F172A] dark:hover:text-white/70 transition-colors">+233 30 396 4346</a>
-              <a href={`mailto:${EMAIL_SALES}`} className="hover:text-[#0F172A] dark:hover:text-white/70 transition-colors">{EMAIL_SALES}</a>
-              <Link href={STORE_URL + "/rfq"} className="text-[#84CC16] hover:text-[#78B800] font-medium transition-colors">Get a Quote</Link>
-            </div>
-          </div>
-        </div>
-
         {/* Main nav */}
         <div className="container-apt">
           <div className="flex items-center justify-between h-16">

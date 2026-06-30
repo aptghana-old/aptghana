@@ -1,25 +1,44 @@
 "use client";
 
-import { useState, useEffect, useRef, useReducer, useCallback } from "react";
+import { useState, useEffect, useRef, useReducer } from "react";
+
+/* ─── Keyframe injection (scoped, no global pollution) ───────────────────────── */
+const MODAL_STYLES = `
+@keyframes apt-modal-in {
+  from { opacity: 0; transform: scale(0.975); }
+  to   { opacity: 1; transform: scale(1); }
+}
+@keyframes apt-bar-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes apt-thumb-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.apt-modal-enter { animation: apt-modal-in 220ms cubic-bezier(0.16,1,0.3,1) both; }
+.apt-bar-enter   { animation: apt-bar-in   180ms cubic-bezier(0.16,1,0.3,1) both; }
+.apt-thumb-enter { animation: apt-thumb-in 260ms cubic-bezier(0.16,1,0.3,1) both; }
+`;
 
 /* ─── Types ─────────────────────────────────────────────────────────────────── */
 export interface GalleryImage {
-  url:     string;
-  alt:     string;
+  url: string;
+  alt: string;
   zoomUrl?: string;
 }
 export interface GalleryVideo {
-  title:     string;
-  url:       string;
+  title: string;
+  url: string;
   thumbnail?: string;
-  language?:  string;
+  language?: string;
 }
 interface Props {
-  images:       GalleryImage[];
-  videos?:      GalleryVideo[];
+  images: GalleryImage[];
+  videos?: GalleryVideo[];
   image360Url?: string;
-  productName:  string;
-  sku?:         string;
+  productName: string;
+  sku?: string;
 }
 
 /* ─── CDN high-res URL upgrade ──────────────────────────────────────────────── */
@@ -56,29 +75,33 @@ const I = {
   image:   "M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z",
   film:    "M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0112 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM12 10.5h.008v.008H12V10.5zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z",
   view360: "M12 9a3 3 0 100 6 3 3 0 000-6zm0 0V3m0 18v-6M3 12h6m12 0h-6M5.636 5.636l4.243 4.243m4.242 4.243l4.243 4.243M5.636 18.364l4.243-4.243m4.242-4.243l4.243-4.243",
+  dblClick: "M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3",
 };
 
 /* ─── Fullscreen reducer ────────────────────────────────────────────────────── */
 type FsTab = "images" | "videos" | "360";
 interface FsState {
-  open:    boolean;
-  idx:     number;
-  zoom:    number;
-  px:      number;
-  py:      number;
-  tab:     FsTab;
-  vidIdx:  number;
+  open:   boolean;
+  idx:    number;
+  zoom:   number;
+  px:     number;
+  py:     number;
+  tab:    FsTab;
+  vidIdx: number;
 }
 type FsAction =
-  | { type: "open"; idx: number; tab?: FsTab }
+  | { type: "open";       idx: number; tab?: FsTab }
   | { type: "close" }
-  | { type: "nav";  idx: number }
-  | { type: "zoom"; zoom: number; px?: number; py?: number }
-  | { type: "pan";  dx: number; dy: number }
-  | { type: "tab";  tab: FsTab }
-  | { type: "vid";  vidIdx: number };
+  | { type: "nav";        idx: number }
+  | { type: "zoom";       zoom: number; px?: number; py?: number }
+  | { type: "wheelZoom";  newZoom: number; cx: number; cy: number; w: number; h: number }
+  | { type: "pan";        dx: number; dy: number }
+  | { type: "tab";        tab: FsTab }
+  | { type: "vid";        vidIdx: number };
 
 const FS0: FsState = { open: false, idx: 0, zoom: 1, px: 0, py: 0, tab: "images", vidIdx: 0 };
+
+function clamp(v: number, lo: number, hi: number) { return Math.max(lo, Math.min(hi, v)); }
 
 function fsReducer(s: FsState, a: FsAction): FsState {
   switch (a.type) {
@@ -87,17 +110,23 @@ function fsReducer(s: FsState, a: FsAction): FsState {
     case "nav":   return { ...s, idx: a.idx,  zoom: 1, px: 0, py: 0 };
     case "tab":   return { ...s, tab: a.tab,  zoom: 1, px: 0, py: 0 };
     case "vid":   return { ...s, vidIdx: a.vidIdx };
-    case "zoom":  return { ...s,
-      zoom: Math.min(6, Math.max(1, a.zoom)),
-      px: a.px ?? s.px,
-      py: a.py ?? s.py,
-    };
+    case "zoom": {
+      const z = clamp(a.zoom, 1, 6);
+      const half = (z - 1) * 50;
+      return { ...s, zoom: z, px: clamp(a.px ?? s.px, -half, half), py: clamp(a.py ?? s.py, -half, half) };
+    }
+    case "wheelZoom": {
+      const oldZ = s.zoom;
+      const z = clamp(a.newZoom, 1, 6);
+      // Zoom-to-cursor: keep the point under cursor stationary
+      const newPx = s.px + a.cx * (1 / z - 1 / oldZ) / a.w * 100;
+      const newPy = s.py + a.cy * (1 / z - 1 / oldZ) / a.h * 100;
+      const half = (z - 1) * 50;
+      return { ...s, zoom: z, px: clamp(newPx, -half, half), py: clamp(newPy, -half, half) };
+    }
     case "pan": {
       const half = (s.zoom - 1) * 50;
-      return { ...s,
-        px: Math.min(half, Math.max(-half, s.px + a.dx)),
-        py: Math.min(half, Math.max(-half, s.py + a.dy)),
-      };
+      return { ...s, px: clamp(s.px + a.dx, -half, half), py: clamp(s.py + a.dy, -half, half) };
     }
     default: return s;
   }
@@ -114,16 +143,19 @@ function Thumb({ img, active, idx, onClick, small = false }: {
       onClick={onClick}
       aria-label={`View image ${idx + 1}`}
       aria-pressed={active}
-      className="shrink-0 rounded-lg overflow-hidden transition-all duration-150 focus-visible:outline-none"
+      className="shrink-0 rounded-lg overflow-hidden transition-all duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
       style={{
         width: sz, height: sz,
         background: "var(--bg-raised)",
         border: `2px solid ${active ? "#0057b8" : "var(--border)"}`,
         boxShadow: active ? "0 0 0 3px rgba(0,87,184,0.15)" : "none",
-        opacity: active ? 1 : 0.7,
+        opacity: active ? 1 : 0.65,
+        transition: "opacity 150ms, border-color 150ms, box-shadow 150ms",
       }}
+      onFocus={(e) => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
       onMouseEnter={(e) => { if (!active) (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
-      onMouseLeave={(e) => { if (!active) (e.currentTarget as HTMLButtonElement).style.opacity = "0.7"; }}
+      onMouseLeave={(e) => { if (!active) (e.currentTarget as HTMLButtonElement).style.opacity = "0.65"; }}
+      onBlur={(e) => { if (!active) (e.currentTarget as HTMLButtonElement).style.opacity = "0.65"; }}
     >
       {img.url && !err ? (
         <img src={img.url} alt={img.alt} className="w-full h-full object-contain p-1.5"
@@ -147,14 +179,17 @@ function VideoThumb({ vid, active, onClick, small = false }: {
       onClick={onClick}
       aria-label={vid.title}
       aria-pressed={active}
-      className="shrink-0 rounded-lg overflow-hidden relative transition-all duration-150 focus-visible:outline-none"
+      className="shrink-0 rounded-lg overflow-hidden relative transition-all duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
       style={{
         width: sz, height: sz,
         background: "#111827",
         border: `2px solid ${active ? "#0057b8" : "var(--border)"}`,
         boxShadow: active ? "0 0 0 3px rgba(0,87,184,0.15)" : "none",
-        opacity: active ? 1 : 0.7,
+        opacity: active ? 1 : 0.65,
+        transition: "opacity 150ms, border-color 150ms, box-shadow 150ms",
       }}
+      onMouseEnter={(e) => { if (!active) (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+      onMouseLeave={(e) => { if (!active) (e.currentTarget as HTMLButtonElement).style.opacity = "0.65"; }}
     >
       {vid.thumbnail ? (
         <img src={vid.thumbnail} alt={vid.title} className="w-full h-full object-cover" loading="lazy" draggable={false} />
@@ -183,332 +218,558 @@ function FullscreenModal({ images, videos = [], image360Url, productName, sku, s
   state: FsState;
   dispatch: React.Dispatch<FsAction>;
 }) {
-  const hasVideos   = videos.length > 0;
-  const has360      = !!image360Url;
-  const total       = images.length;
-  const cur         = images[state.idx];
-  const hiRes       = cur?.zoomUrl || toHiRes(cur?.url || "");
-  const curVid      = videos[state.vidIdx];
+  const hasVideos = videos.length > 0;
+  const has360    = !!image360Url;
+  const total     = images.length;
+  const cur       = images[state.idx];
+  const hiRes     = cur?.zoomUrl || toHiRes(cur?.url || "");
+  const curVid    = videos[state.vidIdx];
   const [imgErr, setImgErr] = useState(false);
 
-  // Pointer state for pinch zoom + pan
-  const ptr1     = useRef<{ id: number; x: number; y: number } | null>(null);
-  const ptr2     = useRef<{ id: number; x: number; y: number } | null>(null);
-  const initDist = useRef(0);
-  const initZoom = useRef(1);
-  const lastPan  = useRef({ x: 0, y: 0 });
+  /* Pointer state */
+  const ptr1      = useRef<{ id: number; x: number; y: number } | null>(null);
+  const ptr2      = useRef<{ id: number; x: number; y: number } | null>(null);
+  const initDist  = useRef(0);
+  const initZoom  = useRef(1);
+  const lastPan   = useRef({ x: 0, y: 0 });
+  const isPinching = useRef(false);
+  const isGrabbing = useRef(false);
 
-  // Swipe state
-  const swipeX = useRef(0);
-  const swipeY = useRef(0);
+  /* Swipe + double-tap state */
+  const swipeX    = useRef(0);
+  const swipeY    = useRef(0);
+  const lastTap   = useRef<{ time: number; x: number; y: number } | null>(null);
 
+  /* Refs */
+  const modalRef  = useRef<HTMLDivElement>(null);
+  const stageRef  = useRef<HTMLDivElement>(null);
+
+  /* Reset error on image change */
   useEffect(() => { setImgErr(false); }, [state.idx]);
 
-  // Keyboard
+  /* Preload adjacent hi-res images */
+  useEffect(() => {
+    if (!state.open || state.tab !== "images" || total <= 1) return;
+    const preload = (src: string) => { if (src) { const img = new window.Image(); img.src = src; } };
+    if (state.idx + 1 < total) preload(images[state.idx + 1]?.zoomUrl || toHiRes(images[state.idx + 1]?.url || ""));
+    if (state.idx - 1 >= 0)   preload(images[state.idx - 1]?.zoomUrl || toHiRes(images[state.idx - 1]?.url || ""));
+  }, [state.open, state.idx, state.tab, images, total]);
+
+  /* Keyboard nav + focus trap */
   useEffect(() => {
     if (!state.open) return;
     document.body.style.overflow = "hidden";
+
+    const container = modalRef.current;
+    const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const getFocusable = () => container ? Array.from(container.querySelectorAll<HTMLElement>(FOCUSABLE)) : [];
+
+    requestAnimationFrame(() => { getFocusable()[0]?.focus(); });
+
     function onKey(e: KeyboardEvent) {
+      /* Focus trap */
+      if (e.key === "Tab") {
+        const els = getFocusable();
+        if (!els.length) return;
+        const first = els[0], last = els[els.length - 1];
+        if (e.shiftKey) {
+          if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+        } else {
+          if (document.activeElement === last) { e.preventDefault(); first.focus(); }
+        }
+        return;
+      }
       if (e.key === "Escape")     dispatch({ type: "close" });
       if (e.key === "ArrowRight" && state.tab === "images")
         dispatch({ type: "nav", idx: (state.idx + 1) % total });
       if (e.key === "ArrowLeft" && state.tab === "images")
         dispatch({ type: "nav", idx: (state.idx - 1 + total) % total });
-      if (e.key === "+" || e.key === "=") dispatch({ type: "zoom", zoom: state.zoom * 1.3 });
-      if (e.key === "-")                  dispatch({ type: "zoom", zoom: state.zoom / 1.3 });
-      if (e.key === "0")                  dispatch({ type: "zoom", zoom: 1, px: 0, py: 0 });
+      if ((e.key === "+" || e.key === "=") && state.tab === "images")
+        dispatch({ type: "zoom", zoom: state.zoom * 1.35 });
+      if (e.key === "-" && state.tab === "images")
+        dispatch({ type: "zoom", zoom: state.zoom / 1.35 });
+      if (e.key === "0" && state.tab === "images")
+        dispatch({ type: "zoom", zoom: 1, px: 0, py: 0 });
     }
+
     document.addEventListener("keydown", onKey);
-    return () => { document.removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+    };
   }, [state.open, state.idx, state.tab, state.zoom, total, dispatch]);
 
-  function onPtrDown(e: React.PointerEvent) {
+  /* Mouse-wheel zoom (non-passive) */
+  useEffect(() => {
+    if (!state.open || state.tab !== "images") return;
+    const el = stageRef.current;
+    if (!el) return;
+
+    function onWheel(e: WheelEvent) {
+      e.preventDefault();
+      const rect = el!.getBoundingClientRect();
+      const cx   = e.clientX - rect.left  - rect.width  / 2;
+      const cy   = e.clientY - rect.top   - rect.height / 2;
+      const factor = e.deltaY < 0 ? 1.18 : 1 / 1.18;
+      dispatch({
+        type: "wheelZoom",
+        newZoom: state.zoom * factor,
+        cx, cy,
+        w: rect.width,
+        h: rect.height,
+      });
+    }
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [state.open, state.tab, state.zoom, dispatch]);
+
+  if (!state.open) return null;
+
+  /* ── Pointer handlers ── */
+  function onPtrDown(e: React.PointerEvent<HTMLDivElement>) {
     e.currentTarget.setPointerCapture(e.pointerId);
     if (!ptr1.current) {
       ptr1.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
       lastPan.current = { x: e.clientX, y: e.clientY };
+      isPinching.current = false;
+      isGrabbing.current = true;
     } else if (!ptr2.current) {
       ptr2.current = { id: e.pointerId, x: e.clientX, y: e.clientY };
       initDist.current = Math.hypot(ptr2.current.x - ptr1.current.x, ptr2.current.y - ptr1.current.y);
       initZoom.current = state.zoom;
+      isPinching.current = true;
     }
   }
-  function onPtrMove(e: React.PointerEvent) {
+
+  function onPtrMove(e: React.PointerEvent<HTMLDivElement>) {
     if (ptr1.current?.id === e.pointerId) ptr1.current = { ...ptr1.current, x: e.clientX, y: e.clientY };
     if (ptr2.current?.id === e.pointerId) ptr2.current = { ...ptr2.current, x: e.clientX, y: e.clientY };
-    if (ptr1.current && ptr2.current) {
+
+    if (ptr1.current && ptr2.current && isPinching.current) {
+      /* Pinch zoom */
       const d = Math.hypot(ptr2.current.x - ptr1.current.x, ptr2.current.y - ptr1.current.y);
-      dispatch({ type: "zoom", zoom: initZoom.current * (d / initDist.current) });
+      const midX = (ptr1.current.x + ptr2.current.x) / 2;
+      const midY = (ptr1.current.y + ptr2.current.y) / 2;
+      const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+      const cx = midX - rect.left - rect.width  / 2;
+      const cy = midY - rect.top  - rect.height / 2;
+      const newZoom = initZoom.current * (d / initDist.current);
+      dispatch({ type: "wheelZoom", newZoom, cx, cy, w: rect.width, h: rect.height });
     } else if (ptr1.current && state.zoom > 1) {
-      const dx = (e.clientX - lastPan.current.x) / state.zoom * 0.6;
-      const dy = (e.clientY - lastPan.current.y) / state.zoom * 0.6;
+      /* Pan */
+      const dx = (e.clientX - lastPan.current.x) / state.zoom * 0.9;
+      const dy = (e.clientY - lastPan.current.y) / state.zoom * 0.9;
       lastPan.current = { x: e.clientX, y: e.clientY };
       dispatch({ type: "pan", dx, dy });
     }
   }
-  function onPtrUp(e: React.PointerEvent) {
-    if (ptr1.current?.id === e.pointerId) ptr1.current = null;
-    if (ptr2.current?.id === e.pointerId) ptr2.current = null;
+
+  function onPtrUp(e: React.PointerEvent<HTMLDivElement>) {
+    if (ptr1.current?.id === e.pointerId) { ptr1.current = null; isGrabbing.current = false; }
+    if (ptr2.current?.id === e.pointerId) { ptr2.current = null; }
+    if (!ptr1.current && !ptr2.current) isPinching.current = false;
   }
-  function onTouchStart(e: React.TouchEvent) {
-    if (e.touches.length === 1) { swipeX.current = e.touches[0].clientX; swipeY.current = e.touches[0].clientY; }
+
+  /* ── Double-click (desktop) ── */
+  function onDoubleClick(e: React.MouseEvent<HTMLDivElement>) {
+    if (state.tab !== "images") return;
+    e.preventDefault();
+    const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+    const cx = e.clientX - rect.left - rect.width  / 2;
+    const cy = e.clientY - rect.top  - rect.height / 2;
+    if (state.zoom > 1.1) {
+      dispatch({ type: "zoom", zoom: 1, px: 0, py: 0 });
+    } else {
+      dispatch({ type: "wheelZoom", newZoom: 2.5, cx, cy, w: rect.width, h: rect.height });
+    }
   }
-  function onTouchEnd(e: React.TouchEvent) {
+
+  /* ── Touch handlers (swipe + double-tap) ── */
+  function onTouchStart(e: React.TouchEvent<HTMLDivElement>) {
+    if (e.touches.length === 1) {
+      swipeX.current = e.touches[0].clientX;
+      swipeY.current = e.touches[0].clientY;
+    }
+  }
+
+  function onTouchEnd(e: React.TouchEvent<HTMLDivElement>) {
+    if (isPinching.current || e.changedTouches.length !== 1) return;
+    const touch = e.changedTouches[0];
+    const now   = Date.now();
+
+    /* Double-tap detection */
+    if (lastTap.current) {
+      const dt   = now - lastTap.current.time;
+      const dist = Math.hypot(touch.clientX - lastTap.current.x, touch.clientY - lastTap.current.y);
+      if (dt < 320 && dist < 36 && state.tab === "images") {
+        e.preventDefault();
+        lastTap.current = null;
+        const rect = (e.currentTarget as HTMLDivElement).getBoundingClientRect();
+        const cx = touch.clientX - rect.left - rect.width  / 2;
+        const cy = touch.clientY - rect.top  - rect.height / 2;
+        if (state.zoom > 1.1) {
+          dispatch({ type: "zoom", zoom: 1, px: 0, py: 0 });
+        } else {
+          dispatch({ type: "wheelZoom", newZoom: 2.5, cx, cy, w: rect.width, h: rect.height });
+        }
+        return;
+      }
+    }
+    lastTap.current = { time: now, x: touch.clientX, y: touch.clientY };
+
+    /* Swipe navigation (only when not zoomed) */
     if (state.zoom > 1 || state.tab !== "images") return;
-    const dx = e.changedTouches[0].clientX - swipeX.current;
-    const dy = e.changedTouches[0].clientY - swipeY.current;
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 48) {
+    const dx = touch.clientX - swipeX.current;
+    const dy = touch.clientY - swipeY.current;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 52) {
       dispatch({ type: "nav", idx: dx < 0 ? (state.idx + 1) % total : (state.idx - 1 + total) % total });
-    } else if (dy > 80 && Math.abs(dx) < 60) {
+    } else if (dy > 90 && Math.abs(dx) < 60) {
       dispatch({ type: "close" });
     }
   }
 
-  if (!state.open) return null;
-
+  /* ── Tab button ── */
   const tabBtn = (tab: FsTab, icon: string, label: string) => (
     <button
+      key={tab}
       onClick={() => dispatch({ type: "tab", tab })}
-      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all"
+      aria-pressed={state.tab === tab}
+      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] font-semibold transition-all focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-400"
       style={{
         background: state.tab === tab ? "rgba(0,87,184,0.9)" : "rgba(255,255,255,0.08)",
-        color: state.tab === tab ? "#fff" : "rgba(255,255,255,0.55)",
+        color:      state.tab === tab ? "#fff"               : "rgba(255,255,255,0.55)",
+        minHeight: 32, minWidth: 44,
       }}
     >
       <Ico d={icon} size={13} sw={1.75} />
-      {label}
+      <span className="hidden xs:inline sm:inline">{label}</span>
     </button>
   );
 
+  const cursorStyle = state.zoom > 1
+    ? (isGrabbing.current ? "grabbing" : "grab")
+    : "zoom-in";
+
   return (
-    <div className="fixed inset-0 z-[600] flex flex-col"
-      style={{ background: "rgba(4,8,18,0.98)", backdropFilter: "blur(16px)" }}
-      role="dialog" aria-modal="true" aria-label="Product media viewer">
-
-      {/* ── Top bar ── */}
-      <div className="flex items-center justify-between px-4 py-3 shrink-0"
-        style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-        <div className="flex items-center gap-2">
-          {tabBtn("images", I.image, `Images${total > 1 ? ` (${total})` : ""}`)}
-          {hasVideos && tabBtn("videos", I.film, `Videos (${videos.length})`)}
-          {has360 && tabBtn("360", I.view360, "360° View")}
+    <>
+      <style>{MODAL_STYLES}</style>
+      {/* Backdrop */}
+      <div
+        ref={modalRef}
+        className="fixed inset-0 z-[600] flex flex-col apt-modal-enter"
+        style={{ background: "rgba(4,8,18,0.97)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
+        role="dialog"
+        aria-modal="true"
+        aria-label={`Product media viewer — ${productName}`}
+      >
+        {/* SR-only zoom announcer */}
+        <div aria-live="polite" className="sr-only">
+          {state.zoom > 1 ? `Zoomed to ${Math.round(state.zoom * 100)}%` : "Normal size"}
         </div>
 
-        {state.tab === "images" && (
-          <div className="flex items-center gap-1">
-            {[
-              { icon: I.zoomOut, label: "Zoom out", fn: () => dispatch({ type: "zoom", zoom: state.zoom / 1.4 }) },
-              { icon: I.reset,   label: "Reset",    fn: () => dispatch({ type: "zoom", zoom: 1, px: 0, py: 0 }) },
-              { icon: I.zoomIn,  label: "Zoom in",  fn: () => dispatch({ type: "zoom", zoom: state.zoom * 1.4 }) },
-            ].map(({ icon, label, fn }) => (
-              <button key={label} onClick={fn} aria-label={label}
-                className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors"
-                style={{ color: "rgba(255,255,255,0.6)", background: "rgba(255,255,255,0.07)" }}>
-                <Ico d={icon} size={15} sw={1.75} />
-              </button>
-            ))}
-            {state.zoom > 1 && (
-              <span className="text-[11px] tabular-nums px-1.5 py-0.5 rounded"
-                style={{ color: "rgba(255,255,255,0.45)", background: "rgba(255,255,255,0.08)" }}>
-                {Math.round(state.zoom * 100)}%
-              </span>
-            )}
-          </div>
-        )}
-
-        <div className="flex items-center gap-2">
-          <span className="text-[12px] hidden sm:block" style={{ color: "rgba(255,255,255,0.3)" }}>
-            Press <kbd className="px-1.5 py-0.5 rounded text-[11px] font-mono"
-              style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}>Esc</kbd> to close
-          </span>
-          <button onClick={() => dispatch({ type: "close" })} aria-label="Close viewer"
-            className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors"
-            style={{ color: "rgba(255,255,255,0.6)", background: "rgba(255,255,255,0.07)" }}>
-            <Ico d={I.close} size={16} sw={2} />
-          </button>
-        </div>
-      </div>
-
-      {/* ── Body ── */}
-      <div className="flex-1 flex overflow-hidden">
-
-        {/* Left sidebar (desktop only) */}
-        <div className="hidden lg:flex flex-col w-56 shrink-0 p-4 gap-4 overflow-y-auto"
-          style={{ borderRight: "1px solid rgba(255,255,255,0.07)" }}>
-
-          {/* Product info */}
-          <div>
-            <p className="text-[13px] font-semibold leading-snug line-clamp-3 mb-1"
-              style={{ color: "rgba(255,255,255,0.85)" }}>{productName}</p>
-            {sku && <p className="text-[11px] font-mono" style={{ color: "rgba(255,255,255,0.35)" }}>{sku}</p>}
+        {/* ── Top bar ── */}
+        <div
+          className="flex items-center justify-between px-3 sm:px-5 py-2.5 shrink-0 apt-bar-enter"
+          style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}
+        >
+          {/* Tab pills */}
+          <div className="flex items-center gap-1.5">
+            {tabBtn("images", I.image, `Images${total > 1 ? ` (${total})` : ""}`)}
+            {hasVideos && tabBtn("videos", I.film,    `Videos (${videos.length})`)}
+            {has360    && tabBtn("360",    I.view360,  "360°")}
           </div>
 
-          {/* Image thumbnails */}
-          {state.tab === "images" && total > 1 && (
-            <div>
-              <p className="text-[11px] uppercase tracking-wider font-bold mb-2"
-                style={{ color: "rgba(255,255,255,0.3)" }}>Images</p>
-              <div className="flex flex-col gap-1.5">
-                {images.map((img, i) => (
-                  <Thumb key={i} img={img} active={i === state.idx} idx={i}
-                    onClick={() => dispatch({ type: "nav", idx: i })} />
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Video list (sidebar) */}
-          {state.tab === "videos" && hasVideos && (
-            <div className="space-y-1.5">
-              <p className="text-[11px] uppercase tracking-wider font-bold mb-2"
-                style={{ color: "rgba(255,255,255,0.3)" }}>Videos</p>
-              {videos.map((v, i) => (
-                <button key={i} onClick={() => dispatch({ type: "vid", vidIdx: i })}
-                  className="w-full flex items-start gap-2 p-2 rounded-lg text-left transition-colors"
-                  style={{
-                    background: i === state.vidIdx ? "rgba(0,87,184,0.25)" : "rgba(255,255,255,0.04)",
-                    border: `1px solid ${i === state.vidIdx ? "rgba(0,87,184,0.5)" : "transparent"}`,
-                  }}>
-                  <div className="w-12 h-9 rounded shrink-0 relative overflow-hidden"
-                    style={{ background: "#111" }}>
-                    {v.thumbnail ? (
-                      <img src={v.thumbnail} alt={v.title} className="w-full h-full object-cover" loading="lazy" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Ico d={I.play} size={14} sw={0} style={{ fill: "rgba(255,255,255,0.4)", stroke: "none" }} />
-                      </div>
-                    )}
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <Ico d={I.play} size={12} sw={0} style={{ fill: "rgba(255,255,255,0.8)", stroke: "none" }} />
-                    </div>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[11px] font-medium line-clamp-2"
-                      style={{ color: i === state.vidIdx ? "#fff" : "rgba(255,255,255,0.6)" }}>
-                      {v.title}
-                    </p>
-                    {v.language && (
-                      <span className="mt-0.5 inline-block text-[10px] px-1.5 py-0.5 rounded"
-                        style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)" }}>
-                        {v.language.toUpperCase()}
-                      </span>
-                    )}
-                  </div>
+          {/* Zoom controls (images tab only) */}
+          {state.tab === "images" && (
+            <div className="flex items-center gap-1 mx-2">
+              {[
+                { icon: I.zoomOut, label: "Zoom out (–)",   fn: () => dispatch({ type: "zoom", zoom: state.zoom / 1.4 }) },
+                { icon: I.reset,   label: "Reset zoom (0)", fn: () => dispatch({ type: "zoom", zoom: 1, px: 0, py: 0 }) },
+                { icon: I.zoomIn,  label: "Zoom in (+)",    fn: () => dispatch({ type: "zoom", zoom: state.zoom * 1.4 }) },
+              ].map(({ icon, label, fn }) => (
+                <button
+                  key={label}
+                  onClick={fn}
+                  aria-label={label}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-400"
+                  style={{ color: "rgba(255,255,255,0.6)", background: "rgba(255,255,255,0.07)" }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.13)"; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.07)"; }}
+                >
+                  <Ico d={icon} size={14} sw={1.75} />
                 </button>
               ))}
+              {state.zoom !== 1 && (
+                <span
+                  className="text-[11px] tabular-nums px-1.5 py-0.5 rounded ml-0.5"
+                  style={{ color: "rgba(255,255,255,0.45)", background: "rgba(255,255,255,0.08)" }}
+                >
+                  {Math.round(state.zoom * 100)}%
+                </span>
+              )}
             </div>
           )}
-        </div>
 
-        {/* ── Main content area ── */}
-        {state.tab === "360" ? (
-          <div className="flex-1 flex flex-col items-center justify-center p-4">
-            <div className="w-full max-w-4xl">
-              <div className="w-full rounded-xl overflow-hidden" style={{ aspectRatio: "16/9", background: "#000", boxShadow: "0 24px 80px rgba(0,0,0,0.6)" }}>
-                <iframe
-                  src={image360Url}
-                  title="360° product view"
-                  allowFullScreen
-                  className="w-full h-full border-0"
-                  aria-label="Interactive 360° product viewer"
-                />
-              </div>
-              <p className="mt-4 text-center text-[12px]" style={{ color: "rgba(255,255,255,0.35)" }}>
-                Drag to rotate · Scroll to zoom
-              </p>
-            </div>
-          </div>
-        ) : state.tab === "images" ? (
-          <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Image stage */}
-            <div className="flex-1 relative overflow-hidden flex items-center justify-center"
-              onPointerDown={onPtrDown} onPointerMove={onPtrMove}
-              onPointerUp={onPtrUp} onPointerCancel={onPtrUp}
-              onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}
-              style={{ cursor: state.zoom > 1 ? "grab" : "default", touchAction: "none" }}>
-
-              {total > 1 && (
+          {/* Close + hint */}
+          <div className="flex items-center gap-2">
+            <span className="text-[11px] hidden md:flex items-center gap-1.5" style={{ color: "rgba(255,255,255,0.28)" }}>
+              <kbd className="px-1.5 py-0.5 rounded text-[10px] font-mono" style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.45)" }}>Esc</kbd>
+              close
+              {state.tab === "images" && (
                 <>
-                  <button onClick={() => dispatch({ type: "nav", idx: (state.idx - 1 + total) % total })}
-                    aria-label="Previous" className="absolute left-3 z-10 w-9 h-9 flex items-center justify-center rounded-full"
-                    style={{ background: "rgba(255,255,255,0.09)", color: "rgba(255,255,255,0.7)" }}>
-                    <Ico d={I.chevL} size={16} sw={2.5} />
-                  </button>
-                  <button onClick={() => dispatch({ type: "nav", idx: (state.idx + 1) % total })}
-                    aria-label="Next" className="absolute right-3 z-10 w-9 h-9 flex items-center justify-center rounded-full"
-                    style={{ background: "rgba(255,255,255,0.09)", color: "rgba(255,255,255,0.7)" }}>
-                    <Ico d={I.chevR} size={16} sw={2.5} />
-                  </button>
+                  <span className="mx-1">·</span>
+                  <span>double-click to zoom</span>
+                  <span className="mx-1">·</span>
+                  <span>scroll to zoom</span>
                 </>
               )}
+            </span>
+            <button
+              onClick={() => dispatch({ type: "close" })}
+              aria-label="Close viewer"
+              className="w-9 h-9 flex items-center justify-center rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-400"
+              style={{ color: "rgba(255,255,255,0.7)", background: "rgba(255,255,255,0.07)" }}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.15)"; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.07)"; }}
+            >
+              <Ico d={I.close} size={16} sw={2} />
+            </button>
+          </div>
+        </div>
 
-              <div style={{
-                transform: `scale(${state.zoom}) translate(${state.px}%, ${state.py}%)`,
-                transition: "transform 150ms cubic-bezier(0.4,0,0.2,1)",
-                transformOrigin: "center",
-                pointerEvents: "none",
-                userSelect: "none",
-              }}>
-                {hiRes && !imgErr ? (
-                  <img src={hiRes} alt={cur?.alt || productName}
-                    className="block"
+        {/* ── Body ── */}
+        <div className="flex-1 flex overflow-hidden">
+
+          {/* Desktop sidebar */}
+          <div
+            className="hidden lg:flex flex-col w-56 shrink-0 p-4 gap-4 overflow-y-auto"
+            style={{ borderRight: "1px solid rgba(255,255,255,0.07)" }}
+          >
+            <div>
+              <p className="text-[13px] font-semibold leading-snug line-clamp-3 mb-1"
+                style={{ color: "rgba(255,255,255,0.85)" }}>{productName}</p>
+              {sku && (
+                <p className="text-[11px] font-mono" style={{ color: "rgba(255,255,255,0.35)" }}>{sku}</p>
+              )}
+            </div>
+
+            {state.tab === "images" && total > 1 && (
+              <div>
+                <p className="text-[11px] uppercase tracking-wider font-bold mb-2.5"
+                  style={{ color: "rgba(255,255,255,0.3)" }}>Images</p>
+                <div className="flex flex-col gap-1.5">
+                  {images.map((img, i) => (
+                    <Thumb key={i} img={img} active={i === state.idx} idx={i}
+                      onClick={() => dispatch({ type: "nav", idx: i })} />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {state.tab === "videos" && hasVideos && (
+              <div className="space-y-1.5">
+                <p className="text-[11px] uppercase tracking-wider font-bold mb-2.5"
+                  style={{ color: "rgba(255,255,255,0.3)" }}>Videos</p>
+                {videos.map((v, i) => (
+                  <button
+                    key={i}
+                    onClick={() => dispatch({ type: "vid", vidIdx: i })}
+                    className="w-full flex items-start gap-2 p-2 rounded-lg text-left transition-all focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-400"
                     style={{
-                      maxWidth: "80vw",
-                      maxHeight: "calc(100vh - 200px)",
-                      objectFit: "contain",
-                      filter: "drop-shadow(0 16px 56px rgba(0,0,0,0.75))",
+                      background:  i === state.vidIdx ? "rgba(0,87,184,0.25)" : "rgba(255,255,255,0.04)",
+                      border:      `1px solid ${i === state.vidIdx ? "rgba(0,87,184,0.5)" : "transparent"}`,
                     }}
-                    draggable={false}
-                    onError={() => setImgErr(true)} />
-                ) : (
-                  <div className="flex flex-col items-center gap-4"
-                    style={{ width: 280, height: 280, color: "rgba(255,255,255,0.2)" }}>
-                    <Ico d={I.tag} size={56} sw={0.75} />
-                    <p className="text-[13px]">Image unavailable</p>
+                  >
+                    <div className="w-12 h-9 rounded shrink-0 relative overflow-hidden" style={{ background: "#111" }}>
+                      {v.thumbnail ? (
+                        <img src={v.thumbnail} alt={v.title} className="w-full h-full object-cover" loading="lazy" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center">
+                          <Ico d={I.play} size={14} sw={0} style={{ fill: "rgba(255,255,255,0.4)", stroke: "none" }} />
+                        </div>
+                      )}
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Ico d={I.play} size={12} sw={0} style={{ fill: "rgba(255,255,255,0.8)", stroke: "none" }} />
+                      </div>
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[11px] font-medium line-clamp-2"
+                        style={{ color: i === state.vidIdx ? "#fff" : "rgba(255,255,255,0.6)" }}>
+                        {v.title}
+                      </p>
+                      {v.language && (
+                        <span className="mt-0.5 inline-block text-[10px] px-1.5 py-0.5 rounded"
+                          style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.4)" }}>
+                          {v.language.toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* ── Content area ── */}
+          {state.tab === "360" ? (
+            <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
+              <div className="w-full max-w-4xl">
+                <div
+                  className="w-full rounded-xl overflow-hidden"
+                  style={{ aspectRatio: "16/9", background: "#000", boxShadow: "0 24px 80px rgba(0,0,0,0.6)" }}
+                >
+                  <iframe
+                    src={image360Url}
+                    title="360° product view"
+                    allowFullScreen
+                    className="w-full h-full border-0"
+                    aria-label="Interactive 360° product viewer"
+                  />
+                </div>
+                <p className="mt-4 text-center text-[12px]" style={{ color: "rgba(255,255,255,0.35)" }}>
+                  Drag to rotate · Scroll to zoom
+                </p>
+              </div>
+            </div>
+
+          ) : state.tab === "images" ? (
+            <div className="flex-1 flex flex-col overflow-hidden">
+              {/* Image stage */}
+              <div
+                ref={stageRef}
+                className="flex-1 relative overflow-hidden flex items-center justify-center select-none"
+                style={{ cursor: cursorStyle, touchAction: "none" }}
+                onPointerDown={onPtrDown}
+                onPointerMove={onPtrMove}
+                onPointerUp={onPtrUp}
+                onPointerCancel={onPtrUp}
+                onTouchStart={onTouchStart}
+                onTouchEnd={onTouchEnd}
+                onDoubleClick={onDoubleClick}
+              >
+                {/* Prev / Next */}
+                {total > 1 && (
+                  <>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); dispatch({ type: "nav", idx: (state.idx - 1 + total) % total }); }}
+                      aria-label={`Previous image (${state.idx} of ${total})`}
+                      className="absolute left-3 z-10 w-10 h-10 flex items-center justify-center rounded-full transition-all focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-400"
+                      style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)", backdropFilter: "blur(4px)", minWidth: 40, minHeight: 40 }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.18)"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.1)"; }}
+                    >
+                      <Ico d={I.chevL} size={18} sw={2.5} />
+                    </button>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); dispatch({ type: "nav", idx: (state.idx + 1) % total }); }}
+                      aria-label={`Next image (${state.idx + 2} of ${total})`}
+                      className="absolute right-3 z-10 w-10 h-10 flex items-center justify-center rounded-full transition-all focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-blue-400"
+                      style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)", backdropFilter: "blur(4px)", minWidth: 40, minHeight: 40 }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.18)"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = "rgba(255,255,255,0.1)"; }}
+                    >
+                      <Ico d={I.chevR} size={18} sw={2.5} />
+                    </button>
+                  </>
+                )}
+
+                {/* Zoomable image */}
+                <div
+                  aria-hidden="true"
+                  style={{
+                    transform: `scale(${state.zoom}) translate(${state.px}%, ${state.py}%)`,
+                    transition: "transform 150ms cubic-bezier(0.4,0,0.2,1)",
+                    transformOrigin: "center",
+                    pointerEvents: "none",
+                    userSelect: "none",
+                    willChange: "transform",
+                  }}
+                >
+                  {hiRes && !imgErr ? (
+                    <img
+                      src={hiRes}
+                      alt={cur?.alt || productName}
+                      className="block"
+                      style={{
+                        maxWidth: "min(80vw, 900px)",
+                        maxHeight: "calc(100svh - 200px)",
+                        objectFit: "contain",
+                        filter: "drop-shadow(0 16px 60px rgba(0,0,0,0.8))",
+                      }}
+                      draggable={false}
+                      onError={() => setImgErr(true)}
+                    />
+                  ) : (
+                    <div
+                      className="flex flex-col items-center gap-4"
+                      style={{ width: 260, height: 260, color: "rgba(255,255,255,0.2)" }}
+                    >
+                      <Ico d={I.tag} size={52} sw={0.75} />
+                      <p className="text-[13px]">Image unavailable</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Bottom hints */}
+                {state.zoom === 1 && (
+                  <div
+                    className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[11px] px-3 py-1.5 rounded-full pointer-events-none whitespace-nowrap"
+                    style={{ background: "rgba(0,0,0,0.5)", color: "rgba(255,255,255,0.38)", backdropFilter: "blur(4px)" }}
+                  >
+                    {total > 1
+                      ? `${state.idx + 1} / ${total} · ← → to navigate · scroll or pinch to zoom`
+                      : "Scroll or double-click to zoom"}
+                  </div>
+                )}
+
+                {/* Zoom level badge */}
+                {state.zoom > 1 && (
+                  <div
+                    className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 text-[11px] px-3 py-1.5 rounded-full pointer-events-none"
+                    style={{ background: "rgba(0,87,184,0.75)", color: "#fff", backdropFilter: "blur(4px)" }}
+                  >
+                    <Ico d={I.zoomIn} size={11} sw={2} />
+                    {Math.round(state.zoom * 100)}% · double-click or press 0 to reset
                   </div>
                 )}
               </div>
 
-              {state.zoom === 1 && total > 1 && (
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-[11px] px-3 py-1 rounded-full pointer-events-none"
-                  style={{ background: "rgba(0,0,0,0.45)", color: "rgba(255,255,255,0.4)" }}>
-                  {state.idx + 1} / {total} · Arrows to navigate · Pinch or scroll to zoom
+              {/* Mobile thumbnail strip */}
+              {total > 1 && (
+                <div
+                  className="lg:hidden flex justify-center gap-2 px-4 py-3 shrink-0 overflow-x-auto apt-thumb-enter"
+                  style={{ borderTop: "1px solid rgba(255,255,255,0.07)", scrollbarWidth: "none" }}
+                >
+                  {images.map((img, i) => (
+                    <Thumb key={i} img={img} active={i === state.idx} idx={i} small
+                      onClick={() => dispatch({ type: "nav", idx: i })} />
+                  ))}
                 </div>
               )}
             </div>
 
-            {/* Mobile thumbnail strip */}
-            {total > 1 && (
-              <div className="lg:hidden flex justify-center gap-2 px-4 py-3 shrink-0 overflow-x-auto scrollbar-hide"
-                style={{ borderTop: "1px solid rgba(255,255,255,0.07)" }}>
-                {images.map((img, i) => (
-                  <Thumb key={i} img={img} active={i === state.idx} idx={i} small
-                    onClick={() => dispatch({ type: "nav", idx: i })} />
-                ))}
-              </div>
-            )}
-          </div>
-        ) : (
-          /* ── Video tab ── */
-          <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Mobile video list */}
-            {hasVideos && (
-              <div className="lg:hidden flex gap-2 px-4 py-3 overflow-x-auto scrollbar-hide shrink-0"
-                style={{ borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-                {videos.map((v, i) => (
-                  <VideoThumb key={i} vid={v} active={i === state.vidIdx}
-                    onClick={() => dispatch({ type: "vid", vidIdx: i })} small />
-                ))}
-              </div>
-            )}
-
-            {/* Video player */}
-            <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
-              {curVid ? (
-                <>
+          ) : (
+            /* ── Video tab ── */
+            <div className="flex-1 flex flex-col overflow-hidden">
+              {hasVideos && (
+                <div
+                  className="lg:hidden flex gap-2 px-4 py-3 overflow-x-auto shrink-0"
+                  style={{ borderBottom: "1px solid rgba(255,255,255,0.07)", scrollbarWidth: "none" }}
+                >
+                  {videos.map((v, i) => (
+                    <VideoThumb key={i} vid={v} active={i === state.vidIdx}
+                      onClick={() => dispatch({ type: "vid", vidIdx: i })} small />
+                  ))}
+                </div>
+              )}
+              <div className="flex-1 flex flex-col items-center justify-center p-4 sm:p-8">
+                {curVid ? (
                   <div className="w-full max-w-4xl">
-                    <div className="w-full aspect-video rounded-xl overflow-hidden"
-                      style={{ background: "#000", boxShadow: "0 24px 80px rgba(0,0,0,0.6)" }}>
+                    <div
+                      className="w-full aspect-video rounded-xl overflow-hidden"
+                      style={{ background: "#000", boxShadow: "0 24px 80px rgba(0,0,0,0.6)" }}
+                    >
                       <iframe
                         src={curVid.url}
                         title={curVid.title}
@@ -523,22 +784,24 @@ function FullscreenModal({ images, videos = [], image360Url, productName, sku, s
                         {curVid.title}
                       </p>
                       {curVid.language && (
-                        <span className="shrink-0 text-[11px] px-2 py-0.5 rounded"
-                          style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}>
+                        <span
+                          className="shrink-0 text-[11px] px-2 py-0.5 rounded"
+                          style={{ background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.5)" }}
+                        >
                           {curVid.language.toUpperCase()}
                         </span>
                       )}
                     </div>
                   </div>
-                </>
-              ) : (
-                <p style={{ color: "rgba(255,255,255,0.3)" }}>No video selected</p>
-              )}
+                ) : (
+                  <p style={{ color: "rgba(255,255,255,0.3)" }}>No video selected</p>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -556,14 +819,13 @@ export default function ProductGallery({ images, videos = [], image360Url, produ
   const hasVideos  = videos.length > 0;
   const ZOOM       = 3;
 
-  // Normalise images — always at least one entry
   const imgs = images.filter((i) => i?.url);
   if (imgs.length === 0) imgs.push({ url: "", alt: productName });
 
   const cur   = imgs[activeIdx];
   const hiUrl = cur?.zoomUrl || toHiRes(cur?.url || "");
 
-  // Measure main image height for zoom panel sizing
+  /* Measure main image for zoom panel */
   useEffect(() => {
     const el = mainImgRef.current;
     if (!el) return;
@@ -572,17 +834,16 @@ export default function ProductGallery({ images, videos = [], image360Url, produ
     return () => ro.disconnect();
   }, []);
 
-  // Preload hi-res on hover start / active change
+  /* Preload hi-res on hover / active change */
   useEffect(() => {
     setHiResReady(false);
     if (!hiUrl) return;
-    const img = new Image();
+    const img = new window.Image();
     img.onload = () => setHiResReady(true);
     img.src = hiUrl;
     return () => { img.onload = null; };
   }, [activeIdx, hiUrl]);
 
-  // Reset error on tab change
   useEffect(() => { setMainErr(false); }, [activeIdx]);
 
   function onMouseMove(e: React.MouseEvent<HTMLDivElement>) {
@@ -593,44 +854,47 @@ export default function ProductGallery({ images, videos = [], image360Url, produ
     });
   }
 
-  // Mobile swipe
+  /* Mobile swipe on main gallery */
   const swipeX = useRef(0);
   function onTouchStart(e: React.TouchEvent) { swipeX.current = e.touches[0].clientX; }
   function onTouchEnd(e: React.TouchEvent) {
     const dx = e.changedTouches[0].clientX - swipeX.current;
-    if (Math.abs(dx) > 48) setActiveIdx((p) => dx < 0 ? (p + 1) % imgs.length : (p - 1 + imgs.length) % imgs.length);
+    if (Math.abs(dx) > 52) setActiveIdx((p) => dx < 0 ? (p + 1) % imgs.length : (p - 1 + imgs.length) % imgs.length);
   }
 
-  // Keyboard nav
+  /* Keyboard nav on main gallery */
   function onKeyDown(e: React.KeyboardEvent) {
     if (e.key === "ArrowRight") setActiveIdx((p) => (p + 1) % imgs.length);
     if (e.key === "ArrowLeft")  setActiveIdx((p) => (p - 1 + imgs.length) % imgs.length);
-    if (e.key === "Enter")      dispatch({ type: "open", idx: activeIdx });
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      dispatch({ type: "open", idx: activeIdx });
+    }
   }
 
   const showZoomPanel = hovering && hiResReady && imgHeight > 0;
 
   return (
     <>
-      {/* ── Gallery layout ── */}
       <div className="relative" onKeyDown={onKeyDown}>
         <div className="flex gap-3">
 
-          {/* Vertical thumbnail strip (desktop) */}
+          {/* Vertical thumbnail strip (sm+) */}
           {imgs.length > 1 && (
-            <div className="hidden sm:flex flex-col gap-2 overflow-y-auto scrollbar-hide shrink-0"
-              style={{ width: 72, maxHeight: 520 }}
-              aria-label="Product image thumbnails">
+            <div
+              className="hidden sm:flex flex-col gap-2 overflow-y-auto shrink-0"
+              style={{ width: 72, maxHeight: 520, scrollbarWidth: "none" }}
+              aria-label="Product image thumbnails"
+            >
               {imgs.map((img, i) => (
                 <Thumb key={i} img={img} active={i === activeIdx} idx={i}
                   onClick={() => { setActiveIdx(i); setMainErr(false); }} />
               ))}
-              {/* Video play thumbnail */}
               {hasVideos && (
                 <button
                   onClick={() => dispatch({ type: "open", idx: 0, tab: "videos" })}
-                  aria-label="View videos"
-                  className="shrink-0 rounded-lg overflow-hidden relative transition-all duration-150 focus-visible:outline-none"
+                  aria-label="View product videos"
+                  className="shrink-0 rounded-lg overflow-hidden relative transition-all duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
                   style={{ width: 68, height: 68, background: "#111827", border: "2px solid var(--border)", opacity: 0.7 }}
                   onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
                   onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.7")}
@@ -643,12 +907,11 @@ export default function ProductGallery({ images, videos = [], image360Url, produ
                   </div>
                 </button>
               )}
-              {/* 360° thumbnail */}
               {image360Url && (
                 <button
                   onClick={() => dispatch({ type: "open", idx: 0, tab: "360" })}
                   aria-label="View 360° interactive model"
-                  className="shrink-0 rounded-lg overflow-hidden relative transition-all duration-150 focus-visible:outline-none"
+                  className="shrink-0 rounded-lg overflow-hidden relative transition-all duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
                   style={{ width: 68, height: 68, background: "#0a1628", border: "2px solid var(--border)", opacity: 0.7 }}
                   onMouseEnter={(e) => (e.currentTarget.style.opacity = "1")}
                   onMouseLeave={(e) => (e.currentTarget.style.opacity = "0.7")}
@@ -671,7 +934,7 @@ export default function ProductGallery({ images, videos = [], image360Url, produ
                 aspectRatio: "1/1",
                 background: "var(--bg-raised)",
                 border: "1px solid var(--border)",
-                cursor: hovering ? "crosshair" : "zoom-in",
+                cursor: hovering && hiResReady ? "crosshair" : "zoom-in",
               }}
               onMouseEnter={() => setHovering(true)}
               onMouseLeave={() => setHovering(false)}
@@ -681,9 +944,9 @@ export default function ProductGallery({ images, videos = [], image360Url, produ
               onTouchEnd={onTouchEnd}
               tabIndex={0}
               role="button"
-              aria-label={`${cur?.alt || productName} — click to view fullscreen`}
+              aria-label={`${cur?.alt || productName} — click or press Enter to view full screen`}
             >
-              {/* Base image */}
+              {/* Base image (lazy for non-LCP, eager for active) */}
               {cur?.url && !mainErr ? (
                 <img
                   key={cur.url}
@@ -695,21 +958,22 @@ export default function ProductGallery({ images, videos = [], image360Url, produ
                     transition: "opacity 100ms",
                   }}
                   draggable={false}
+                  loading={activeIdx === 0 ? "eager" : "lazy"}
+                  fetchPriority={activeIdx === 0 ? "high" : "auto"}
                   onError={() => setMainErr(true)}
                 />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center"
-                  style={{ color: "var(--text-4)" }}>
+                <div className="absolute inset-0 flex items-center justify-center" style={{ color: "var(--text-4)" }}>
                   <Ico d={I.tag} size={48} sw={0.75} />
                 </div>
               )}
 
-              {/* Hi-res zoom overlay (fades in when ready) */}
+              {/* Hi-res zoom overlay */}
               {hiUrl && (
                 <div
-                  className="absolute inset-0"
                   aria-hidden="true"
                   style={{
+                    position: "absolute", inset: 0,
                     backgroundImage: `url("${hiUrl}")`,
                     backgroundSize: `${ZOOM * 100}%`,
                     backgroundPosition: `${mousePos.x * 100}% ${mousePos.y * 100}%`,
@@ -727,15 +991,15 @@ export default function ProductGallery({ images, videos = [], image360Url, produ
                   aria-hidden="true"
                   style={{
                     position: "absolute",
-                    width: `${100 / ZOOM}%`,
+                    width:  `${100 / ZOOM}%`,
                     height: `${100 / ZOOM}%`,
-                    left: `${mousePos.x * 100}%`,
-                    top:  `${mousePos.y * 100}%`,
+                    left:  `${mousePos.x * 100}%`,
+                    top:   `${mousePos.y * 100}%`,
                     transform: "translate(-50%,-50%)",
-                    border: "1.5px solid rgba(0,87,184,0.7)",
+                    border: "1.5px solid rgba(0,87,184,0.65)",
                     borderRadius: 4,
-                    background: "rgba(0,87,184,0.05)",
-                    boxShadow: "0 0 0 1px rgba(255,255,255,0.1)",
+                    background: "rgba(0,87,184,0.04)",
+                    boxShadow: "0 0 0 1px rgba(255,255,255,0.12)",
                     pointerEvents: "none",
                   }}
                 />
@@ -743,23 +1007,20 @@ export default function ProductGallery({ images, videos = [], image360Url, produ
 
               {/* Hi-res loading spinner */}
               {hovering && !hiResReady && hiUrl && (
-                <div className="absolute top-3 left-3 w-4 h-4 rounded-full border-2 border-transparent"
-                  style={{
-                    borderTopColor: "#0057b8",
-                    animation: "spin 0.7s linear infinite",
-                    pointerEvents: "none",
-                  }}
+                <div
+                  className="absolute top-3 left-3 w-4 h-4 rounded-full border-2 border-transparent"
                   aria-hidden="true"
+                  style={{ borderTopColor: "#0057b8", animation: "spin 0.7s linear infinite", pointerEvents: "none" }}
                 />
               )}
 
-              {/* Expand to fullscreen */}
+              {/* Expand button */}
               <button
                 onClick={(e) => { e.stopPropagation(); dispatch({ type: "open", idx: activeIdx }); }}
-                aria-label="View fullscreen"
-                className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-lg transition-all"
+                aria-label="View full screen"
+                className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-lg transition-all focus-visible:outline-2 focus-visible:outline-blue-400"
                 style={{
-                  background: "rgba(0,0,0,0.45)",
+                  background: "rgba(0,0,0,0.48)",
                   backdropFilter: "blur(4px)",
                   color: "#fff",
                   opacity: hovering ? 1 : 0,
@@ -772,17 +1033,19 @@ export default function ProductGallery({ images, videos = [], image360Url, produ
 
               {/* Image counter */}
               {imgs.length > 1 && !hovering && (
-                <div className="absolute bottom-3 right-3 text-[11px] font-semibold px-2 py-0.5 rounded-md text-white"
-                  style={{ background: "rgba(0,0,0,0.4)" }}>
+                <div
+                  className="absolute bottom-3 right-3 text-[11px] font-semibold px-2 py-0.5 rounded-md text-white"
+                  style={{ background: "rgba(0,0,0,0.42)" }}
+                >
                   {activeIdx + 1} / {imgs.length}
                 </div>
               )}
 
-              {/* Zoom / hover hint */}
+              {/* Zoom hint */}
               <div
                 className="absolute bottom-3 left-3 flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-lg text-white pointer-events-none"
                 style={{
-                  background: showZoomPanel ? "rgba(0,87,184,0.75)" : "rgba(0,0,0,0.38)",
+                  background: showZoomPanel ? "rgba(0,87,184,0.78)" : "rgba(0,0,0,0.4)",
                   backdropFilter: "blur(4px)",
                   opacity: hovering ? 1 : 0,
                   transition: "opacity 150ms, background 150ms",
@@ -795,15 +1058,21 @@ export default function ProductGallery({ images, videos = [], image360Url, produ
               {/* Mobile nav arrows */}
               {imgs.length > 1 && (
                 <>
-                  <button onClick={(e) => { e.stopPropagation(); setActiveIdx((p) => (p - 1 + imgs.length) % imgs.length); }}
-                    aria-label="Previous" className="sm:hidden absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full"
-                    style={{ background: "rgba(0,0,0,0.38)", color: "#fff" }}>
-                    <Ico d={I.chevL} size={15} sw={2.5} />
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setActiveIdx((p) => (p - 1 + imgs.length) % imgs.length); }}
+                    aria-label="Previous image"
+                    className="sm:hidden absolute left-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-full"
+                    style={{ background: "rgba(0,0,0,0.4)", color: "#fff", minWidth: 36, minHeight: 36 }}
+                  >
+                    <Ico d={I.chevL} size={16} sw={2.5} />
                   </button>
-                  <button onClick={(e) => { e.stopPropagation(); setActiveIdx((p) => (p + 1) % imgs.length); }}
-                    aria-label="Next" className="sm:hidden absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full"
-                    style={{ background: "rgba(0,0,0,0.38)", color: "#fff" }}>
-                    <Ico d={I.chevR} size={15} sw={2.5} />
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setActiveIdx((p) => (p + 1) % imgs.length); }}
+                    aria-label="Next image"
+                    className="sm:hidden absolute right-2 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-full"
+                    style={{ background: "rgba(0,0,0,0.4)", color: "#fff", minWidth: 36, minHeight: 36 }}
+                  >
+                    <Ico d={I.chevR} size={16} sw={2.5} />
                   </button>
                 </>
               )}
@@ -811,11 +1080,10 @@ export default function ProductGallery({ images, videos = [], image360Url, produ
           </div>
         </div>
 
-        {/* ── Side zoom panel (desktop, floats over purchase panel) ── */}
+        {/* Desktop side zoom panel */}
         {showZoomPanel && (
           <div
             aria-hidden="true"
-            aria-label="Zoomed product view"
             className="hidden xl:block absolute rounded-2xl overflow-hidden"
             style={{
               left: "calc(100% + 14px)",
@@ -832,8 +1100,8 @@ export default function ProductGallery({ images, videos = [], image360Url, produ
               background: "var(--bg-surface)",
             }}
           >
-            {/* Panel border overlay */}
-            <div className="absolute inset-0 rounded-2xl pointer-events-none"
+            <div
+              className="absolute inset-0 rounded-2xl"
               style={{
                 backgroundImage: `url("${hiUrl}")`,
                 backgroundSize: `${ZOOM * 100}%`,
@@ -841,9 +1109,10 @@ export default function ProductGallery({ images, videos = [], image360Url, produ
                 backgroundRepeat: "no-repeat",
               }}
             />
-            {/* Zoom label */}
-            <div className="absolute bottom-3 left-3 flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-lg text-white pointer-events-none"
-              style={{ background: "rgba(0,87,184,0.75)", backdropFilter: "blur(4px)" }}>
+            <div
+              className="absolute bottom-3 left-3 flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-lg text-white pointer-events-none"
+              style={{ background: "rgba(0,87,184,0.78)", backdropFilter: "blur(4px)" }}
+            >
               <Ico d={I.zoomIn} size={11} sw={2} />
               {ZOOM}× zoom
             </div>
@@ -851,23 +1120,27 @@ export default function ProductGallery({ images, videos = [], image360Url, produ
         )}
       </div>
 
-      {/* ── Mobile horizontal thumbnails ── */}
+      {/* Mobile horizontal thumbnails */}
       {imgs.length > 1 && (
-        <div className="sm:hidden flex gap-2 mt-3 overflow-x-auto scrollbar-hide pb-0.5">
+        <div
+          className="sm:hidden flex gap-2 mt-3 pb-0.5 overflow-x-auto"
+          style={{ scrollbarWidth: "none" }}
+        >
           {imgs.map((img, i) => (
             <Thumb key={i} img={img} active={i === activeIdx} idx={i}
               onClick={() => { setActiveIdx(i); setMainErr(false); }} />
           ))}
           {hasVideos && (
             <VideoThumb vid={videos[0]} active={false}
-              onClick={() => dispatch({ type: "open", idx: 0, tab: "videos" })} />
+              onClick={() => dispatch({ type: "open", idx: 0, tab: "videos" })} small />
           )}
           {image360Url && (
             <button
               onClick={() => dispatch({ type: "open", idx: 0, tab: "360" })}
               aria-label="View 360°"
-              className="shrink-0 rounded-lg flex flex-col items-center justify-center gap-1 transition-all"
-              style={{ width: 48, height: 48, background: "#0a1628", border: "2px solid var(--border)" }}>
+              className="shrink-0 rounded-lg flex flex-col items-center justify-center gap-1 transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+              style={{ width: 48, height: 48, background: "#0a1628", border: "2px solid var(--border)" }}
+            >
               <Ico d={I.view360} size={14} sw={1.5} style={{ color: "rgba(255,255,255,0.7)" }} />
               <span className="text-[8px] font-bold" style={{ color: "rgba(255,255,255,0.5)" }}>360°</span>
             </button>
@@ -875,7 +1148,7 @@ export default function ProductGallery({ images, videos = [], image360Url, produ
         </div>
       )}
 
-      {/* ── Fullscreen modal ── */}
+      {/* Fullscreen modal */}
       <FullscreenModal
         images={imgs}
         videos={videos}

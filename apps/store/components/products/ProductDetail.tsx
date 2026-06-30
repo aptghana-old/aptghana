@@ -2,8 +2,11 @@
 
 import { useState, useMemo, useEffect, useRef } from "react";
 import Link from "next/link";
-import ProductGallery from "./ProductGallery";
 import ProductCard, { type ProductCardData } from "./ProductCard";
+import RecentlyViewed from "./RecentlyViewed";
+import Recommendations from "./Recommendations";
+import { ImageZoomClick } from "@/components/ImageZoom";
+import { ProductProvider } from "@/components/Product/product-context";
 import { useCart } from "@/lib/store/cart";
 import { useWishlist } from "@/lib/store/wishlist";
 import { useCompare, type CompareItem } from "@/lib/store/compare";
@@ -616,9 +619,12 @@ function OverviewSection({ product }: { product: ProductFull }) {
 }
 
 /* ── Specifications section ──────────────────────────────────────────────────── */
+const SPEC_ROW_LIMIT = 5;
+
 function SpecificationsSection({ specs }: { specs: SpecGroup[] }) {
   const [query, setQuery] = useState("");
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
 
   const filtered = useMemo(() => {
     if (!query.trim()) return specs;
@@ -633,6 +639,7 @@ function SpecificationsSection({ specs }: { specs: SpecGroup[] }) {
 
   const totalAttrs = specs.reduce((s, g) => s + g.attributes.length, 0);
   const toggle = (name: string) => setCollapsed((p) => { const n = new Set(p); n.has(name) ? n.delete(name) : n.add(name); return n; });
+  const toggleExpand = (name: string) => setExpanded((p) => { const n = new Set(p); n.has(name) ? n.delete(name) : n.add(name); return n; });
 
   if (specs.length === 0) {
     return (
@@ -672,6 +679,9 @@ function SpecificationsSection({ specs }: { specs: SpecGroup[] }) {
       <div className="space-y-3">
         {filtered.map((group) => {
           const isOpen = !collapsed.has(group.group);
+          const isExpanded = expanded.has(group.group) || !!query.trim();
+          const visible = isExpanded ? group.attributes : group.attributes.slice(0, SPEC_ROW_LIMIT);
+          const hiddenCount = group.attributes.length - SPEC_ROW_LIMIT;
           return (
             <div key={group.group} className="rounded-xl overflow-hidden" style={{ border: "1px solid var(--border)" }}>
               <button type="button" onClick={() => toggle(group.group)}
@@ -689,7 +699,7 @@ function SpecificationsSection({ specs }: { specs: SpecGroup[] }) {
                 <div className="overflow-hidden">
                   <table className="w-full text-[13px]">
                     <tbody>
-                      {group.attributes.map((attr, i) => (
+                      {visible.map((attr, i) => (
                         <tr key={attr.name} style={{ background: i % 2 === 0 ? "var(--bg-surface)" : "var(--bg-raised)", borderTop: "1px solid var(--border)" }}>
                           <td className="px-4 py-2.5 w-[46%]" style={{ color: "var(--text-3)" }}>{attr.name}</td>
                           <td className="px-4 py-2.5 font-medium" style={{ color: "var(--text-1)" }}>
@@ -700,6 +710,22 @@ function SpecificationsSection({ specs }: { specs: SpecGroup[] }) {
                       ))}
                     </tbody>
                   </table>
+                  {!isExpanded && hiddenCount > 0 && (
+                    <button type="button" onClick={() => toggleExpand(group.group)}
+                      className="w-full flex items-center justify-center gap-1.5 py-2.5 text-[12px] font-semibold transition-colors"
+                      style={{ borderTop: "1px solid var(--border)", color: "#0057b8", background: "var(--bg-raised)" }}>
+                      <Icon d={IC.chevD} size={12} sw={2.5} />
+                      Show {hiddenCount} more row{hiddenCount !== 1 ? "s" : ""}
+                    </button>
+                  )}
+                  {isExpanded && !query.trim() && group.attributes.length > SPEC_ROW_LIMIT && (
+                    <button type="button" onClick={() => toggleExpand(group.group)}
+                      className="w-full flex items-center justify-center gap-1.5 py-2.5 text-[12px] font-semibold transition-colors"
+                      style={{ borderTop: "1px solid var(--border)", color: "var(--text-4)", background: "var(--bg-raised)" }}>
+                      <Icon d={IC.chevD} size={12} sw={2.5} className="rotate-180" />
+                      Show less
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -908,6 +934,150 @@ function TabbedRelatedSection({ product }: { product: ProductFull }) {
   );
 }
 
+/* ── Compatibility / Grouped Related Section ─────────────────────────────────── */
+function CompatibilitySection({ product }: { product: ProductFull }) {
+  const groups = [
+    { label: "Accessories",       products: product.accessories  ?? [] },
+    { label: "Replacement Parts", products: product.replacements ?? [] },
+  ].filter(g => g.products.length > 0);
+
+  const [selectedIdx, setSelectedIdx] = useState<number | undefined>();
+  const [showAll, setShowAll] = useState(false);
+
+  if (groups.length === 0) return null;
+
+  const PREVIEW_LIMIT = 5;
+  const activeGroup  = selectedIdx !== undefined ? groups[selectedIdx] : null;
+  const visibleItems = activeGroup
+    ? showAll ? activeGroup.products : activeGroup.products.slice(0, PREVIEW_LIMIT)
+    : [];
+
+  function open(idx: number) { setSelectedIdx(idx); setShowAll(false); }
+  function close() { setSelectedIdx(undefined); setShowAll(false); }
+
+  return (
+    <section id="compatibility" className="py-8" style={{ borderBottom: "1px solid var(--border)" }}>
+      <h2 className="text-[17px] font-bold mb-5" style={{ color: "var(--text-1)" }}>Compatible Products</h2>
+
+      {/* Group tiles */}
+      <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+        {groups.map((g, idx) => (
+          <button key={g.label} onClick={() => open(idx)}
+            className="flex items-center gap-3 text-left rounded-xl p-3.5 transition-all hover:shadow-md group"
+            style={{ border: "1px solid var(--border)", background: "var(--bg-surface)", minWidth: 220, maxWidth: 320 }}>
+            {g.products[0]?.images?.main?.url && (
+              <img src={g.products[0].images.main.url} alt={g.label}
+                className="w-10 h-10 object-contain shrink-0 rounded-lg"
+                style={{ background: "var(--bg-raised)" }} loading="lazy" />
+            )}
+            <div className="min-w-0">
+              <p className="text-[14px] font-semibold group-hover:underline" style={{ color: "var(--text-1)" }}>{g.label}</p>
+              <p className="text-[12px]" style={{ color: "var(--text-4)" }}>{g.products.length} product{g.products.length !== 1 ? "s" : ""}</p>
+            </div>
+            <Icon d={IC.chevR} size={14} sw={2.5} className="ml-auto shrink-0" style={{ color: "var(--text-4)" }} />
+          </button>
+        ))}
+      </div>
+
+      {/* Dialog */}
+      {selectedIdx !== undefined && activeGroup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
+          <div className="absolute inset-0 bg-black/40" onClick={close} aria-hidden="true" />
+          <div className="relative z-10 w-full max-w-3xl rounded-2xl overflow-hidden flex flex-col"
+            style={{ background: "var(--bg-surface)", maxHeight: "85vh", boxShadow: "0 24px 64px rgba(0,0,0,0.22)" }}>
+
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 shrink-0"
+              style={{ background: "#0057b8", borderBottom: "1px solid rgba(255,255,255,0.15)" }}>
+              <div>
+                <p className="text-[11px] uppercase tracking-wide text-white/60 mb-0.5">Compatible with this product</p>
+                <p className="text-[15px] font-bold text-white">{activeGroup.label}</p>
+              </div>
+              <button onClick={close} aria-label="Close"
+                className="w-8 h-8 flex items-center justify-center rounded-full transition-colors"
+                style={{ background: "rgba(255,255,255,0.15)", color: "#fff" }}>
+                <Icon d="M6 18L18 6M6 6l12 12" size={14} sw={2.5} />
+              </button>
+            </div>
+
+            {/* Table header */}
+            <div className="hidden sm:grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 px-5 py-2.5 text-[11px] font-bold uppercase tracking-wide shrink-0"
+              style={{ background: "var(--bg-raised)", borderBottom: "1px solid var(--border)", color: "var(--text-4)" }}>
+              <span className="w-14">Image</span>
+              <span>Product</span>
+              <span className="text-right w-28">Price</span>
+              <span className="w-32" />
+            </div>
+
+            {/* Product rows */}
+            <div className="overflow-y-auto flex-1">
+              {visibleItems.map((p, i) => (
+                <div key={p._id}
+                  className="grid grid-cols-1 sm:grid-cols-[auto_1fr_auto_auto] items-center gap-3 sm:gap-4 px-5 py-4"
+                  style={{ borderBottom: "1px solid var(--border)", background: i % 2 === 0 ? "var(--bg-surface)" : "var(--bg-raised)" }}>
+
+                  {/* Image */}
+                  <a href={`/products/${p.slug}`} tabIndex={-1}>
+                    <img src={p.images?.main?.url ?? ""} alt={p.name}
+                      className="w-14 h-14 object-contain rounded-lg shrink-0"
+                      style={{ background: "var(--bg-raised)" }} />
+                  </a>
+
+                  {/* Info */}
+                  <div className="min-w-0">
+                    <a href={`/products/${p.slug}`}
+                      className="text-[13px] font-semibold leading-snug line-clamp-2 hover:underline"
+                      style={{ color: "var(--text-1)" }}>
+                      {p.name}
+                    </a>
+                    <p className="text-[11px] font-mono mt-0.5" style={{ color: "var(--text-4)" }}>{p.sku}</p>
+                  </div>
+
+                  {/* Price */}
+                  <div className="sm:text-right w-full sm:w-28">
+                    {p.pricing?.listPrice ? (
+                      <span className="text-[14px] font-bold tabular-nums" style={{ color: "var(--text-1)" }}>
+                        {fmtPrice(p.pricing.listPrice, p.pricing.currency)}
+                      </span>
+                    ) : (
+                      <span className="text-[12px]" style={{ color: "var(--text-4)" }}>POA</span>
+                    )}
+                  </div>
+
+                  {/* CTA */}
+                  <div className="flex gap-2 w-full sm:w-32">
+                    <a href={`/products/${p.slug}`}
+                      className="flex-1 h-9 flex items-center justify-center gap-1.5 rounded-lg text-[12px] font-bold text-white transition-colors"
+                      style={{ background: "#0057b8" }}>
+                      <Icon d={IC.external} size={12} sw={2} />
+                      View
+                    </a>
+                  </div>
+                </div>
+              ))}
+
+              {/* View All toggle */}
+              {!showAll && activeGroup.products.length > PREVIEW_LIMIT && (
+                <div className="px-5 py-4 flex items-center justify-between"
+                  style={{ borderTop: "1px solid var(--border)", background: "var(--bg-raised)" }}>
+                  <span className="text-[13px]" style={{ color: "var(--text-3)" }}>
+                    Showing {PREVIEW_LIMIT} of {activeGroup.products.length} products
+                  </span>
+                  <button onClick={() => setShowAll(true)}
+                    className="h-9 px-4 rounded-lg text-[13px] font-semibold border-2 transition-colors"
+                    style={{ borderColor: "#0057b8", color: "#0057b8" }}>
+                    View all {activeGroup.products.length}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </section>
+  );
+}
+
 /* ── More from Brand (8–12 product carousel/grid) ───────────────────────────── */
 function MoreFromBrandSection({ product }: { product: ProductFull }) {
   const brandName = product.brand?.name ?? brandLabel(product.brandSlug);
@@ -958,8 +1128,6 @@ export default function ProductDetail({ product }: { product: ProductFull }) {
     return () => window.removeEventListener("scroll", check);
   }, []);
 
-  const allImages = [product.images?.main, ...(product.images?.gallery ?? [])].filter((img): img is Media => !!(img?.url));
-
   const totalSpecs = product.specifications?.reduce((s, g) => s + g.attributes.length, 0) ?? 0;
   const hasTabbedRelated =
     (product.relatedProducts?.length ?? 0) > 0 ||
@@ -967,6 +1135,9 @@ export default function ProductDetail({ product }: { product: ProductFull }) {
     (product.replacements?.length ?? 0) > 0 ||
     (product.fallbackProducts?.length ?? 0) > 0;
   const hasBrandProducts = (product.brandProducts?.length ?? 0) > 0;
+  const hasCompatibility =
+    (product.accessories?.length ?? 0) > 0 ||
+    (product.replacements?.length ?? 0) > 0;
 
   const sections: SectionDef[] = [
     { id: "overview",       label: "Overview" },
@@ -975,44 +1146,56 @@ export default function ProductDetail({ product }: { product: ProductFull }) {
     ...(product.crossReferences?.length ? [{ id: "cross-references", label: "Cross-Refs", count: product.crossReferences.length }] : []),
     ...(hasTabbedRelated ? [{ id: "related",         label: "Related" }] : []),
     ...(hasBrandProducts ? [{ id: "more-from-brand", label: "More from Brand" }] : []),
+    ...(hasCompatibility  ? [{ id: "compatibility",   label: "Compatible" }] : []),
   ];
 
   return (
-    <div className="pb-20 lg:pb-0">
-      <Breadcrumb product={product} />
+    <ProductProvider product={product}>
+      <div className="pb-20 lg:pb-0">
+        <Breadcrumb product={product} />
 
-      {/* ── Hero: Gallery + Purchase Panel ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8 xl:gap-10 mb-2">
-        <div>
-          <ProductGallery images={allImages} videos={product.videos} image360Url={product.image360Url} productName={product.name} sku={product.sku} />
+        {/* ── Hero: Gallery + Purchase Panel ── */}
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8 xl:gap-10 mb-2">
+          <div>
+            <ImageZoomClick />
+          </div>
+          <aside className="lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
+            <PurchasePanel product={product} panelRef={panelRef} />
+          </aside>
         </div>
-        <aside className="lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
-          <PurchasePanel product={product} panelRef={panelRef} />
-        </aside>
+
+        {/* ── Sticky section nav ── */}
+        <SectionNav sections={sections} />
+
+        {/* ── Content sections ── */}
+        <OverviewSection product={product} />
+        <SpecificationsSection specs={product.specifications ?? []} />
+        <DocumentsSection docs={product.documents ?? []} />
+        {(product.crossReferences?.length ?? 0) > 0 && (
+          <CrossRefSection refs={product.crossReferences!} />
+        )}
+
+        {/* ── Brand block ── */}
+        <BrandSection product={product} />
+
+        {/* ── Tabbed related (Related | Accessories | Replacements) ── */}
+        {hasTabbedRelated && <TabbedRelatedSection product={product} />}
+
+        {/* ── More from Brand carousel (8–12 products) ── */}
+        {hasBrandProducts && <MoreFromBrandSection product={product} />}
+
+        {/* ── Compatible Products (Accessories / Replacement Parts) ── */}
+        {hasCompatibility && <CompatibilitySection product={product} />}
+
+        {/* ── Recommended For You ── */}
+        <Recommendations currentSku={product.sku} />
+
+        {/* ── Recently Viewed ── */}
+        <RecentlyViewed currentSku={product.sku} />
+
+        {/* ── Mobile sticky CTA ── */}
+        <MobileStickyBar product={product} visible={mobileCTAVisible} />
       </div>
-
-      {/* ── Sticky section nav ── */}
-      <SectionNav sections={sections} />
-
-      {/* ── Content sections ── */}
-      <OverviewSection product={product} />
-      <SpecificationsSection specs={product.specifications ?? []} />
-      <DocumentsSection docs={product.documents ?? []} />
-      {(product.crossReferences?.length ?? 0) > 0 && (
-        <CrossRefSection refs={product.crossReferences!} />
-      )}
-
-      {/* ── Brand block ── */}
-      <BrandSection product={product} />
-
-      {/* ── Tabbed related (Related | Accessories | Replacements) ── */}
-      {hasTabbedRelated && <TabbedRelatedSection product={product} />}
-
-      {/* ── More from Brand carousel (8–12 products) ── */}
-      {hasBrandProducts && <MoreFromBrandSection product={product} />}
-
-      {/* ── Mobile sticky CTA ── */}
-      <MobileStickyBar product={product} visible={mobileCTAVisible} />
-    </div>
+    </ProductProvider>
   );
 }
