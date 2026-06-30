@@ -87,7 +87,7 @@ export default async function BrandsPage() {
             brands={brands!}
             config={{
               containerClass: "container-apt",
-              brandHref: (slug) => `${STORE_URL}/brands/${slug}`,
+              brandHref: `${STORE_URL}/brands`,
               rfqHref: `${STORE_URL}/rfq`,
               contactHref: "/contact",
             }}

@@ -11,7 +11,7 @@ export interface BrandListItem {
 
 export interface BrandsPageConfig {
   containerClass: string;
-  brandHref: (slug: string) => string;
+  brandHref: string;
   rfqHref: string;
   contactHref: string;
 }

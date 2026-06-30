@@ -507,7 +507,7 @@ export default function BrandsPageContent({ brands, config }: Props) {
 
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 10 }}>
                   <Link
-                    href={brandHref("schneider-electric")}
+                    href={`${brandHref}/schneider-electric`}
                     style={{
                       display: "inline-flex",
                       alignItems: "center",

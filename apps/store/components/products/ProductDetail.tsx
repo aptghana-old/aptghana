@@ -184,7 +184,9 @@ function PurchasePanel({ product, panelRef }: { product: ProductFull; panelRef?:
 
   const hasCompatibility =
     (product.accessories?.length ?? 0) > 0 ||
-    (product.replacements?.length ?? 0) > 0;
+    (product.replacements?.length ?? 0) > 0 ||
+    (product.relatedProducts?.length ?? 0) > 0 ||
+    (product.fallbackProducts?.length ?? 0) > 0;
 
   const inStock = (product.inventory?.quantity ?? 0) > 0;
   const minQty = Math.max(1, product.pricing.minimumOrderQty || 1);
@@ -895,9 +897,15 @@ function TabbedRelatedSection({ product }: { product: ProductFull }) {
   );
 }
 
-/* ── Compatibility / Grouped Related Section ─────────────────────────────────── */
+/* ── Related & Compatible Panel (renders inside Purchase Panel) ──────────────── */
 function CompatibilitySection({ product }: { product: ProductFull }) {
+  const relatedProducts = (product.relatedProducts?.length ?? 0) > 0
+    ? product.relatedProducts!
+    : (product.fallbackProducts ?? []);
+  const isRelatedFallback = (product.relatedProducts?.length ?? 0) === 0 && relatedProducts.length > 0;
+
   const groups = [
+    ...(relatedProducts.length > 0 ? [{ label: isRelatedFallback ? "Similar Products" : "Related Products", products: relatedProducts }] : []),
     { label: "Accessories", products: product.accessories ?? [] },
     { label: "Replacement Parts", products: product.replacements ?? [] },
   ].filter(g => g.products.length > 0);
@@ -917,25 +925,32 @@ function CompatibilitySection({ product }: { product: ProductFull }) {
   function close() { setSelectedIdx(undefined); setShowAll(false); }
 
   return (
-    <section id="compatibility" className="py-8" style={{ borderBottom: "1px solid var(--border)" }}>
-      <h2 className="text-[17px] font-bold mb-5" style={{ color: "var(--text-1)" }}>Compatible Products</h2>
+    <div>
+      <p className="text-[12px] font-bold uppercase tracking-wide mb-2.5" style={{ color: "var(--text-3)" }}>Related &amp; Compatible</p>
 
-      {/* Group tiles */}
-      <div className="flex flex-col sm:flex-row flex-wrap gap-3">
+      {/* Group tiles — 2-col compact grid */}
+      <div className="grid grid-cols-2 gap-2">
         {groups.map((g, idx) => (
           <button key={g.label} onClick={() => open(idx)}
-            className="flex items-center gap-3 text-left rounded-xl p-3.5 transition-all hover:shadow-md group"
-            style={{ border: "1px solid var(--border)", background: "var(--bg-surface)", minWidth: 220, maxWidth: 320 }}>
-            {g.products[ 0 ]?.images?.main?.url && (
+            className="flex items-center gap-2.5 text-left rounded-xl p-3 transition-all group"
+            style={{ border: "1px solid var(--border)", background: "var(--bg-surface)" }}
+            onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#0057b8"; }}
+            onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "var(--border)"; }}>
+            {g.products[ 0 ]?.images?.main?.url ? (
               <img src={g.products[ 0 ].images.main.url} alt={g.label}
-                className="w-10 h-10 object-contain shrink-0 rounded-lg"
+                className="w-9 h-9 object-contain shrink-0 rounded-lg"
                 style={{ background: "var(--bg-raised)" }} loading="lazy" />
+            ) : (
+              <div className="w-9 h-9 rounded-lg shrink-0 flex items-center justify-center"
+                style={{ background: "var(--bg-raised)", color: "var(--text-4)" }}>
+                <Icon d={IC.tag} size={14} sw={1.75} />
+              </div>
             )}
-            <div className="min-w-0">
-              <p className="text-[14px] font-semibold group-hover:underline" style={{ color: "var(--text-1)" }}>{g.label}</p>
-              <p className="text-[12px]" style={{ color: "var(--text-4)" }}>{g.products.length} product{g.products.length !== 1 ? "s" : ""}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-[12px] font-semibold leading-tight group-hover:underline" style={{ color: "var(--text-1)" }}>{g.label}</p>
+              <p className="text-[11px] tabular-nums" style={{ color: "var(--text-4)" }}>{g.products.length} item{g.products.length !== 1 ? "s" : ""}</p>
             </div>
-            <Icon d={IC.chevR} size={14} sw={2.5} className="ml-auto shrink-0" style={{ color: "var(--text-4)" }} />
+            <Icon d={IC.chevR} size={11} sw={2.5} className="shrink-0" style={{ color: "var(--text-4)" }} />
           </button>
         ))}
       </div>
@@ -1035,7 +1050,7 @@ function CompatibilitySection({ product }: { product: ProductFull }) {
           </div>
         </div>
       )}
-    </section>
+    </div>
   );
 }
 
@@ -1091,23 +1106,13 @@ export default function ProductDetail({ product }: { product: ProductFull }) {
     return () => window.removeEventListener("scroll", check);
   }, []);
 
-  const hasTabbedRelated =
-    (product.relatedProducts?.length ?? 0) > 0 ||
-    (product.accessories?.length ?? 0) > 0 ||
-    (product.replacements?.length ?? 0) > 0 ||
-    (product.fallbackProducts?.length ?? 0) > 0;
-
   const totalSpecs = product.specifications?.reduce((s, g) => s + g.attributes.length, 0) ?? 0;
-  const hasBrandProducts = (product.brandProducts?.length ?? 0) > 0;
-
 
   const sections: SectionDef[] = [
     { id: "overview", label: "Overview" },
     { id: "specifications", label: "Specifications", count: totalSpecs },
     { id: "documents", label: "Documents", count: product.documents?.length ?? 0 },
     ...(product.crossReferences?.length ? [ { id: "cross-references", label: "Cross-Refs", count: product.crossReferences.length } ] : []),
-    ...(hasBrandProducts ? [ { id: "more-from-brand", label: "More from Brand" } ] : []),
-    // ...(hasCompatibility ? [ { id: "compatibility", label: "Compatible" } ] : []),
   ];
 
   return (
@@ -1135,12 +1140,6 @@ export default function ProductDetail({ product }: { product: ProductFull }) {
         {(product.crossReferences?.length ?? 0) > 0 && (
           <CrossRefSection refs={product.crossReferences!} />
         )}
-
-        {/* ── Tabbed related (Related | Accessories | Replacements) ── */}
-        {hasTabbedRelated && <TabbedRelatedSection product={product} />}
-
-        {/* ── More from Brand carousel (8–12 products) ── */}
-        {hasBrandProducts && <MoreFromBrandSection product={product} />}
 
         {/* ── Recommended For You ── */}
         <Recommendations currentSku={product.sku} />

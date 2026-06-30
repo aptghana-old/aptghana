@@ -19,7 +19,7 @@ function getBrandMark(name: string): string {
 
 interface Props {
   brands: BrandListItem[];
-  brandHref: (slug: string) => string;
+  brandHref: string;
   rfqHref: string;
   contactHref: string;
   containerClass: string;
@@ -196,7 +196,7 @@ export default function BrandsGrid({ brands, brandHref, rfqHref, contactHref, co
             {filtered.map((brand) => (
               <Link
                 key={brand.slug}
-                href={brandHref(brand.slug)}
+                href={`${brandHref}/${brand.slug}`}
                 style={{
                   display: "flex",
                   flexDirection: "column",
