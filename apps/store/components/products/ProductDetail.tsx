@@ -182,11 +182,9 @@ function PurchasePanel({ product, panelRef }: { product: ProductFull; panelRef?:
   const [ added, setAdded ] = useState(false);
   const [ copied, setCopied ] = useState(false);
 
-  const hasTabbedRelated =
-    (product.relatedProducts?.length ?? 0) > 0 ||
+  const hasCompatibility =
     (product.accessories?.length ?? 0) > 0 ||
-    (product.replacements?.length ?? 0) > 0 ||
-    (product.fallbackProducts?.length ?? 0) > 0;
+    (product.replacements?.length ?? 0) > 0;
 
   const inStock = (product.inventory?.quantity ?? 0) > 0;
   const minQty = Math.max(1, product.pricing.minimumOrderQty || 1);
@@ -430,8 +428,7 @@ function PurchasePanel({ product, panelRef }: { product: ProductFull; panelRef?:
         )}
       </div>
 
-      {/* ── Tabbed related (Related | Accessories | Replacements) ── */}
-      {hasTabbedRelated && <TabbedRelatedSection product={product} />}
+      {hasCompatibility && <CompatibilitySection product={product} />}
 
       {/* Technical support */}
       <div className="rounded-xl p-3.5 text-[13px]"
@@ -845,53 +842,6 @@ function CrossRefSection({ refs }: { refs: CrossRef[] }) {
   );
 }
 
-/* ── Brand section ───────────────────────────────────────────────────────────── */
-function BrandSection({ product }: { product: ProductFull }) {
-  const brand = product.brand;
-  const name = brand?.name ?? brandLabel(product.brandSlug);
-
-  return (
-    <div className="rounded-2xl p-6 flex flex-col sm:flex-row items-start sm:items-center gap-5 my-8"
-      style={{ background: "#0e1b24" }}>
-      <div className="w-20 h-16 shrink-0 rounded-xl flex items-center justify-center p-2.5"
-        style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.15)" }}>
-        {brand?.logo?.url
-          ? <img src={brand.logo.url} alt={name} className="w-full h-full object-contain" style={{ filter: "brightness(0) invert(1)" }} />
-          : <span className="text-[11px] font-bold uppercase tracking-wider text-center leading-tight" style={{ color: "rgba(255,255,255,0.7)" }}>{name}</span>}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 mb-1 flex-wrap">
-          <h3 className="text-[16px] font-bold text-white">{name}</h3>
-          {brand?.isPartner && (
-            <span className="text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full"
-              style={{ background: "rgba(61,205,88,0.2)", color: "#3dcd58" }}>
-              Authorised Partner
-            </span>
-          )}
-        </div>
-        {brand?.country && <p className="text-[12px] mb-1" style={{ color: "rgba(255,255,255,0.5)" }}>{brand.country}</p>}
-        {brand?.shortDescription && <p className="text-[13px] line-clamp-2" style={{ color: "rgba(255,255,255,0.7)" }}>{brand.shortDescription}</p>}
-        {brand?.productCount && <p className="text-[12px] mt-1" style={{ color: "rgba(255,255,255,0.4)" }}>{brand.productCount.toLocaleString()} products available</p>}
-      </div>
-      <div className="flex flex-col gap-2 shrink-0">
-        <Link href={`/brands/${product.brandSlug}`}
-          className="flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl text-[13px] font-semibold text-white transition-opacity hover:opacity-90"
-          style={{ background: "#0057b8" }}>
-          All {name} Products
-        </Link>
-        {brand?.website && (
-          <a href={brand.website} target="_blank" rel="noopener noreferrer"
-            className="flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl text-[13px] font-medium transition-colors"
-            style={{ border: "1px solid rgba(255,255,255,0.2)", color: "rgba(255,255,255,0.8)", background: "rgba(255,255,255,0.05)" }}>
-            <Icon d={IC.external} size={12} sw={1.75} />
-            {name} Website
-          </a>
-        )}
-      </div>
-    </div>
-  );
-}
-
 /* ── Tabbed Related Section (Related | Accessories | Replacements) ───────────── */
 function TabbedRelatedSection({ product }: { product: ProductFull }) {
   const relatedProducts = (product.relatedProducts?.length ?? 0) > 0
@@ -1137,16 +1087,15 @@ export default function ProductDetail({ product }: { product: ProductFull }) {
     return () => window.removeEventListener("scroll", check);
   }, []);
 
-  const totalSpecs = product.specifications?.reduce((s, g) => s + g.attributes.length, 0) ?? 0;
-  // const hasTabbedRelated =
-  //   (product.relatedProducts?.length ?? 0) > 0 ||
-  //   (product.accessories?.length ?? 0) > 0 ||
-  //   (product.replacements?.length ?? 0) > 0 ||
-  //   (product.fallbackProducts?.length ?? 0) > 0;
-  const hasBrandProducts = (product.brandProducts?.length ?? 0) > 0;
-  const hasCompatibility =
+  const hasTabbedRelated =
+    (product.relatedProducts?.length ?? 0) > 0 ||
     (product.accessories?.length ?? 0) > 0 ||
-    (product.replacements?.length ?? 0) > 0;
+    (product.replacements?.length ?? 0) > 0 ||
+    (product.fallbackProducts?.length ?? 0) > 0;
+
+  const totalSpecs = product.specifications?.reduce((s, g) => s + g.attributes.length, 0) ?? 0;
+  const hasBrandProducts = (product.brandProducts?.length ?? 0) > 0;
+
 
   const sections: SectionDef[] = [
     { id: "overview", label: "Overview" },
@@ -1154,7 +1103,7 @@ export default function ProductDetail({ product }: { product: ProductFull }) {
     { id: "documents", label: "Documents", count: product.documents?.length ?? 0 },
     ...(product.crossReferences?.length ? [ { id: "cross-references", label: "Cross-Refs", count: product.crossReferences.length } ] : []),
     ...(hasBrandProducts ? [ { id: "more-from-brand", label: "More from Brand" } ] : []),
-    ...(hasCompatibility ? [ { id: "compatibility", label: "Compatible" } ] : []),
+    // ...(hasCompatibility ? [ { id: "compatibility", label: "Compatible" } ] : []),
   ];
 
   return (
@@ -1163,11 +1112,11 @@ export default function ProductDetail({ product }: { product: ProductFull }) {
         <Breadcrumb product={product} />
 
         {/* ── Hero: Gallery + Purchase Panel ── */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_420px] gap-8 xl:gap-10 mb-2">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 xl:gap-10 mb-2">
           <div>
             <ImageZoomOnHover />
           </div>
-          <aside className="lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-5rem)] lg:overflow-y-auto">
+          <aside className="lg:sticky lg:top-20 lg:self-start lg:max-h-[calc(100vh-5rem)] lg:col-span-2 lg:overflow-y-auto">
             <PurchasePanel product={product} panelRef={panelRef} />
           </aside>
         </div>
@@ -1183,14 +1132,11 @@ export default function ProductDetail({ product }: { product: ProductFull }) {
           <CrossRefSection refs={product.crossReferences!} />
         )}
 
-        {/* ── Brand block ── */}
-        <BrandSection product={product} />
+        {/* ── Tabbed related (Related | Accessories | Replacements) ── */}
+        {hasTabbedRelated && <TabbedRelatedSection product={product} />}
 
         {/* ── More from Brand carousel (8–12 products) ── */}
         {hasBrandProducts && <MoreFromBrandSection product={product} />}
-
-        {/* ── Compatible Products (Accessories / Replacement Parts) ── */}
-        {hasCompatibility && <CompatibilitySection product={product} />}
 
         {/* ── Recommended For You ── */}
         <Recommendations currentSku={product.sku} />
