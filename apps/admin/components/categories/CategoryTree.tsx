@@ -10,6 +10,7 @@ import {
 import { Badge, statusVariant } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Select } from "@/components/ui/Input";
+import { LEVEL_LABEL, LEVEL_BADGE_VARIANT, LEVEL_DOT } from "@/lib/categoryLevels";
 import CategorySidePanel from "./CategorySidePanel";
 import type { ParentContext } from "./CategoryForm";
 
@@ -28,7 +29,6 @@ interface SearchResultNode extends TreeNode {
   breadcrumb: { name: string; slug: string }[];
 }
 
-const LEVEL_LABEL: Record<string, string> = { group: "Group", category: "Category", subcategory: "Subcategory", range: "Range" };
 const CHILD_LEVEL: Record<string, string | undefined> = { group: "category", category: "subcategory", subcategory: "range", range: undefined };
 
 type DropPosition = "before" | "after" | "inside";
@@ -268,7 +268,7 @@ export default function CategoryTree({ rootNodes, canEdit, canDelete }: Props) {
             {node.name}
           </Link>
 
-          <Badge variant="default">{LEVEL_LABEL[node.level] ?? node.level}</Badge>
+          <Badge variant={LEVEL_BADGE_VARIANT[node.level] ?? "default"}>{LEVEL_LABEL[node.level] ?? node.level}</Badge>
           <Badge variant={statusVariant(node.status)} dot>{node.status}</Badge>
 
           <span className="flex items-center gap-1 text-[11px] ml-auto shrink-0" style={{ color: "var(--apt-text-muted)" }}>
@@ -309,8 +309,8 @@ export default function CategoryTree({ rootNodes, canEdit, canDelete }: Props) {
   }
 
   return (
-    <div>
-      <div className="flex items-center gap-2 px-4 sm:px-6 py-3 flex-wrap" style={{ borderBottom: "1px solid var(--apt-border)" }}>
+    <div className="rounded-xl overflow-hidden" style={{ background: "var(--apt-bg)", border: "1px solid var(--apt-border)" }}>
+      <div className="flex items-center gap-3 px-4 sm:px-6 py-3 flex-wrap" style={{ borderBottom: "1px solid var(--apt-border)" }}>
         <div className="relative flex-1 max-w-xs">
           <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: "var(--apt-text-muted)" }} />
           <input
@@ -322,8 +322,18 @@ export default function CategoryTree({ rootNodes, canEdit, canDelete }: Props) {
           />
           {query && <button onClick={() => setQuery("")} className="absolute right-3 top-1/2 -translate-y-1/2" style={{ color: "var(--apt-text-muted)" }}><X size={13} /></button>}
         </div>
+
+        <div className="hidden sm:flex items-center gap-3">
+          {(["group", "category", "subcategory"] as const).map((lvl) => (
+            <span key={lvl} className="flex items-center gap-1.5 text-[11px]" style={{ color: "var(--apt-text-secondary)" }}>
+              <span className="w-2 h-2 rounded-sm shrink-0" style={{ background: LEVEL_DOT[lvl] }} />
+              {LEVEL_LABEL[lvl]}
+            </span>
+          ))}
+        </div>
+
         {canEdit && (
-          <Button variant="primary" size="sm" icon={<Plus size={13} />} onClick={() => setPanel({ mode: "create" })}>
+          <Button variant="primary" size="sm" icon={<Plus size={13} />} onClick={() => setPanel({ mode: "create" })} className="ml-auto">
             Add Group
           </Button>
         )}
@@ -366,7 +376,7 @@ export default function CategoryTree({ rootNodes, canEdit, canDelete }: Props) {
                     <div className="text-[13px] font-medium" style={{ color: "var(--apt-text-primary)" }}>{r.name}</div>
                     <div className="text-[11px]" style={{ color: "var(--apt-text-muted)" }}>{r.breadcrumb.map((b) => b.name).join(" / ") || "Top level"}</div>
                   </div>
-                  <Badge variant="default" className="ml-auto">{LEVEL_LABEL[r.level] ?? r.level}</Badge>
+                  <Badge variant={LEVEL_BADGE_VARIANT[r.level] ?? "default"} className="ml-auto">{LEVEL_LABEL[r.level] ?? r.level}</Badge>
                 </Link>
               ))}
             </div>

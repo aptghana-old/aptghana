@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Radio } from "lucide-react";
 import { connectDB, AnalyticsModel } from "@apt/db";
 import { formatNumber } from "@/lib/analytics/range";
+import { getActiveSessionIds } from "@/lib/analytics/liveVisitors";
 import { Panel, EmptyState, AppBadge } from "@/components/analytics/primitives";
 
 export const metadata: Metadata = { title: "Visitors" };
@@ -22,7 +23,6 @@ function deviceIcon(device: string): string {
 }
 
 async function getVisitors() {
-  const since5m   = new Date(Date.now() - 5 * 60 * 1000);
   const since24h  = new Date(Date.now() - 24 * 60 * 60 * 1000);
 
   try {
@@ -30,7 +30,7 @@ async function getVisitors() {
 
     const [activeSessions, recentEvents, sessionSummaries] = await Promise.all([
       // Active now — distinct sessions with events in last 5 min
-      AnalyticsModel.distinct("sessionId", { createdAt: { $gte: since5m } }),
+      getActiveSessionIds(),
 
       // Recent raw events (last 24h) for the live stream
       AnalyticsModel.find({ createdAt: { $gte: since24h } })

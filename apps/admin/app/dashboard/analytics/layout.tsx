@@ -1,6 +1,7 @@
-import Link from "next/link";
 import type { Metadata } from "next";
-import { LayoutDashboard, Users, Share2, FileText, Radio } from "lucide-react";
+import { LayoutDashboard, Share2, FileText, Radio } from "lucide-react";
+import { getActiveSessionIds } from "@/lib/analytics/liveVisitors";
+import { AnalyticsTabNav, AnalyticsQueryToggle } from "@/components/analytics/AnalyticsTabNav";
 
 export const metadata: Metadata = {
   title: { default: "Analytics", template: "%s · Analytics" },
@@ -29,7 +30,9 @@ interface Props {
   children: React.ReactNode;
 }
 
-export default function AnalyticsLayout({ children }: Props) {
+export default async function AnalyticsLayout({ children }: Props) {
+  const activeSessions = await getActiveSessionIds();
+
   return (
     <div className="flex flex-col min-h-full" style={{ background: "var(--apt-bg-subtle)" }}>
 
@@ -39,11 +42,7 @@ export default function AnalyticsLayout({ children }: Props) {
         style={{ borderBottom: "1px solid var(--apt-border)", background: "var(--apt-bg)" }}
       >
         {/* Tab nav */}
-        <nav className="flex items-center gap-1">
-          {TABS.map(({ label, href, icon: Icon }) => (
-            <AnalyticsTabLink key={href} href={href} label={label} Icon={Icon} />
-          ))}
-        </nav>
+        <AnalyticsTabNav tabs={TABS} />
 
         {/* Right controls */}
         <div className="flex items-center gap-2">
@@ -51,22 +50,14 @@ export default function AnalyticsLayout({ children }: Props) {
           <span className="inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full"
             style={{ background: "rgba(0,212,111,0.08)", color: "#00D68F", border: "1px solid rgba(0,212,111,0.15)" }}>
             <span className="w-1.5 h-1.5 rounded-full bg-[#00D68F] animate-pulse" />
-            Live
+            {activeSessions.length} active now
           </span>
 
           {/* App filter */}
-          <div className="flex items-center rounded-lg overflow-hidden" style={{ background: "var(--apt-bg-raised)", border: "1px solid var(--apt-border)" }}>
-            {APPS.map((a) => (
-              <AppFilterLink key={a.value} label={a.label} value={a.value} />
-            ))}
-          </div>
+          <AnalyticsQueryToggle param="app" options={APPS} />
 
           {/* Range selector */}
-          <div className="flex items-center rounded-lg overflow-hidden" style={{ background: "var(--apt-bg-raised)", border: "1px solid var(--apt-border)" }}>
-            {RANGES.map((r) => (
-              <RangeLink key={r.value} label={r.label} value={r.value} />
-            ))}
-          </div>
+          <AnalyticsQueryToggle param="range" options={RANGES} defaultValue="7d" />
         </div>
       </div>
 
@@ -75,44 +66,5 @@ export default function AnalyticsLayout({ children }: Props) {
         {children}
       </main>
     </div>
-  );
-}
-
-/* ─── Tab link — server component, no active state tracking ─────────────── */
-function AnalyticsTabLink({ href, label, Icon }: { href: string; label: string; Icon: React.ComponentType<{ className?: string }> }) {
-  return (
-    <Link
-      href={href}
-      className="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
-      style={{ color: "var(--apt-text-secondary)" }}
-    >
-      <Icon className="w-3.5 h-3.5" />
-      {label}
-    </Link>
-  );
-}
-
-function RangeLink({ label, value }: { label: string; value: string }) {
-  return (
-    <Link
-      href={`?range=${value}`}
-      className="px-2.5 py-1 text-xs font-medium transition-colors"
-      style={{ color: "var(--apt-text-muted)" }}
-    >
-      {label}
-    </Link>
-  );
-}
-
-function AppFilterLink({ label, value }: { label: string; value: string }) {
-  const param = value ? `?app=${value}` : "?";
-  return (
-    <Link
-      href={param}
-      className="px-2.5 py-1 text-xs font-medium transition-colors"
-      style={{ color: "var(--apt-text-muted)" }}
-    >
-      {label}
-    </Link>
   );
 }

@@ -1,4 +1,4 @@
-type Variant = "default" | "active" | "inactive" | "pending" | "draft" | "success" | "warning" | "error" | "info" | "blue";
+export type Variant = "default" | "active" | "inactive" | "pending" | "draft" | "success" | "warning" | "error" | "info" | "blue";
 
 interface BadgeProps {
   variant?: Variant;

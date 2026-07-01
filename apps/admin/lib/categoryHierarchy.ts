@@ -1,4 +1,4 @@
-import { connectDB, CategoryModel, ProductModel } from "@apt/db";
+import { connectDB, CategoryModel, ProductModel, Types } from "@apt/db";
 
 export type CategoryLevel = "group" | "category" | "subcategory" | "range";
 
@@ -81,21 +81,30 @@ export async function reparentDescendants(categoryId: string): Promise<void> {
   }
 }
 
+/**
+ * `Product.categories` is declared in the schema as `[{id, name, slug, level}]`,
+ * but the data actually stored (as of this writing) is a plain array of
+ * Category ObjectIds — `"categories.id"` never matches anything against real
+ * data. Queried here via the native driver (`.collection`) to bypass
+ * Mongoose's schema-based cast, which would otherwise mangle a raw ObjectId
+ * passed against a path declared as an embedded-document array.
+ */
 export async function getLiveProductCount(categoryId: string): Promise<number> {
   await connectDB();
-  return ProductModel.countDocuments({ "categories.id": categoryId });
+  return ProductModel.collection.countDocuments({ categories: new Types.ObjectId(categoryId) });
 }
 
 export async function getLiveProductCounts(categoryIds: string[]): Promise<Map<string, number>> {
   await connectDB();
   if (categoryIds.length === 0) return new Map();
-  const rows = await ProductModel.aggregate<{ _id: string; count: number }>([
-    { $match: { "categories.id": { $in: categoryIds } } },
+  const ids = categoryIds.map((id) => new Types.ObjectId(id));
+  const rows = await ProductModel.collection.aggregate<{ _id: Types.ObjectId; count: number }>([
+    { $match: { categories: { $in: ids } } },
     { $unwind: "$categories" },
-    { $match: { "categories.id": { $in: categoryIds } } },
-    { $group: { _id: "$categories.id", count: { $sum: 1 } } },
-  ]);
-  return new Map(rows.map((r) => [r._id, r.count]));
+    { $match: { categories: { $in: ids } } },
+    { $group: { _id: "$categories", count: { $sum: 1 } } },
+  ]).toArray();
+  return new Map(rows.map((r) => [r._id.toString(), r.count]));
 }
 
 export interface DeletableResult { deletable: boolean; reason?: string }

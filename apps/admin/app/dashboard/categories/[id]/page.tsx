@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { connectDB, CategoryModel, ProductModel } from "@apt/db";
+import { connectDB, CategoryModel, ProductModel, Types } from "@apt/db";
 import { hasPermission, type AdminRole } from "@apt/auth";
 import { ChevronLeft, ChevronRight, Edit, Package, FolderTree, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Badge, statusVariant } from "@/components/ui/Badge";
 import { auth } from "@/lib/auth";
-import { getBreadcrumb, getLiveProductCount } from "@/lib/categoryHierarchy";
+import { getBreadcrumb, getLiveProductCount, getLiveProductCounts } from "@/lib/categoryHierarchy";
+import { LEVEL_LABEL, LEVEL_BADGE_VARIANT } from "@/lib/categoryLevels";
+import { Panel, StatCard, BarList } from "@/components/analytics/primitives";
 
 interface CategoryData {
   _id: { toString(): string };
@@ -46,32 +48,50 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 async function getData(id: string) {
   await connectDB();
-  const [cat, products, children, productCount, breadcrumb] = await Promise.all([
+  // See getLiveProductCount's comment in lib/categoryHierarchy.ts: Product.categories
+  // is physically an array of raw ObjectIds, not the schema's {id,name,slug,level}
+  // shape, so these two queries go through the native driver (.collection) too.
+  const categoryObjectId = new Types.ObjectId(id);
+  const [cat, products, children, productCount, inStockCount, breadcrumb] = await Promise.all([
     CategoryModel.findById(id).lean(),
-    ProductModel.find({ "categories.id": id, status: { $ne: "archived" } })
-      .select("name sku status pricing")
+    ProductModel.collection
+      .find(
+        { categories: categoryObjectId, status: { $ne: "archived" } },
+        { projection: { name: 1, sku: 1, status: 1, pricing: 1 } }
+      )
       .sort({ createdAt: -1 })
       .limit(20)
-      .lean(),
+      .toArray(),
     CategoryModel.find({ parentId: id }).select("name slug status level").sort({ displayOrder: 1, name: 1 }).lean(),
     getLiveProductCount(id),
+    ProductModel.collection.countDocuments({
+      categories: categoryObjectId,
+      status: { $ne: "archived" },
+      $expr: { $gt: [{ $ifNull: ["$inventory.quantity", 0] }, 0] },
+    }),
     getBreadcrumb(id),
   ]);
+
+  const children_ = children as unknown as { _id: { toString(): string }; name: string; slug: string; status: string; level: string }[];
+  const childCounts = await getLiveProductCounts(children_.map((c) => c._id.toString()));
+
   return {
     cat: cat as unknown as CategoryData | null,
     products: products as unknown as ProductRow[],
-    children: children as unknown as { _id: { toString(): string }; name: string; slug: string; status: string; level: string }[],
+    children: children_,
+    childCounts,
     productCount,
+    inStockCount,
     breadcrumb,
   };
 }
 
-const LEVEL_LABEL: Record<string, string> = { group: "Group", category: "Category", subcategory: "Subcategory", range: "Range" };
-
 export default async function CategoryDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const { cat, products, children, productCount, breadcrumb } = await getData(id);
+  const { cat, products, children, childCounts, productCount, inStockCount, breadcrumb } = await getData(id);
   if (!cat) notFound();
+
+  const inStockPct = productCount > 0 ? Math.round((inStockCount / productCount) * 100) : null;
 
   const session = await auth();
   const role = (session?.user as { role?: AdminRole } | undefined)?.role ?? "sales";
@@ -89,8 +109,6 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
         <Link href="/dashboard/categories">
           <Button variant="ghost" size="sm" icon={<ChevronLeft size={14} />}>Categories</Button>
         </Link>
-        <div style={{ width: 1, height: 20, background: "var(--apt-border)" }} />
-        <h1 className="text-[15px] font-semibold" style={{ color: "var(--apt-text-primary)" }}>{cat.name}</h1>
         {canEdit && (
           <div className="ml-auto">
             <Link href={`/dashboard/categories/${id}/edit`}>
@@ -118,6 +136,42 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
         </a>
       </div>
 
+      <div className="px-6 pt-5 space-y-5">
+        {/* Header identity card */}
+        <div className="card p-6 flex items-center gap-5 flex-wrap">
+          <div
+            className="w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden"
+            style={{ background: "#EEF0FF", color: "#3D4CD6" }}
+          >
+            {cat.image?.url ? (
+              <img src={cat.image.url} alt={cat.name} className="w-full h-full object-cover" />
+            ) : (
+              <FolderTree size={30} />
+            )}
+          </div>
+          <div className="flex-1 min-w-[220px]">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h1 className="text-[22px] font-extrabold tracking-tight" style={{ color: "var(--apt-text-primary)" }}>{cat.name}</h1>
+              <Badge variant={statusVariant(cat.status)} dot>{cat.status}</Badge>
+              <Badge variant={LEVEL_BADGE_VARIANT[cat.level] ?? "default"}>{LEVEL_LABEL[cat.level] ?? cat.level}</Badge>
+              {cat.isFeatured && <Badge variant="info">Featured</Badge>}
+            </div>
+            <div className="font-mono text-[12px] mt-1.5" style={{ color: "var(--apt-text-muted)" }}>{cat.slug}</div>
+            {cat.shortDescription && (
+              <p className="text-[13px] mt-2 max-w-2xl" style={{ color: "var(--apt-text-secondary)" }}>{cat.shortDescription}</p>
+            )}
+          </div>
+        </div>
+
+        {/* KPI row */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <StatCard label="Products (live)" value={productCount.toLocaleString()} accent="#3D4CD6" />
+          <StatCard label="Subcategories" value={children.length.toLocaleString()} accent="#0BA5A5" />
+          <StatCard label="Level" value={LEVEL_LABEL[cat.level] ?? cat.level} accent="#F5820A" />
+          <StatCard label="In Stock" value={inStockPct != null ? `${inStockPct}%` : "—"} accent="#00B37E" />
+        </div>
+      </div>
+
       <div className="p-6 grid grid-cols-3 gap-5">
         {/* Main */}
         <div className="col-span-2 space-y-5">
@@ -129,7 +183,7 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
                 </h2>
               </div>
               <table className="data-table">
-                <thead><tr><th>Name</th><th>Level</th><th>Status</th></tr></thead>
+                <thead><tr><th>Name</th><th>Level</th><th>Status</th><th className="text-right">Products</th></tr></thead>
                 <tbody>
                   {children.map((c) => (
                     <tr key={c._id.toString()}>
@@ -143,6 +197,9 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
                       </td>
                       <td><span className="text-[12px]" style={{ color: "var(--apt-text-muted)" }}>{LEVEL_LABEL[c.level] ?? c.level}</span></td>
                       <td><Badge variant={statusVariant(c.status)} dot>{c.status}</Badge></td>
+                      <td className="text-right font-mono text-[12.5px]" style={{ color: "var(--apt-text-primary)" }}>
+                        {(childCounts.get(c._id.toString()) ?? 0).toLocaleString()}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -192,23 +249,14 @@ export default async function CategoryDetailPage({ params }: { params: Promise<{
 
         {/* Sidebar */}
         <div className="space-y-4">
-          <div className="card p-5">
-            {cat.image?.url && (
-              <div className="w-full h-24 rounded-lg border overflow-hidden mb-4" style={{ borderColor: "var(--apt-border)" }}>
-                <img src={cat.image.url} alt={cat.name} className="w-full h-full object-cover" />
-              </div>
-            )}
-            <div className="text-[18px] font-bold mb-1" style={{ color: "var(--apt-text-primary)" }}>{cat.name}</div>
-            <div className="font-mono text-[11px] mb-3" style={{ color: "var(--apt-text-muted)" }}>{cat.slug}</div>
-            {cat.shortDescription && (
-              <p className="text-[12px] mb-3" style={{ color: "var(--apt-text-secondary)" }}>{cat.shortDescription}</p>
-            )}
-            <div className="flex flex-wrap gap-2">
-              <Badge variant={statusVariant(cat.status)} dot>{cat.status}</Badge>
-              <Badge variant="default">{LEVEL_LABEL[cat.level] ?? cat.level}</Badge>
-              {cat.isFeatured && <Badge variant="info">Featured</Badge>}
-            </div>
-          </div>
+          {children.length > 0 && (
+            <Panel title="Products by subcategory">
+              <BarList
+                accent="#0BA5A5"
+                items={children.map((c) => ({ label: c.name, value: childCounts.get(c._id.toString()) ?? 0 }))}
+              />
+            </Panel>
+          )}
 
           <div className="card p-5">
             <h3 className="text-[13px] font-semibold mb-3" style={{ color: "var(--apt-text-primary)" }}>Details</h3>

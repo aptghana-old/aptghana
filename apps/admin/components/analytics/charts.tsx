@@ -208,6 +208,65 @@ export function Donut({
   );
 }
 
+/* ─── ActivityHeatmap ─────────────────────────────────────────────────────── */
+const HEATMAP_HOUR_LABELS = ["00", "04", "08", "12", "16", "20", "23"];
+
+export function ActivityHeatmap({
+  days,
+  matrix,
+  accent = "#00B37E",
+}: {
+  /** Row labels, e.g. ["Mon", "Tue", …] */
+  days: string[];
+  /** matrix[dayIndex][hour 0-23] = session count */
+  matrix: number[][];
+  accent?: string;
+}) {
+  const max = Math.max(0, ...matrix.flat());
+  if (max === 0) return <EmptyState />;
+
+  return (
+    <div>
+      <div className="flex flex-col gap-1">
+        {matrix.map((row, ri) => (
+          <div key={days[ri] ?? ri} className="flex items-center gap-2">
+            <span
+              className="w-8 shrink-0 text-right font-mono"
+              style={{ fontSize: 10, color: "var(--apt-text-muted)" }}
+            >
+              {days[ri]}
+            </span>
+            <div className="flex gap-[3px] flex-1">
+              {row.map((v, ci) => {
+                const opacity = v === 0 ? 0 : 0.12 + (v / max) * 0.88;
+                return (
+                  <div
+                    key={ci}
+                    className="flex-1 rounded-sm aspect-square"
+                    style={{
+                      background: v === 0 ? "var(--apt-bg-raised)" : accent,
+                      opacity: v === 0 ? 1 : opacity,
+                    }}
+                    title={`${days[ri]} ${String(ci).padStart(2, "0")}:00 · ${formatNumber(v)} session${v === 1 ? "" : "s"}`}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        ))}
+        <div className="flex items-center gap-2">
+          <span className="w-8 shrink-0" />
+          <div className="flex justify-between flex-1" style={{ fontSize: 9.5, color: "var(--apt-text-muted)" }}>
+            {HEATMAP_HOUR_LABELS.map((h) => (
+              <span key={h}>{h}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ─── Funnel ──────────────────────────────────────────────────────────────── */
 export interface FunnelStage {
   stage: string;

@@ -1,17 +1,36 @@
 import type { Metadata } from "next";
 import { connectDB, AnalyticsModel } from "@apt/db";
-import { resolveRange, formatNumber, formatPercent, deltaPercent } from "@/lib/analytics/range";
+import { resolveRange, formatNumber, formatPercent } from "@/lib/analytics/range";
 import { Panel, StatCard, BarList, EmptyState } from "@/components/analytics/primitives";
-import { AreaChart, Donut, Funnel } from "@/components/analytics/charts";
+import { AreaChart, Donut, Funnel, ActivityHeatmap } from "@/components/analytics/charts";
 
 export const metadata: Metadata = { title: "Overview" };
 export const dynamic = "force-dynamic";
+
+const HEATMAP_DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 /* ─── hostname filter ─────────────────────────────────────────────────────── */
 function hostFilter(app?: string | null): Record<string, unknown> {
   if (app === "store") return { hostname: { $regex: /store|3001/ } };
   if (app === "web")   return { hostname: { $not: /store|3001/ } };
   return {};
+}
+
+/** Inclusive list of "YYYY-MM-DD" (UTC) day keys spanning [from, to], for zero-filling daily series. */
+function dayKeys(from: Date, to: Date): string[] {
+  const days: string[] = [];
+  const cursor = new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate()));
+  const end = new Date(Date.UTC(to.getUTCFullYear(), to.getUTCMonth(), to.getUTCDate()));
+  while (cursor <= end) {
+    days.push(cursor.toISOString().slice(0, 10));
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+  return days;
+}
+
+/** Mongo $dayOfWeek is 1=Sun…7=Sat; map to a Mon…Sun row index. */
+function heatmapRowIndex(dow: number): number {
+  return (dow + 5) % 7;
 }
 
 /* ─── Data ────────────────────────────────────────────────────────────────── */
@@ -30,7 +49,7 @@ async function getData(from: Date, to: Date, prevFrom: Date, prevTo: Date, app?:
       // previous period
       pageviewsPrev, sessionsPrev, convPrev,
       // charts & breakdowns
-      dailyTrend, topPages, trafficSources, deviceStats, eventStats, topSearches,
+      dailyTrend, dailyConversions, heatmapAgg, topPages, trafficSources, deviceStats, eventStats, topSearches,
     ] = await Promise.all([
       AnalyticsModel.countDocuments({ ...cur,  eventType: "pageview" }),
       AnalyticsModel.distinct("sessionId", cur),
@@ -47,6 +66,19 @@ async function getData(from: Date, to: Date, prevFrom: Date, prevTo: Date, app?:
         { $group: { _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, views: { $sum: 1 }, sessions: { $addToSet: "$sessionId" } } },
         { $project: { views: 1, sessions: { $size: "$sessions" } } },
         { $sort: { _id: 1 } },
+      ]),
+
+      // daily RFQ + search counts, for KPI sparklines
+      AnalyticsModel.aggregate<{ _id: { day: string; type: string }; count: number }>([
+        { $match: { ...cur, eventType: { $in: ["rfq_submit", "search"] } } },
+        { $group: { _id: { day: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, type: "$eventType" }, count: { $sum: 1 } } },
+      ]),
+
+      // sessions by weekday × hour of day (GMT), for the activity heatmap
+      AnalyticsModel.aggregate<{ _id: { dow: number; hour: number }; sessions: number }>([
+        { $match: { ...cur, eventType: "pageview" } },
+        { $group: { _id: { dow: { $dayOfWeek: "$createdAt" }, hour: { $hour: "$createdAt" } }, sessions: { $addToSet: "$sessionId" } } },
+        { $project: { sessions: { $size: "$sessions" } } },
       ]),
 
       AnalyticsModel.aggregate<{ _id: string; views: number }>([
@@ -106,9 +138,31 @@ async function getData(from: Date, to: Date, prevFrom: Date, prevTo: Date, app?:
     const funnelProducts  = eventStats.find((e) => e._id === "product_view")?.count ?? 0;
     const funnelConv      = convCur;
 
-    const trendLabels = dailyTrend.map((d) =>
-      new Date(d._id + "T12:00:00Z").toLocaleDateString("en-GH", { day: "numeric", month: "short" })
-    );
+    // Zero-filled, day-aligned series for the KPI sparklines — dailyTrend/dailyConversions
+    // only contain days that actually had events, so build the full day range explicitly.
+    const days = dayKeys(from, to);
+    const viewsByDay    = new Map(dailyTrend.map((d) => [d._id, d.views]));
+    const sessionsByDay = new Map(dailyTrend.map((d) => [d._id, d.sessions]));
+    const rfqByDay    = new Map(dailyConversions.filter((d) => d._id.type === "rfq_submit").map((d) => [d._id.day, d.count]));
+    const searchByDay = new Map(dailyConversions.filter((d) => d._id.type === "search").map((d) => [d._id.day, d.count]));
+
+    const trendLabels    = days.map((d) => new Date(d + "T12:00:00Z").toLocaleDateString("en-GH", { day: "numeric", month: "short" }));
+    const trendViews     = days.map((d) => viewsByDay.get(d) ?? 0);
+    const trendSessions  = days.map((d) => sessionsByDay.get(d) ?? 0);
+    const trendRfq       = days.map((d) => rfqByDay.get(d) ?? 0);
+    const trendSearches  = days.map((d) => searchByDay.get(d) ?? 0);
+    const trendConvRate  = days.map((d) => {
+      const s = sessionsByDay.get(d) ?? 0;
+      return s > 0 ? (rfqByDay.get(d) ?? 0) / s : 0;
+    });
+
+    // 7 (Mon…Sun) × 24 (hour) session-count matrix for the activity heatmap
+    const heatmapMatrix = Array.from({ length: 7 }, () => Array(24).fill(0) as number[]);
+    for (const cell of heatmapAgg) {
+      const row = heatmapRowIndex(cell._id.dow);
+      const hour = cell._id.hour;
+      if (row >= 0 && row < 7 && hour >= 0 && hour < 24) heatmapMatrix[row][hour] = cell.sessions;
+    }
 
     return {
       stats: {
@@ -120,8 +174,8 @@ async function getData(from: Date, to: Date, prevFrom: Date, prevTo: Date, app?:
         prevConvRate: sessionsPrevN > 0 ? convPrev / sessionsPrevN : 0,
       },
       trendLabels,
-      trendViews: dailyTrend.map((d) => d.views),
-      trendSessions: dailyTrend.map((d) => d.sessions),
+      trendViews, trendSessions, trendRfq, trendSearches, trendConvRate,
+      heatmapMatrix,
       topPages,
       trafficSources,
       deviceStats, totalDevices,
@@ -169,7 +223,11 @@ export default async function OverviewPage({
     );
   }
 
-  const { stats, trendLabels, trendViews, trendSessions, topPages, trafficSources, deviceStats, totalDevices, eventStats, totalEvents, topSearches, funnelStages } = data;
+  const {
+    stats, trendLabels, trendViews, trendSessions, trendRfq, trendSearches, trendConvRate,
+    heatmapMatrix, topPages, trafficSources, deviceStats, totalDevices, eventStats, totalEvents,
+    topSearches, funnelStages,
+  } = data;
 
   const deviceColors: Record<string, string> = { desktop: "#0EA5E9", mobile: "#00B37E", tablet: "#F59E0B" };
 
@@ -195,6 +253,7 @@ export default async function OverviewPage({
           previous={stats.pageviewsPrev}
           hint={`vs prev ${r.label}`}
           accent="#0EA5E9"
+          spark={trendViews}
         />
         <StatCard
           label="Sessions"
@@ -202,6 +261,7 @@ export default async function OverviewPage({
           current={stats.sessionsCurN}
           previous={stats.sessionsPrevN}
           accent="#00B37E"
+          spark={trendSessions}
         />
         <StatCard
           label="RFQ Conversions"
@@ -209,12 +269,14 @@ export default async function OverviewPage({
           current={stats.convCur}
           previous={stats.convPrev}
           accent="#F59E0B"
+          spark={trendRfq}
         />
         <StatCard
           label="Searches"
           value={formatNumber(stats.searchCur)}
           hint="product & category"
           accent="#A78BFA"
+          spark={trendSearches}
         />
         <StatCard
           label="Conversion Rate"
@@ -223,6 +285,7 @@ export default async function OverviewPage({
           previous={Math.round(stats.prevConvRate * 10000)}
           hint="RFQs per session"
           accent="#F472B6"
+          spark={trendConvRate}
         />
       </div>
 
@@ -280,6 +343,23 @@ export default async function OverviewPage({
           />
         </Panel>
       </div>
+
+      {/* ── Activity heatmap ─────────────────────────────────────────────────── */}
+      <Panel
+        title="Activity heatmap"
+        subtitle="Sessions by hour of day & weekday · GMT"
+        action={
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-medium" style={{ color: "var(--apt-text-muted)" }}>Less</span>
+            {[0.15, 0.4, 0.65, 0.9].map((o) => (
+              <span key={o} className="w-2.5 h-2.5 rounded-sm" style={{ background: "#00B37E", opacity: o }} />
+            ))}
+            <span className="text-[10px] font-medium" style={{ color: "var(--apt-text-muted)" }}>More</span>
+          </div>
+        }
+      >
+        <ActivityHeatmap days={HEATMAP_DAYS} matrix={heatmapMatrix} accent="#00B37E" />
+      </Panel>
 
       {/* ── Top pages + Top searches ───────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">

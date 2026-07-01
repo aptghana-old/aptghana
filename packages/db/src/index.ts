@@ -1,4 +1,5 @@
 export { connectDB } from "./connection";
+export { Types } from "mongoose";
 export { ProductModel } from "./models/Product";
 export { BrandModel } from "./models/Brand";
 export { CategoryModel } from "./models/Category";
