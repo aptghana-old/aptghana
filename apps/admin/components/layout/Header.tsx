@@ -227,13 +227,20 @@ export interface SessionUser {
   image?: string | null;
 }
 
+export interface SystemStatus {
+  configured: number;
+  total: number;
+}
+
 interface HeaderProps {
   user: SessionUser;
+  systemStatus?: SystemStatus;
   onCommandPalette(): void;
   onMobileMenuToggle(): void;
 }
 
-export default function Header({ user, onCommandPalette, onMobileMenuToggle }: HeaderProps) {
+export default function Header({ user, systemStatus, onCommandPalette, onMobileMenuToggle }: HeaderProps) {
+  const allConfigured = !!systemStatus && systemStatus.configured === systemStatus.total;
   return (
     <header
       className="flex items-center gap-2 sm:gap-4 px-3 sm:px-5 shrink-0 z-10"
@@ -289,6 +296,26 @@ export default function Header({ user, onCommandPalette, onMobileMenuToggle }: H
         >
           <Search size={16} />
         </button>
+
+        {/* Integrations status */}
+        {systemStatus && (
+          <a
+            href="/dashboard/integrations"
+            title={`${systemStatus.configured} of ${systemStatus.total} integrations configured`}
+            className="hidden md:inline-flex items-center gap-1.5 px-2.5 h-7 rounded-full text-[11px] font-semibold font-mono transition-colors"
+            style={{
+              background: allConfigured ? "var(--color-success-50)" : "var(--color-warning-50)",
+              color: allConfigured ? "var(--color-success-700)" : "var(--color-warning-700)",
+              border: `1px solid ${allConfigured ? "var(--color-success-100)" : "var(--color-warning-100)"}`,
+            }}
+          >
+            <span
+              className="w-1.5 h-1.5 rounded-full"
+              style={{ background: allConfigured ? "var(--color-success-500)" : "var(--color-warning-500)" }}
+            />
+            {systemStatus.configured}/{systemStatus.total} INTEGRATIONS
+          </a>
+        )}
 
         {/* Notifications */}
         <button

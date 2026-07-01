@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import Sidebar from "@/components/layout/Sidebar";
-import Header, { type SessionUser } from "@/components/layout/Header";
+import Sidebar, { type SidebarNavCounts } from "@/components/layout/Sidebar";
+import Header, { type SessionUser, type SystemStatus } from "@/components/layout/Header";
 import CommandPalette from "@/components/layout/CommandPalette";
 import type { AdminRole } from "@apt/auth";
 
@@ -12,9 +12,11 @@ interface DashboardShellProps {
   user: SessionUser;
   role: AdminRole;
   permissions: string[];
+  navCounts?: SidebarNavCounts;
+  systemStatus?: SystemStatus;
 }
 
-export default function DashboardShell({ children, user, role, permissions }: DashboardShellProps) {
+export default function DashboardShell({ children, user, role, permissions, navCounts, systemStatus }: DashboardShellProps) {
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const pathname = usePathname();
@@ -39,10 +41,12 @@ export default function DashboardShell({ children, user, role, permissions }: Da
         onMobileClose={() => setMobileNavOpen(false)}
         role={role}
         permissions={permissions}
+        counts={navCounts}
       />
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         <Header
           user={user}
+          systemStatus={systemStatus}
           onCommandPalette={() => setPaletteOpen(true)}
           onMobileMenuToggle={() => setMobileNavOpen((v) => !v)}
         />

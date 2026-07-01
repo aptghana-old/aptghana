@@ -111,7 +111,7 @@
   --apt-ring:         rgba(0, 87, 184, 0.35);
 
   /* Sidebar */
-  --apt-sidebar-bg:   #0a1628;
+  --apt-sidebar-bg:   linear-gradient(180deg, #101c30 0%, #0a1420 100%);
   --apt-sidebar-text: rgba(255,255,255,0.6);
   --apt-sidebar-text-active: #ffffff;
   --apt-sidebar-active: rgba(255,255,255,0.08);

@@ -27,7 +27,7 @@ const SidebarCtx = createContext<{ collapsed: boolean; toggle(): void }>({
 });
 export const useSidebar = () => useContext(SidebarCtx);
 
-type NavItem = { label: string; href: string; icon: React.ReactNode; badge?: string };
+type NavItem = { label: string; href: string; icon: React.ReactNode; badge?: string; badgeTone?: "neutral" | "accent" };
 type NavSection = { section: string; items: NavItem[] };
 
 const NAV: NavSection[] = [
@@ -108,7 +108,12 @@ function NavItemLink({ item, active, collapsed }: { item: NavItem; active: boole
         <span className="truncate leading-none">{item.label}</span>
       )}
       {!collapsed && item.badge && (
-        <span className="ml-auto text-[10px] font-semibold bg-[#ff6b00] text-white px-1.5 py-0.5 rounded-full leading-none">
+        <span
+          className={[
+            "ml-auto text-[10px] font-semibold px-1.5 py-0.5 rounded-full leading-none font-mono",
+            item.badgeTone === "accent" ? "bg-[#ff6b00] text-white" : "text-white/35 bg-white/5",
+          ].join(" ")}
+        >
           {item.badge}
         </span>
       )}
@@ -121,14 +126,20 @@ function NavItemLink({ item, active, collapsed }: { item: NavItem; active: boole
   );
 }
 
+export interface SidebarNavCounts {
+  products?: string;
+  quotesPending?: string;
+}
+
 interface SidebarProps {
   mobileOpen: boolean;
   onMobileClose: () => void;
   role: AdminRole;
   permissions: string[];
+  counts?: SidebarNavCounts;
 }
 
-export default function Sidebar({ mobileOpen, onMobileClose, role, permissions }: SidebarProps) {
+export default function Sidebar({ mobileOpen, onMobileClose, role, permissions, counts }: SidebarProps) {
   const [ collapsed, setCollapsed ] = useState(false);
   const pathname = usePathname();
 
@@ -143,9 +154,19 @@ export default function Sidebar({ mobileOpen, onMobileClose, role, permissions }
     return hasPermission(role, permissions, required as Permission);
   };
 
+  const BADGES: Record<string, { value?: string; tone: "neutral" | "accent" }> = {
+    "/dashboard/products": { value: counts?.products, tone: "neutral" },
+    "/dashboard/quotes": { value: counts?.quotesPending, tone: "accent" },
+  };
+
   const visibleSections = NAV.map((section) => ({
     ...section,
-    items: section.items.filter((item) => canView(item.href)),
+    items: section.items
+      .filter((item) => canView(item.href))
+      .map((item) => {
+        const badge = BADGES[item.href];
+        return badge?.value ? { ...item, badge: badge.value, badgeTone: badge.tone } : item;
+      }),
   })).filter((section) => section.items.length > 0);
 
   return (

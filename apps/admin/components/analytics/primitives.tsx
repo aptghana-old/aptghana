@@ -49,6 +49,8 @@ export function StatCard({
   previous,
   hint,
   accent = "#00B37E",
+  spark,
+  href,
 }: {
   label: string;
   value: string;
@@ -56,11 +58,13 @@ export function StatCard({
   previous?: number;
   hint?: string;
   accent?: string;
+  spark?: number[];
+  href?: string;
 }) {
   const delta = current != null && previous != null ? deltaPercent(current, previous) : null;
   const up = (delta ?? 0) >= 0;
-  return (
-    <div className="rounded-xl p-5" style={{ background: "var(--apt-bg)", border: "1px solid var(--apt-border)" }}>
+  const content = (
+    <div className="rounded-xl p-5 h-full" style={{ background: "var(--apt-bg)", border: "1px solid var(--apt-border)" }}>
       <div className="flex items-center justify-between mb-3">
         <p className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--apt-text-muted)" }}>{label}</p>
         <span className="w-2 h-2 rounded-full" style={{ backgroundColor: accent }} />
@@ -78,8 +82,11 @@ export function StatCard({
         )}
         {hint && <span style={{ color: "var(--apt-text-muted)" }}>{hint}</span>}
       </div>
+      {spark && spark.length > 1 && <div className="mt-3"><Sparkbar values={spark} accent={accent} /></div>}
     </div>
   );
+  if (href) return <a href={href} className="block h-full">{content}</a>;
+  return content;
 }
 
 /* ─── BarList ─────────────────────────────────────────────────────────────── */

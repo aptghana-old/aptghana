@@ -101,6 +101,43 @@ export function AreaChart({
   );
 }
 
+/* ─── MiniBarChart ────────────────────────────────────────────────────────── */
+export interface MiniBar {
+  label: string;
+  value: number;
+}
+
+export function MiniBarChart({ bars, accent = "#12B76A", height = 110 }: { bars: MiniBar[]; accent?: string; height?: number }) {
+  if (bars.length === 0 || bars.every((b) => b.value === 0)) return <EmptyState />;
+  const max = Math.max(1, ...bars.map((b) => b.value));
+  const peakIdx = bars.reduce((best, b, i) => (b.value > bars[best].value ? i : best), 0);
+
+  return (
+    <div>
+      <div className="flex items-end gap-2" style={{ height }}>
+        {bars.map((b, i) => (
+          <div key={`${b.label}-${i}`} className="flex-1 flex flex-col items-center gap-1.5 h-full justify-end">
+            <div
+              className="w-full rounded-t"
+              style={{
+                height: `${Math.max(4, (b.value / max) * 100)}%`,
+                background: i === peakIdx ? `linear-gradient(180deg, ${accent}, ${accent}CC)` : "var(--apt-bg-raised)",
+              }}
+              title={`${b.label}: ${formatNumber(b.value)}`}
+            />
+            <span
+              className="text-[9.5px] font-mono"
+              style={{ color: i === peakIdx ? "var(--apt-text-primary)" : "var(--apt-text-muted)", fontWeight: i === peakIdx ? 700 : 400 }}
+            >
+              {b.label}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ─── Donut ───────────────────────────────────────────────────────────────── */
 export interface DonutSegment {
   label: string;
@@ -122,29 +159,28 @@ export function Donut({
 
   const r = 54;
   const circ = 2 * Math.PI * r;
-  let offset = 0;
+  const dashes = segments.map((s) => (s.value / total) * circ);
+  const arcs = segments.map((s, i) => ({
+    ...s,
+    dash: dashes[i],
+    offset: dashes.slice(0, i).reduce((a, d) => a + d, 0),
+  }));
 
   return (
     <div className="flex items-center gap-6">
       <svg viewBox="0 0 140 140" className="w-28 h-28 shrink-0 -rotate-90">
         <circle cx={70} cy={70} r={r} fill="none" stroke="var(--apt-border)" strokeWidth={16} />
-        {segments.map((s) => {
-          const frac = s.value / total;
-          const dash = frac * circ;
-          const el = (
-            <circle
-              key={s.label}
-              cx={70} cy={70} r={r}
-              fill="none"
-              stroke={s.color}
-              strokeWidth={16}
-              strokeDasharray={`${dash} ${circ - dash}`}
-              strokeDashoffset={-offset}
-            />
-          );
-          offset += dash;
-          return el;
-        })}
+        {arcs.map((s) => (
+          <circle
+            key={s.label}
+            cx={70} cy={70} r={r}
+            fill="none"
+            stroke={s.color}
+            strokeWidth={16}
+            strokeDasharray={`${s.dash} ${circ - s.dash}`}
+            strokeDashoffset={-s.offset}
+          />
+        ))}
       </svg>
 
       <div className="flex-1 min-w-0">
