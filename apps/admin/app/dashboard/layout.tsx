@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import DashboardShell from "@/components/layout/DashboardShell";
 import { connectDB, ProductModel, QuoteModel } from "@apt/db";
 import { formatNumber } from "@/lib/analytics/range";
+import { getIntegrationsSummary } from "@/lib/integrations";
 import type { AdminRole } from "@apt/auth";
 
 async function getNavCounts() {
@@ -19,11 +20,6 @@ async function getNavCounts() {
   } catch {
     return {};
   }
-}
-
-function getSystemStatus() {
-  const checks = [!!process.env.ODOO_URL, !!process.env.MEILISEARCH_HOST, !!process.env.PAYSTACK_SECRET_KEY];
-  return { configured: checks.filter(Boolean).length, total: checks.length };
 }
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -51,7 +47,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       role={user.role ?? "sales"}
       permissions={user.permissions ?? []}
       navCounts={navCounts}
-      systemStatus={getSystemStatus()}
+      systemStatus={getIntegrationsSummary()}
     >
       {children}
     </DashboardShell>
