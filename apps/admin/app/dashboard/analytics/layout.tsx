@@ -1,17 +1,16 @@
 import type { Metadata } from "next";
-import { LayoutDashboard, Share2, FileText, Radio } from "lucide-react";
 import { getActiveSessionIds } from "@/lib/analytics/liveVisitors";
-import { AnalyticsTabNav, AnalyticsQueryToggle } from "@/components/analytics/AnalyticsTabNav";
+import { AnalyticsTabNav, AnalyticsQueryToggle, type AnalyticsTab } from "@/components/analytics/AnalyticsTabNav";
 
 export const metadata: Metadata = {
   title: { default: "Analytics", template: "%s · Analytics" },
 };
 
-const TABS = [
-  { label: "Overview",    href: "/dashboard/analytics",             icon: LayoutDashboard },
-  { label: "Visitors",    href: "/dashboard/analytics/visitors",    icon: Radio },
-  { label: "Acquisition", href: "/dashboard/analytics/acquisition", icon: Share2 },
-  { label: "Content",     href: "/dashboard/analytics/content",     icon: FileText },
+const TABS: AnalyticsTab[] = [
+  { label: "Overview",    href: "/dashboard/analytics",             icon: "LayoutDashboard" },
+  { label: "Visitors",    href: "/dashboard/analytics/visitors",    icon: "Radio" },
+  { label: "Acquisition", href: "/dashboard/analytics/acquisition", icon: "Share2" },
+  { label: "Content",     href: "/dashboard/analytics/content",     icon: "FileText" },
 ];
 
 const RANGES = [

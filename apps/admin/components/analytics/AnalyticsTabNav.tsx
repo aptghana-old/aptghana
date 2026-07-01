@@ -2,12 +2,21 @@
 
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
-import type { ComponentType } from "react";
+import { LayoutDashboard, Share2, FileText, Radio } from "lucide-react";
+
+/**
+ * Icons must be resolved here, not passed in from the server layout — React
+ * Server Components can only serialize plain data across the server/client
+ * boundary, and a component reference (e.g. the LayoutDashboard function)
+ * isn't plain data. So `AnalyticsTab.icon` is a lookup key, not the component.
+ */
+const ICONS = { LayoutDashboard, Share2, FileText, Radio } as const;
+export type AnalyticsTabIcon = keyof typeof ICONS;
 
 export interface AnalyticsTab {
   label: string;
   href: string;
-  icon: ComponentType<{ className?: string }>;
+  icon: AnalyticsTabIcon;
 }
 
 export function AnalyticsTabNav({ tabs }: { tabs: AnalyticsTab[] }) {
@@ -20,8 +29,9 @@ export function AnalyticsTabNav({ tabs }: { tabs: AnalyticsTab[] }) {
 
   return (
     <nav className="flex items-center gap-1">
-      {tabs.map(({ label, href, icon: Icon }) => {
+      {tabs.map(({ label, href, icon }) => {
         const active = isActive(href);
+        const Icon = ICONS[icon];
         return (
           <Link
             key={href}
