@@ -16,11 +16,13 @@ async function getBrand(id: string) {
     name: string;
     slug: string;
     description?: string;
+    shortDescription?: string;
     logo?: { url?: string; alt?: string };
     country?: string;
     website?: string;
     status: string;
     isFeatured?: boolean;
+    isPartner?: boolean;
   } | null;
 }
 
@@ -33,17 +35,19 @@ export default async function EditBrandPage({ params }: { params: Promise<{ id: 
     name: brand.name,
     slug: brand.slug,
     description: brand.description ?? "",
+    shortDescription: brand.shortDescription ?? "",
     country: brand.country ?? "",
     website: brand.website ?? "",
     logoUrl: brand.logo?.url ?? "",
     status: brand.status,
     isFeatured: brand.isFeatured ?? false,
+    isPartner: brand.isPartner ?? false,
   };
 
   return (
     <div>
       <div
-        className="flex items-center gap-4 px-6 py-4"
+        className="flex items-center gap-4 px-4 sm:px-6 py-4"
         style={{ borderBottom: "1px solid var(--apt-border)", background: "var(--apt-bg)" }}
       >
         <Link href={`/dashboard/brands/${id}`}>
@@ -52,7 +56,7 @@ export default async function EditBrandPage({ params }: { params: Promise<{ id: 
         <div style={{ width: 1, height: 20, background: "var(--apt-border)" }} />
         <h1 className="text-[15px] font-semibold" style={{ color: "var(--apt-text-primary)" }}>Edit Brand</h1>
       </div>
-      <div className="p-6 max-w-2xl">
+      <div className="p-4 sm:p-6 max-w-5xl">
         <BrandForm initial={initial} brandId={id} />
       </div>
     </div>

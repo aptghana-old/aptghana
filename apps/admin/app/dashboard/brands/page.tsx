@@ -1,66 +1,90 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { connectDB, BrandModel, ProductModel } from "@apt/db";
-import { Tag, Plus, Globe, ExternalLink } from "lucide-react";
-import { Badge, statusVariant } from "@/components/ui/Badge";
+import { hasPermission, type AdminRole } from "@apt/auth";
+import { Tag, Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
+import { StatCard } from "@/components/analytics/primitives";
+import { auth } from "@/lib/auth";
+import BrandsGrid, { type BrandCard } from "@/components/brands/BrandsGrid";
 
 export const metadata: Metadata = { title: "Brands" };
+export const dynamic = "force-dynamic";
 
-async function getBrands() {
+interface RawBrand {
+  _id: { toString(): string };
+  name: string;
+  slug: string;
+  logo?: { url?: string };
+  country?: string;
+  status: string;
+  isFeatured?: boolean;
+  isPartner?: boolean;
+}
+
+async function getBrands(): Promise<BrandCard[]> {
   try {
     await connectDB();
     const brands = await BrandModel.find({ status: { $ne: "deleted" } })
+      .select("name slug logo country status isFeatured isPartner")
       .sort({ name: 1 })
-      .lean();
+      .lean<RawBrand[]>();
 
-    const slugs = brands.map((b) => (b as unknown as { slug: string }).slug);
-    const counts = await ProductModel.aggregate([
-      { $match: { brandSlug: { $in: slugs }, status: "active" } },
+    const counts = await ProductModel.aggregate<{ _id: string; count: number }>([
+      { $match: { brandSlug: { $in: brands.map((b) => b.slug) }, status: "active" } },
       { $group: { _id: "$brandSlug", count: { $sum: 1 } } },
     ]);
+    const countMap = new Map(counts.map((c) => [c._id, c.count]));
 
-    const countMap = Object.fromEntries(counts.map((c) => [c._id, c.count]));
-
-    return brands.map((b) => {
-      const brand = b as unknown as {
-        _id: { toString(): string };
-        name: string;
-        slug: string;
-        logoUrl?: string;
-        country?: string;
-        website?: string;
-        status: string;
-        isFeatured?: boolean;
-        updatedAt: Date;
-      };
-      return { ...brand, productCount: countMap[brand.slug] ?? 0 };
-    });
-  } catch {
+    return brands.map((b) => ({
+      id: b._id.toString(),
+      name: b.name,
+      slug: b.slug,
+      logoUrl: b.logo?.url || undefined,
+      country: b.country,
+      status: b.status,
+      isFeatured: b.isFeatured ?? false,
+      isPartner: b.isPartner ?? false,
+      productCount: countMap.get(b.slug) ?? 0,
+    }));
+  } catch (err) {
+    console.error("[brands list]", err);
     return [];
   }
 }
 
 export default async function BrandsPage() {
+  const session = await auth();
+  const role = (session?.user as { role?: AdminRole } | undefined)?.role ?? "sales";
+  const overrides = (session?.user as { permissions?: string[] } | undefined)?.permissions ?? [];
+  const canCreate = hasPermission(role, overrides, "brands:create");
+
   const brands = await getBrands();
+
+  const featured = brands.filter((b) => b.isFeatured).length;
+  const partners = brands.filter((b) => b.isPartner).length;
+  const countries = new Set(brands.map((b) => b.country).filter(Boolean)).size;
+  const totalProducts = brands.reduce((sum, b) => sum + b.productCount, 0);
 
   return (
     <div>
       <PageHeader
         title="Brands"
-        description={`${brands.length} brand${brands.length !== 1 ? "s" : ""}`}
+        description={`${brands.length} brand${brands.length !== 1 ? "s" : ""} · ${partners} manufacturer partner${partners !== 1 ? "s" : ""} · ${totalProducts.toLocaleString()} products across the catalog`}
         actions={
-          <Link href="/dashboard/brands/new">
-            <Button variant="primary" size="sm" icon={<Plus size={13} />}>
-              Add Brand
-            </Button>
-          </Link>
+          canCreate && (
+            <Link href="/dashboard/brands/new">
+              <Button variant="primary" size="sm" icon={<Plus size={13} />}>
+                Add Brand
+              </Button>
+            </Link>
+          )
         }
       />
 
-      <div className="p-4 sm:p-6">
+      <div className="px-4 sm:px-6 pt-4 pb-4 sm:pb-6 space-y-4">
         {brands.length === 0 ? (
           <div className="card">
             <EmptyState
@@ -68,121 +92,28 @@ export default async function BrandsPage() {
               title="No brands yet"
               description="Add your first brand to start organising the catalogue."
               action={
-                <Link href="/dashboard/brands/new">
-                  <Button variant="primary" size="sm" icon={<Plus size={13} />}>
-                    Add first brand
-                  </Button>
-                </Link>
+                canCreate && (
+                  <Link href="/dashboard/brands/new">
+                    <Button variant="primary" size="sm" icon={<Plus size={13} />}>
+                      Add first brand
+                    </Button>
+                  </Link>
+                )
               }
             />
           </div>
         ) : (
-          <div className="card overflow-hidden">
-            <div className="overflow-x-auto">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Brand</th>
-                  <th className="hidden sm:table-cell">Country</th>
-                  <th>Products</th>
-                  <th>Status</th>
-                  <th className="hidden md:table-cell">Featured</th>
-                  <th className="hidden md:table-cell">Website</th>
-                  <th className="hidden lg:table-cell">Updated</th>
-                  <th className="w-px" />
-                </tr>
-              </thead>
-              <tbody>
-                {brands.map((brand) => (
-                  <tr key={brand._id.toString()}>
-                    <td>
-                      <Link
-                        href={`/dashboard/brands/${brand._id.toString()}`}
-                        className="flex items-center gap-3 group"
-                      >
-                        <div
-                          className="w-9 h-9 rounded-lg shrink-0 flex items-center justify-center overflow-hidden"
-                          style={{ background: "var(--apt-bg-raised)" }}
-                        >
-                          {brand.logoUrl ? (
-                            <img src={brand.logoUrl} alt={brand.name} className="w-full h-full object-contain p-1" />
-                          ) : (
-                            <Tag size={15} style={{ color: "var(--apt-text-muted)" }} />
-                          )}
-                        </div>
-                        <div>
-                          <div
-                            className="text-[13px] font-medium group-hover:text-[#0057b8] transition-colors"
-                            style={{ color: "var(--apt-text-primary)" }}
-                          >
-                            {brand.name}
-                          </div>
-                          <div className="text-[11px] font-mono hidden sm:block" style={{ color: "var(--apt-text-muted)" }}>
-                            {brand.slug}
-                          </div>
-                        </div>
-                      </Link>
-                    </td>
-                    <td className="hidden sm:table-cell">
-                      <span className="text-[13px]" style={{ color: "var(--apt-text-secondary)" }}>
-                        {brand.country ?? "—"}
-                      </span>
-                    </td>
-                    <td>
-                      <span className="text-[13px] font-medium tabular-nums" style={{ color: "var(--apt-text-primary)" }}>
-                        {brand.productCount.toLocaleString()}
-                      </span>
-                    </td>
-                    <td>
-                      <Badge variant={statusVariant(brand.status)} dot>
-                        {brand.status}
-                      </Badge>
-                    </td>
-                    <td className="hidden md:table-cell">
-                      {brand.isFeatured ? (
-                        <Badge variant="info">Featured</Badge>
-                      ) : (
-                        <span className="text-[12px]" style={{ color: "var(--apt-text-disabled)" }}>—</span>
-                      )}
-                    </td>
-                    <td className="hidden md:table-cell">
-                      {brand.website ? (
-                        <a
-                          href={brand.website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-[12px] hover:underline"
-                          style={{ color: "var(--apt-text-brand)" }}
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <Globe size={11} />
-                          <span>Visit</span>
-                          <ExternalLink size={10} />
-                        </a>
-                      ) : (
-                        <span className="text-[12px]" style={{ color: "var(--apt-text-disabled)" }}>—</span>
-                      )}
-                    </td>
-                    <td className="hidden lg:table-cell">
-                      <span className="text-[12px]" style={{ color: "var(--apt-text-muted)" }}>
-                        {new Date(brand.updatedAt).toLocaleDateString("en-GH", { day: "numeric", month: "short" })}
-                      </span>
-                    </td>
-                    <td>
-                      <Link
-                        href={`/dashboard/brands/${brand._id.toString()}/edit`}
-                        className="text-[12px] px-2 py-1 rounded hover:bg-[var(--apt-bg-raised)] transition-colors"
-                        style={{ color: "var(--apt-text-muted)" }}
-                      >
-                        Edit
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            </div>{/* /overflow-x-auto */}
-          </div>
+          <>
+            {/* KPI strip */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <StatCard label="Total Brands" value={brands.length.toLocaleString()} accent="#3D4CD6" />
+              <StatCard label="Featured" value={featured.toLocaleString()} accent="#00B37E" />
+              <StatCard label="Partners" value={partners.toLocaleString()} accent="#0BA5A5" />
+              <StatCard label="Countries" value={countries.toLocaleString()} accent="#F5820A" />
+            </div>
+
+            <BrandsGrid brands={brands} />
+          </>
         )}
       </div>
     </div>

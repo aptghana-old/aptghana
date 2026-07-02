@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const body = await req.json();
-    const { name, slug, description, country, website, logoUrl, status, isFeatured } = body;
+    const { name, slug, description, shortDescription, country, website, logoUrl, status, isFeatured, isPartner } = body;
 
     if (!name?.trim()) {
       return NextResponse.json({ error: "Brand name is required" }, { status: 422 });
@@ -26,11 +26,13 @@ export async function POST(req: NextRequest) {
       name: name.trim(),
       slug: finalSlug,
       description: description?.trim() ?? "",
+      shortDescription: shortDescription?.trim() ?? "",
       country: country || undefined,
       website: website?.trim() || undefined,
       logo: { url: logoUrl?.trim() || "", alt: name.trim() },
       status: status ?? "active",
       isFeatured: isFeatured ?? false,
+      isPartner: isPartner ?? false,
     });
 
     return NextResponse.json({ id: brand._id.toString() }, { status: 201 });

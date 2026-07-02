@@ -10,7 +10,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     await connectDB();
     const { id } = await params;
     const body = await req.json();
-    const { name, slug, description, country, website, logoUrl, status, isFeatured } = body;
+    const { name, slug, description, shortDescription, country, website, logoUrl, status, isFeatured, isPartner } = body;
 
     const brand = await BrandModel.findById(id);
     if (!brand) return NextResponse.json({ error: "Brand not found" }, { status: 404 });
@@ -27,8 +27,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     if (country !== undefined)     updates.country = country || undefined;
     if (website !== undefined)     updates.website = website?.trim() || undefined;
     if (logoUrl !== undefined)     updates.logo = { url: logoUrl.trim(), alt: (name ?? brand.name).trim() };
+    if (shortDescription !== undefined) updates.shortDescription = shortDescription.trim();
     if (status !== undefined)      updates.status = status;
     if (isFeatured !== undefined)  updates.isFeatured = isFeatured;
+    if (isPartner !== undefined)   updates.isPartner = isPartner;
 
     await BrandModel.updateOne({ _id: id }, { $set: updates });
     return NextResponse.json({ id });
