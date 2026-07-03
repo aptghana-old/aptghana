@@ -3,15 +3,16 @@
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { Search } from "lucide-react";
 
-/** Lifecycle order for the pills; anything unexpected sorts after these. */
-const STATUS_FLOW = ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled", "refunded"];
-
 interface Props {
   statusCounts: { status: string; count: number }[];
-  searchPlaceholder?: string;
+  /** Lifecycle order for the pills; unknown statuses sort after these. */
+  statusFlow: string[];
+  /** Optional pretty names for status keys (e.g. QUOTE_STATUS_LABELS). */
+  statusLabels?: Record<string, string>;
+  searchPlaceholder: string;
 }
 
-export default function OrdersQuickFilters({ statusCounts, searchPlaceholder = "Search order, customer…" }: Props) {
+export default function DealQuickFilters({ statusCounts, statusFlow, statusLabels, searchPlaceholder }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const params = useSearchParams();
@@ -19,8 +20,8 @@ export default function OrdersQuickFilters({ statusCounts, searchPlaceholder = "
   const total = statusCounts.reduce((n, s) => n + s.count, 0);
 
   const pills = [...statusCounts].sort((a, b) => {
-    const ai = STATUS_FLOW.indexOf(a.status), bi = STATUS_FLOW.indexOf(b.status);
-    return (ai === -1 ? STATUS_FLOW.length : ai) - (bi === -1 ? STATUS_FLOW.length : bi);
+    const ai = statusFlow.indexOf(a.status), bi = statusFlow.indexOf(b.status);
+    return (ai === -1 ? statusFlow.length : ai) - (bi === -1 ? statusFlow.length : bi);
   });
 
   function push(mutate: (qs: URLSearchParams) => void) {
@@ -43,6 +44,7 @@ export default function OrdersQuickFilters({ statusCounts, searchPlaceholder = "
     });
   }
 
+  const label = (s: string) => statusLabels?.[s] ?? s.replace(/_/g, " ");
   const pillBase = "text-[12px] font-semibold px-3.5 py-[7px] rounded-full transition-colors cursor-pointer whitespace-nowrap";
 
   return (
@@ -69,7 +71,7 @@ export default function OrdersQuickFilters({ statusCounts, searchPlaceholder = "
               ? { background: "var(--apt-text-primary)", color: "var(--apt-bg)" }
               : { background: "var(--apt-bg)", border: "1px solid var(--apt-border)", color: "var(--apt-text-secondary)" }}
           >
-            {s.status.replace(/_/g, " ")} · {s.count.toLocaleString()}
+            {label(s.status)} · {s.count.toLocaleString()}
           </button>
         );
       })}
@@ -88,7 +90,7 @@ export default function OrdersQuickFilters({ statusCounts, searchPlaceholder = "
             placeholder={searchPlaceholder}
             className="w-full bg-transparent text-[12.5px] outline-none placeholder:text-[var(--apt-text-muted)]"
             style={{ color: "var(--apt-text-primary)" }}
-            aria-label="Search orders"
+            aria-label={searchPlaceholder}
           />
         </div>
       </form>

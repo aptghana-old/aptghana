@@ -7,8 +7,10 @@ import { auth } from "@/lib/auth";
 import { getDealList, getDealKpis, getDealAnalytics, getDealFilterOptions, parseDealParams, resolveDatePreset } from "@/lib/dealFilters";
 import DealListShell from "@/components/deals/DealListShell";
 import type { DealColumn, DealTableRow } from "@/components/deals/DealTable";
-import OrdersOverview, { compactMoney } from "@/components/orders/OrdersOverview";
-import OrdersQuickFilters from "@/components/orders/OrdersQuickFilters";
+import DealOverview, { compactMoney } from "@/components/deals/DealOverview";
+import DealQuickFilters from "@/components/deals/DealQuickFilters";
+
+const ORDER_STATUS_FLOW = ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled", "refunded"];
 
 export const metadata: Metadata = { title: "Orders" };
 export const dynamic = "force-dynamic";
@@ -145,8 +147,8 @@ export default async function OrdersPage({ searchParams }: Props) {
         total={total}
         page={page}
         pageSize={PAGE_SIZE}
-        overview={<OrdersOverview kpis={kpis} analytics={analytics} currency={currency} rangeLabel={rangeLabel} />}
-        quickFilters={<OrdersQuickFilters statusCounts={analytics.byStatus} />}
+        overview={<DealOverview kind="order" kpis={kpis} analytics={analytics} currency={currency} rangeLabel={rangeLabel} />}
+        quickFilters={<DealQuickFilters statusCounts={analytics.byStatus} statusFlow={ORDER_STATUS_FLOW} searchPlaceholder="Search order, customer…" />}
         bulkEndpoint={canEdit ? "/api/orders/bulk" : undefined}
         bulkStatusOptions={canEdit ? [
           { value: "confirmed", label: "Confirmed" }, { value: "processing", label: "Processing" },
