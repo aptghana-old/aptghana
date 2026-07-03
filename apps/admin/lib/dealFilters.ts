@@ -235,6 +235,8 @@ export interface DealKpis {
   openCount: number;
   conversionRate: number | null;
   monthlyGrowth: number | null;
+  /** Deal-count growth vs the prior period (%, null when prior period had none). */
+  countGrowth: number | null;
   expiringQuotes: number;
   outstandingAmount: number;
 }
@@ -273,7 +275,7 @@ export async function getDealKpis(kind: DealKind, p: DealFilterParams): Promise<
   const prevRange: DateRange = { from: range.prevFrom, to: range.prevTo, prevFrom: range.prevFrom, prevTo: range.prevTo, label: "" };
   const [prevSummary] = await Model.aggregate([
     ...buildFilteredPipeline(kind, p, prevRange),
-    { $group: { _id: null, totalRevenue: { $sum: `$${valueField}` } } },
+    { $group: { _id: null, totalRevenue: { $sum: `$${valueField}` }, totalCount: { $sum: 1 } } },
   ]);
 
   let expiringQuotes = 0;
@@ -287,6 +289,7 @@ export async function getDealKpis(kind: DealKind, p: DealFilterParams): Promise<
   const totalCount = summary?.totalCount ?? 0;
   const totalRevenue = summary?.totalRevenue ?? 0;
   const prevRevenue = prevSummary?.totalRevenue ?? 0;
+  const prevCount = prevSummary?.totalCount ?? 0;
 
   return {
     totalCount,
@@ -295,6 +298,7 @@ export async function getDealKpis(kind: DealKind, p: DealFilterParams): Promise<
     openCount: summary?.openCount ?? 0,
     conversionRate: totalCount > 0 ? (summary?.converted ?? 0) / totalCount : null,
     monthlyGrowth: prevRevenue > 0 ? ((totalRevenue - prevRevenue) / prevRevenue) * 100 : null,
+    countGrowth: prevCount > 0 ? ((totalCount - prevCount) / prevCount) * 100 : null,
     expiringQuotes,
     outstandingAmount: summary?.outstandingAmount ?? 0,
   };
@@ -302,7 +306,10 @@ export async function getDealKpis(kind: DealKind, p: DealFilterParams): Promise<
 
 export interface DealAnalytics {
   revenueTrend: { date: string; revenue: number; count: number }[];
+  /** Counts per status; ignores the active status filter so breakdowns/pills stay complete. */
   byStatus: { status: string; count: number }[];
+  /** Counts per origin channel; ignores the active channel filter. */
+  byChannel: { channel: string; count: number }[];
   topCustomers: { name: string; value: number; count: number }[];
   topBrands: { brand: string; count: number }[];
   salesRepPerformance: { name: string; count: number; revenue: number }[];
@@ -315,9 +322,14 @@ export async function getDealAnalytics(kind: DealKind, p: DealFilterParams): Pro
   const Model = modelFor(kind);
   const valueField = VALUE_FIELD[kind];
   const match = buildBaseMatch(kind, p, range);
+  // Breakdown panels exclude their own dimension's filter, otherwise filtering
+  // by a status/channel collapses the breakdown to a single bar/slice.
+  const statusFreeMatch = buildBaseMatch(kind, { ...p, status: undefined }, range);
+  const channelFreeMatch = buildBaseMatch(kind, { ...p, channel: undefined }, range);
 
-  const [revenueTrend, byStatus, topCustomers, topBrands, salesRepRows]: [
+  const [revenueTrend, byStatus, byChannel, topCustomers, topBrands, salesRepRows]: [
     { _id: string; revenue: number; count: number }[],
+    { _id: string; count: number }[],
     { _id: string; count: number }[],
     { _id: string; value: number; count: number }[],
     { _id: string; count: number }[],
@@ -329,8 +341,13 @@ export async function getDealAnalytics(kind: DealKind, p: DealFilterParams): Pro
       { $sort: { _id: 1 } },
     ]),
     Model.aggregate([
-      { $match: match },
+      { $match: statusFreeMatch },
       { $group: { _id: "$status", count: { $sum: 1 } } },
+      { $sort: { count: -1 } },
+    ]),
+    Model.aggregate([
+      { $match: channelFreeMatch },
+      { $group: { _id: { $ifNull: ["$originChannel", "unknown"] }, count: { $sum: 1 } } },
       { $sort: { count: -1 } },
     ]),
     Model.aggregate([
@@ -376,6 +393,7 @@ export async function getDealAnalytics(kind: DealKind, p: DealFilterParams): Pro
   return {
     revenueTrend: revenueTrend.map((r) => ({ date: r._id, revenue: r.revenue, count: r.count })),
     byStatus: byStatus.map((s) => ({ status: s._id, count: s.count })),
+    byChannel: byChannel.map((c) => ({ channel: c._id, count: c.count })),
     topCustomers: topCustomers.map((c) => ({ name: c._id, value: c.value, count: c.count })),
     topBrands: topBrands.map((b) => ({ brand: b._id, count: b.count })),
     salesRepPerformance: salesRepRows.map((r) => ({ name: r.name ?? "Unassigned", count: r.count, revenue: r.revenue })),

@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { hasPermission, type AdminRole } from "@apt/auth";
 import { Badge, statusVariant } from "@/components/ui/Badge";
-import { PageHeader } from "@/components/ui/PageHeader";
 import ExportMenu from "@/components/exports/ExportMenu";
 import { auth } from "@/lib/auth";
-import { getDealList, getDealKpis, getDealAnalytics, getDealFilterOptions, parseDealParams } from "@/lib/dealFilters";
+import { getDealList, getDealKpis, getDealAnalytics, getDealFilterOptions, parseDealParams, resolveDatePreset } from "@/lib/dealFilters";
 import DealListShell from "@/components/deals/DealListShell";
 import type { DealColumn, DealTableRow } from "@/components/deals/DealTable";
+import OrdersOverview, { compactMoney } from "@/components/orders/OrdersOverview";
+import OrdersQuickFilters from "@/components/orders/OrdersQuickFilters";
 
 export const metadata: Metadata = { title: "Orders" };
 export const dynamic = "force-dynamic";
@@ -17,13 +18,13 @@ const PAGE_SIZE = 40;
 const COLUMNS: DealColumn[] = [
   { key: "ref", label: "Order" },
   { key: "customer", label: "Customer" },
-  { key: "rep", label: "Sales Rep", defaultVisible: false },
-  { key: "items", label: "Items", align: "right" },
+  { key: "rep", label: "Rep" },
+  { key: "items", label: "Items", align: "center" },
   { key: "total", label: "Total", align: "right", sortable: true },
   { key: "status", label: "Status" },
   { key: "paymentStatus", label: "Payment" },
   { key: "channel", label: "Channel", defaultVisible: false },
-  { key: "createdAt", label: "Date", sortable: true },
+  { key: "createdAt", label: "Date", align: "right", sortable: true },
 ];
 
 interface OrderRow {
@@ -83,7 +84,7 @@ export default async function OrdersPage({ searchParams }: Props) {
       case "rep":
         return <span className="text-[12px]" style={{ color: "var(--apt-text-secondary)" }}>{o.salesRepName ?? "—"}</span>;
       case "items":
-        return <span className="text-[12px]" style={{ color: "var(--apt-text-muted)" }}>{o.items?.length ?? 0}</span>;
+        return <span className="font-mono text-[12px]" style={{ color: "var(--apt-text-secondary)" }}>{o.items?.length ?? 0}</span>;
       case "total":
         return o.total ? (
           <span className="text-[13px] font-semibold tabular-nums" style={{ color: "var(--apt-text-primary)" }}>{o.currency ?? "GHS"} {o.total.toLocaleString()}</span>
@@ -95,7 +96,7 @@ export default async function OrdersPage({ searchParams }: Props) {
       case "channel":
         return <span className="text-[12px] capitalize" style={{ color: "var(--apt-text-muted)" }}>{o.originChannel ?? "—"}</span>;
       case "createdAt":
-        return <span className="text-[12px]" style={{ color: "var(--apt-text-muted)" }}>{new Date(o.createdAt).toLocaleDateString("en-GH", { day: "numeric", month: "short", year: "2-digit" })}</span>;
+        return <span className="font-mono text-[11.5px]" style={{ color: "var(--apt-text-muted)" }}>{new Date(o.createdAt).toLocaleDateString("en-GH", { day: "numeric", month: "short", year: "2-digit" })}</span>;
       default:
         return null;
     }
@@ -106,13 +107,30 @@ export default async function OrdersPage({ searchParams }: Props) {
     cells: Object.fromEntries(COLUMNS.map((c) => [c.key, renderCell(o, c.key)])),
   }));
 
+  const currency = options.currencies[0] ?? "GHS";
+  const rangeLabel = resolveDatePreset(params).label;
+
   return (
     <div>
-      <PageHeader
-        title="Orders"
-        description={`${total.toLocaleString()} order${total !== 1 ? "s" : ""} matching your filters`}
-        actions={canExport ? <ExportMenu datasets={[{ key: "orders", label: "Orders" }, { key: "sales", label: "Sales" }, { key: "payments", label: "Payments" }]} inheritParams={["status", "preset", "salesRep", "currency"]} /> : undefined}
-      />
+      {/* ── Header ── */}
+      <div
+        className="flex items-end justify-between gap-4 px-4 sm:px-6 py-5 flex-wrap"
+        style={{ borderBottom: "1px solid var(--apt-border)", background: "var(--apt-bg)" }}
+      >
+        <div className="min-w-0">
+          <h1 className="text-[24px] font-extrabold tracking-tight leading-none" style={{ color: "var(--apt-text-primary)" }}>
+            Orders
+          </h1>
+          <p className="text-[13px] mt-1.5" style={{ color: "var(--apt-text-muted)" }}>
+            {total.toLocaleString()} order{total !== 1 ? "s" : ""} · {compactMoney(kpis.totalRevenue, currency)} gross merchandise value · {rangeLabel.toLowerCase()}
+          </p>
+        </div>
+        {canExport && (
+          <div className="flex items-center gap-2 shrink-0">
+            <ExportMenu datasets={[{ key: "orders", label: "Orders" }, { key: "sales", label: "Sales" }, { key: "payments", label: "Payments" }]} inheritParams={["status", "preset", "salesRep", "currency"]} />
+          </div>
+        )}
+      </div>
 
       <DealListShell
         kind="order"
@@ -120,13 +138,15 @@ export default async function OrdersPage({ searchParams }: Props) {
         current={sp}
         storageNamespace="orders"
         kpis={kpis}
-        currency={options.currencies[0] ?? "GHS"}
+        currency={currency}
         analytics={analytics}
         columns={COLUMNS}
         rows={tableRows}
         total={total}
         page={page}
         pageSize={PAGE_SIZE}
+        overview={<OrdersOverview kpis={kpis} analytics={analytics} currency={currency} rangeLabel={rangeLabel} />}
+        quickFilters={<OrdersQuickFilters statusCounts={analytics.byStatus} />}
         bulkEndpoint={canEdit ? "/api/orders/bulk" : undefined}
         bulkStatusOptions={canEdit ? [
           { value: "confirmed", label: "Confirmed" }, { value: "processing", label: "Processing" },

@@ -12,8 +12,25 @@ export interface DealColumn {
   key: string;
   label: string;
   sortable?: boolean;
-  align?: "left" | "right";
+  align?: "left" | "center" | "right";
   defaultVisible?: boolean;
+}
+
+const ALIGN_CLASS: Record<string, string | undefined> = { center: "text-center", right: "text-right" };
+
+/** Windowed page list: 1 … around current … last (all pages when few). */
+function pageItems(page: number, totalPages: number): (number | "…")[] {
+  if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+  const wanted = [...new Set([1, page - 1, page, page + 1, totalPages])]
+    .filter((p) => p >= 1 && p <= totalPages)
+    .sort((a, b) => a - b);
+  const out: (number | "…")[] = [];
+  for (const p of wanted) {
+    const prev = out[out.length - 1];
+    if (typeof prev === "number" && p - prev > 1) out.push("…");
+    out.push(p);
+  }
+  return out;
 }
 
 /**
@@ -121,7 +138,7 @@ export default function DealTable({
                   <th className="w-px"><input type="checkbox" className="rounded" checked={Boolean(selected?.size) && selected?.size === rows.length} onChange={onToggleAll} /></th>
                 )}
                 {visibleColumns.map((c) => (
-                  <th key={c.key} className={c.align === "right" ? "text-right" : undefined}>
+                  <th key={c.key} className={ALIGN_CLASS[c.align ?? "left"]}>
                     {c.sortable ? (
                       <Link href={sortHref(c.key)} onClick={() => setNavigating(true)} className="inline-flex items-center gap-1 hover:underline">
                         {c.label}
@@ -139,7 +156,7 @@ export default function DealTable({
                     <td><input type="checkbox" className="rounded" checked={selected?.has(row.id) ?? false} onChange={() => onToggle?.(row.id)} /></td>
                   )}
                   {visibleColumns.map((c) => (
-                    <td key={c.key} className={c.align === "right" ? "text-right" : undefined}>{row.cells[c.key]}</td>
+                    <td key={c.key} className={ALIGN_CLASS[c.align ?? "left"]}>{row.cells[c.key]}</td>
                   ))}
                 </tr>
               ))}
@@ -149,30 +166,68 @@ export default function DealTable({
       )}
 
       {totalPages > 1 && (
-        <div className="flex items-center justify-between px-4 py-3" style={{ borderTop: "1px solid var(--apt-border)" }}>
-          <span className="text-[12px]" style={{ color: "var(--apt-text-muted)" }}>
-            {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, total)} of {total.toLocaleString()}
+        <div className="flex items-center justify-between gap-3 px-4 py-3 flex-wrap" style={{ borderTop: "1px solid var(--apt-border)", background: "var(--apt-bg-subtle)" }}>
+          <span className="font-mono text-[11.5px]" style={{ color: "var(--apt-text-muted)" }}>
+            Showing {((page - 1) * pageSize + 1).toLocaleString()}–{Math.min(page * pageSize, total).toLocaleString()} of {total.toLocaleString()}
           </span>
-          <div className="flex items-center gap-2">
-            {navigating && <Loader2 size={13} className="animate-spin" style={{ color: "var(--apt-text-muted)" }} />}
-            {page > 1 ? (
-              <Link href={pageHref(page - 1)} onClick={() => setNavigating(true)}>
-                <Button variant="outline" size="xs" icon={<ChevronLeft size={12} />}>Prev</Button>
-              </Link>
-            ) : (
-              <Button variant="outline" size="xs" icon={<ChevronLeft size={12} />} disabled>Prev</Button>
+          <div className="flex items-center gap-1.5">
+            {navigating && <Loader2 size={13} className="animate-spin mr-1" style={{ color: "var(--apt-text-muted)" }} />}
+            <PageArrow dir="prev" disabled={page <= 1} href={pageHref(page - 1)} onNavigate={() => setNavigating(true)} />
+            {pageItems(page, totalPages).map((p, i) =>
+              p === "…" ? (
+                <span key={`gap-${i}`} className="px-1 font-mono text-[12px]" style={{ color: "var(--apt-text-muted)" }}>…</span>
+              ) : (
+                <PageNumber key={p} page={p} current={p === page} href={pageHref(p)} onNavigate={() => setNavigating(true)} />
+              )
             )}
-            <span className="text-[12px] px-1" style={{ color: "var(--apt-text-muted)" }}>Page {page} of {totalPages}</span>
-            {page < totalPages ? (
-              <Link href={pageHref(page + 1)} onClick={() => setNavigating(true)}>
-                <Button variant="outline" size="xs" iconRight={<ChevronRight size={12} />}>Next</Button>
-              </Link>
-            ) : (
-              <Button variant="outline" size="xs" iconRight={<ChevronRight size={12} />} disabled>Next</Button>
-            )}
+            <PageArrow dir="next" disabled={page >= totalPages} href={pageHref(page + 1)} onNavigate={() => setNavigating(true)} />
           </div>
         </div>
       )}
     </div>
+  );
+}
+
+function PageArrow({ dir, disabled, href, onNavigate }: { dir: "prev" | "next"; disabled: boolean; href: string; onNavigate(): void }) {
+  const icon = dir === "prev" ? <ChevronLeft size={14} /> : <ChevronRight size={14} />;
+  const cls = "w-[30px] h-[30px] rounded-lg flex items-center justify-center transition-colors";
+  if (disabled) {
+    return (
+      <span className={cls} style={{ border: "1px solid var(--apt-border)", color: "var(--apt-text-disabled)", background: "var(--apt-bg)" }} aria-hidden>
+        {icon}
+      </span>
+    );
+  }
+  return (
+    <Link
+      href={href}
+      onClick={onNavigate}
+      className={`${cls} hover:bg-[var(--apt-bg-raised)]`}
+      style={{ border: "1px solid var(--apt-border)", color: "var(--apt-text-secondary)", background: "var(--apt-bg)" }}
+      aria-label={dir === "prev" ? "Previous page" : "Next page"}
+    >
+      {icon}
+    </Link>
+  );
+}
+
+function PageNumber({ page, current, href, onNavigate }: { page: number; current: boolean; href: string; onNavigate(): void }) {
+  const cls = "min-w-[30px] h-[30px] px-2 rounded-lg flex items-center justify-center font-mono text-[12px] transition-colors";
+  if (current) {
+    return (
+      <span className={`${cls} font-semibold`} style={{ background: "var(--apt-text-primary)", color: "var(--apt-bg)" }} aria-current="page">
+        {page}
+      </span>
+    );
+  }
+  return (
+    <Link
+      href={href}
+      onClick={onNavigate}
+      className={`${cls} hover:bg-[var(--apt-bg-raised)]`}
+      style={{ border: "1px solid var(--apt-border)", color: "var(--apt-text-secondary)", background: "var(--apt-bg)" }}
+    >
+      {page}
+    </Link>
   );
 }

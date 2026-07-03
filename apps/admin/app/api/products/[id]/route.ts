@@ -19,13 +19,25 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
     const updates: Record<string, unknown> = {};
 
+    const cleanList = (v: unknown): string[] =>
+      Array.isArray(v) ? v.map((x) => String(x).trim()).filter(Boolean) : [];
+
     if (body.name !== undefined)             updates.name = body.name.trim();
     if (body.slug !== undefined)             updates.slug = body.slug?.trim() || slugify(body.name ?? product.name as string);
     if (body.sku  !== undefined)             updates.sku  = body.sku.trim().toUpperCase();
     if (body.mpn  !== undefined)             updates.mpn  = body.mpn?.trim() || undefined;
+    if (body.supplierRef !== undefined)      updates.supplierRef = body.supplierRef?.trim() || undefined;
     if (body.shortDescription !== undefined) updates.shortDescription = body.shortDescription?.trim();
     if (body.description !== undefined)      updates.description      = body.description?.trim();
     if (body.status !== undefined)           updates.status = body.status;
+    if (body.features !== undefined)         updates.features       = cleanList(body.features);
+    if (body.applications !== undefined)     updates.applications   = cleanList(body.applications);
+    if (body.certifications !== undefined)   updates.certifications = cleanList(body.certifications);
+    if (body.tags !== undefined)             updates.tags           = cleanList(body.tags);
+    if (body.isNew !== undefined)            updates.isNew        = Boolean(body.isNew);
+    if (body.isFeatured !== undefined)       updates.isFeatured   = Boolean(body.isFeatured);
+    if (body.isClearance !== undefined)      updates.isClearance  = Boolean(body.isClearance);
+    if (body.discount !== undefined)         updates.discount     = body.discount ? Math.min(100, Math.max(0, parseFloat(body.discount))) : 0;
 
     if (body.brandId !== undefined) {
       if (body.brandId) {
@@ -56,27 +68,35 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
       }
     }
 
+    // Schema shape: specifications: [{ group, attributes: [{ name, value, unit }] }]
     if (body.specGroups !== undefined) {
       updates.specifications = (body.specGroups ?? [])
-        .map((g: { name: string; specs: { key: string; value: string }[] }) => ({
-          groupName: g.name,
-          specs: g.specs.filter((s) => s.key && s.value).map((s) => ({ name: s.key, values: [s.value] })),
+        .map((g: { name?: string; specs?: { key?: string; value?: string; unit?: string }[] }) => ({
+          group: g.name?.trim() || "General",
+          attributes: (g.specs ?? [])
+            .filter((s) => s.key?.trim() && s.value?.trim())
+            .map((s) => ({ name: s.key!.trim(), value: s.value!.trim(), unit: s.unit?.trim() || undefined })),
         }))
-        .filter((g: { specs: unknown[] }) => g.specs.length > 0);
+        .filter((g: { attributes: unknown[] }) => g.attributes.length > 0);
     }
 
-    if (body.listPrice !== undefined || body.currency !== undefined) {
-      updates["pricing.listPrice"] = body.listPrice ? parseFloat(body.listPrice) : undefined;
-      updates["pricing.currency"]  = body.currency ?? "GHS";
-    }
+    const numOrSkip = (path: string, raw: unknown, parse: (v: string) => number) => {
+      if (raw === undefined) return;
+      const n = parse(String(raw));
+      if (!Number.isNaN(n)) updates[path] = n;
+    };
+    numOrSkip("pricing.listPrice", body.listPrice, parseFloat);
+    numOrSkip("pricing.tradePrice", body.tradePrice, parseFloat);
+    numOrSkip("pricing.minimumOrderQty", body.minimumOrderQty, (v) => parseInt(v, 10));
+    if (body.currency !== undefined)  updates["pricing.currency"]  = body.currency || "GHS";
+    if (body.leadTime !== undefined)  updates["pricing.leadTime"]  = body.leadTime?.trim() || undefined;
+    if (body.incoterms !== undefined) updates["pricing.incoterms"] = body.incoterms?.trim() || undefined;
 
-    if (body.stockQty !== undefined) {
-      updates["inventory.stockQty"] = parseInt(body.stockQty, 10);
-    }
+    numOrSkip("inventory.quantity", body.quantity ?? body.stockQty, (v) => parseInt(v, 10));
 
     if (body.metaTitle !== undefined || body.metaDescription !== undefined) {
-      updates["seo.metaTitle"]       = body.metaTitle?.trim()       || body.name?.trim() || product.name as string;
-      updates["seo.metaDescription"] = body.metaDescription?.trim();
+      updates["seo.title"]       = body.metaTitle?.trim()       || body.name?.trim() || product.name as string;
+      updates["seo.description"] = body.metaDescription?.trim() ?? "";
     }
 
     await ProductModel.updateOne({ _id: id }, { $set: updates });

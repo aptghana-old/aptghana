@@ -11,8 +11,12 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
     const body = await req.json();
-    const { name, sku, mpn, slug, brandId, categoryId, shortDescription, description, status,
-      specGroups, listPrice, currency, stockQty, metaTitle, metaDescription } = body;
+    const { name, sku, mpn, supplierRef, slug, brandId, categoryId, shortDescription, description, status,
+      specGroups, listPrice, tradePrice, currency, minimumOrderQty, leadTime, incoterms,
+      quantity, stockQty, isNew, isFeatured, isClearance, discount, metaTitle, metaDescription } = body;
+
+    const cleanList = (v: unknown): string[] =>
+      Array.isArray(v) ? v.map((x) => String(x).trim()).filter(Boolean) : [];
 
     if (!name?.trim() || !sku?.trim()) {
       return NextResponse.json({ error: "Name and SKU are required" }, { status: 422 });
@@ -36,18 +40,26 @@ export async function POST(req: NextRequest) {
     }
     const categories = chain ? buildEmbeddedCategories(chain.chain) : [];
 
-    const specs = (specGroups ?? []).map((g: { name: string; specs: { key: string; value: string }[] }) => ({
-      groupName: g.name,
-      specs: g.specs.filter((s) => s.key && s.value).map((s) => ({ name: s.key, values: [s.value] })),
-    })).filter((g: { specs: unknown[] }) => g.specs.length > 0);
+    // Schema shape: specifications: [{ group, attributes: [{ name, value, unit }] }]
+    const specs = (specGroups ?? [])
+      .map((g: { name?: string; specs?: { key?: string; value?: string; unit?: string }[] }) => ({
+        group: g.name?.trim() || "General",
+        attributes: (g.specs ?? [])
+          .filter((s) => s.key?.trim() && s.value?.trim())
+          .map((s) => ({ name: s.key!.trim(), value: s.value!.trim(), unit: s.unit?.trim() || undefined })),
+      }))
+      .filter((g: { attributes: unknown[] }) => g.attributes.length > 0);
 
     const finalSlug = slug?.trim() || slugify(name);
     const finalStatus: string = status ?? "draft";
+
+    const initialQty = quantity ?? stockQty;
 
     const product = await ProductModel.create({
       name: name.trim(),
       sku:  sku.trim().toUpperCase(),
       mpn:  mpn?.trim() ?? undefined,
+      supplierRef: supplierRef?.trim() || undefined,
       slug: finalSlug,
       brandId:   brandId   || undefined,
       brandName,
@@ -57,19 +69,31 @@ export async function POST(req: NextRequest) {
       catalogue: chain ? { path: chain.path, url: chain.url } : undefined,
       shortDescription: shortDescription?.trim() ?? undefined,
       description:      description?.trim()      ?? undefined,
+      features:       cleanList(body.features),
+      applications:   cleanList(body.applications),
+      certifications: cleanList(body.certifications),
+      tags:           cleanList(body.tags),
       status: finalStatus,
+      isNew:       Boolean(isNew),
+      isFeatured:  Boolean(isFeatured),
+      isClearance: Boolean(isClearance),
+      discount:    discount ? Math.min(100, Math.max(0, parseFloat(discount))) : 0,
       specifications: specs,
       pricing: {
-        listPrice: listPrice ? parseFloat(listPrice) : undefined,
-        currency:  currency  ?? "GHS",
+        listPrice:       listPrice ? parseFloat(listPrice) : undefined,
+        tradePrice:      tradePrice ? parseFloat(tradePrice) : undefined,
+        currency:        currency ?? "GHS",
+        minimumOrderQty: minimumOrderQty ? parseInt(minimumOrderQty, 10) : undefined,
+        leadTime:        leadTime?.trim() || undefined,
+        incoterms:       incoterms?.trim() || undefined,
       },
       inventory: {
-        stockQty: stockQty ? parseInt(stockQty, 10) : 0,
-        managed:  true,
+        quantity: initialQty ? parseInt(initialQty, 10) : 0,
+        tracked:  true,
       },
       seo: {
-        metaTitle:       metaTitle?.trim()       || name.trim(),
-        metaDescription: metaDescription?.trim() ?? undefined,
+        title:       metaTitle?.trim()       || name.trim(),
+        description: metaDescription?.trim() ?? undefined,
       },
     });
 
@@ -87,7 +111,7 @@ export async function POST(req: NextRequest) {
           shortDescription: product.shortDescription as string | undefined,
           brandSlug:        brandSlug,
           pricing:          { listPrice: listPrice ? parseFloat(listPrice) : 0, currency: currency ?? "GHS" },
-          inventory:        { quantity: stockQty ? parseInt(stockQty, 10) : 0, tracked: true },
+          inventory:        { quantity: initialQty ? parseInt(initialQty, 10) : 0, tracked: true },
         },
         brandName ?? "",
         indexCats,
