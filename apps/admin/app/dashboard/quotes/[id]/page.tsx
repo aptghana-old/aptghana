@@ -6,10 +6,29 @@ import { STORE_URL as STORE_URL_DEFAULT } from "@apt/config";
 import { QUOTE_STATUS_LABELS, type QuoteStatus } from "@apt/types";
 import {
   ChevronLeft, User, Building, Mail, Phone, MapPin, Globe, History, FileDown,
+  FileText, SearchCheck, CheckCircle2, CreditCard, PackageCheck,
 } from "lucide-react";
 import { Badge, statusVariant } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import QuoteEditor, { type EditorQuote } from "@/components/quotes/QuoteEditor";
+import { StatusStepper, StatusBanner, type StepperStep } from "@/components/deals/StatusStepper";
+
+const QUOTE_STEPS = [
+  { key: "submitted", label: "Submitted", icon: <FileText size={17} /> },
+  { key: "reviewing", label: "Reviewing", icon: <SearchCheck size={17} /> },
+  { key: "approved", label: "Approved", icon: <CheckCircle2 size={17} /> },
+  { key: "paid", label: "Paid", icon: <CreditCard size={17} /> },
+  { key: "completed", label: "Completed", icon: <PackageCheck size={17} /> },
+];
+
+/** Where each quote status sits on the condensed 5-step lifecycle. */
+const QUOTE_STEP_INDEX: Record<string, number> = {
+  draft: 0, pending: 0,
+  reviewing: 1,
+  approved: 2, waiting_customer: 2,
+  paid: 3, processing: 3, ready_for_delivery: 3, shipped: 3,
+  delivered: 4, completed: 4,
+};
 
 export const metadata: Metadata = { title: "Quote Review" };
 
@@ -128,20 +147,27 @@ export default async function QuoteDetailPage({ params }: Props) {
 
   const statusLabel = QUOTE_STATUS_LABELS[quote.status] ?? quote.status;
 
+  const isTerminal = quote.status === "cancelled" || quote.status === "expired";
+  const curStep = QUOTE_STEP_INDEX[quote.status] ?? -1;
+  const steps: StepperStep[] = QUOTE_STEPS.map((s, i) => ({
+    ...s,
+    done: curStep >= 0 && i <= curStep,
+    active: i === curStep,
+  }));
+
   return (
     <div>
       {/* Header */}
       <div
-        className="flex items-center gap-4 px-6 py-4 flex-wrap"
+        className="flex items-center gap-3 px-4 sm:px-6 py-4 flex-wrap"
         style={{ borderBottom: "1px solid var(--apt-border)", background: "var(--apt-bg)" }}
       >
         <Link href="/dashboard/quotes">
           <Button variant="ghost" size="sm" icon={<ChevronLeft size={14} />}>Quotes</Button>
         </Link>
-        <div style={{ width: 1, height: 20, background: "var(--apt-border)" }} />
-        <span className="font-mono text-[14px] font-semibold" style={{ color: "var(--apt-text-primary)" }}>
+        <h1 className="font-mono text-[19px] font-extrabold tracking-tight" style={{ color: "var(--apt-text-primary)" }}>
           {quote.quoteNumber ?? quote.ref}
-        </span>
+        </h1>
         <Badge variant={statusVariant(quote.status)} dot>{statusLabel}</Badge>
         <Badge variant={quote.kind === "approval_request" ? "blue" : "default"}>
           {quote.kind === "approval_request" ? "Approval Request" : "RFQ"}
@@ -169,7 +195,7 @@ export default async function QuoteDetailPage({ params }: Props) {
               href={`/api/quotes/${quote._id.toString()}/pdf?type=${d.type}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[12px] font-medium transition-colors hover:bg-[var(--apt-bg-raised)]"
+              className="inline-flex items-center gap-1.5 h-8 px-3 rounded-md text-[12px] font-semibold transition-colors hover:bg-[var(--apt-bg-raised)]"
               style={{ border: "1px solid var(--apt-border)", color: "var(--apt-text-secondary)" }}
             >
               <FileDown size={12} />
@@ -179,7 +205,22 @@ export default async function QuoteDetailPage({ params }: Props) {
         </div>
       </div>
 
-      <div className="p-6 grid grid-cols-1 xl:grid-cols-3 gap-6 max-w-[1400px]">
+      {/* Lifecycle stepper / terminal banner */}
+      <div className="px-4 sm:px-6 pt-4 sm:pt-6 max-w-[1400px]">
+        {isTerminal ? (
+          <StatusBanner
+            tone={quote.status === "expired" ? "warning" : "error"}
+            title={quote.status === "expired" ? "Quote Expired" : "Quote Cancelled"}
+            description={quote.status === "expired"
+              ? "The validity window on this quote has passed. Re-issue it to continue the deal."
+              : "This enquiry was cancelled and is no longer active."}
+          />
+        ) : (
+          <StatusStepper steps={steps} />
+        )}
+      </div>
+
+      <div className="p-4 sm:p-6 grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6 max-w-[1400px]">
         {/* Left: editor (items, pricing, approval) */}
         <div className="xl:col-span-2 min-w-0">
           <QuoteEditor quote={editorQuote} />
