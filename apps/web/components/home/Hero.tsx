@@ -21,7 +21,7 @@ const SEARCH_SUGGESTIONS = [
 ];
 
 export default function Hero() {
-  const [query, setQuery] = useState("");
+  const [ query, setQuery ] = useState("");
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,22 +41,11 @@ export default function Hero() {
           backgroundSize: "60px 60px",
         }}
       />
-      {/* Dark mode grid overlay */}
-      <div
-        className="absolute inset-0 pointer-events-none hidden dark:block"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(132,204,22,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(132,204,22,0.04) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-        }}
-      />
       {/* Light mode top gradient */}
-      <div className="absolute top-0 inset-x-0 h-[40%] pointer-events-none bg-gradient-to-b from-[#EFF6FF]/60 via-transparent to-transparent dark:hidden" />
-      {/* Dark mode left glow */}
-      <div className="absolute top-0 left-0 w-[60%] h-full pointer-events-none hidden dark:block bg-gradient-to-r from-[#0057b8]/8 via-transparent to-transparent" />
+      <div className="absolute top-0 inset-x-0 h-[40%] pointer-events-none bg-linear-to-b from-[#EFF6FF]/60 via-transparent to-transparent" />
       {/* Bottom-right lime accents */}
-      <div className="absolute bottom-0 right-0 w-[45%] h-[1px] pointer-events-none bg-gradient-to-l from-[#84CC16]/30 via-[#84CC16]/10 to-transparent" />
-      <div className="absolute bottom-0 right-0 w-[1px] h-[35%] pointer-events-none bg-gradient-to-t from-[#84CC16]/30 via-[#84CC16]/10 to-transparent" />
+      <div className="absolute bottom-0 right-0 w-[45%] h-px pointer-events-none bg-linear-to-l from-[#84CC16]/30 via-[#84CC16]/10 to-transparent" />
+      <div className="absolute bottom-0 right-0 w-px h-[35%] pointer-events-none bg-linear-to-t from-[#84CC16]/30 via-[#84CC16]/10 to-transparent" />
       <div className="absolute bottom-20 right-20 w-36 h-36 rounded-full border border-[#84CC16]/8 dark:border-[#84CC16]/8 pointer-events-none" />
       <div className="absolute bottom-10 right-10 w-20 h-20 rounded-full border border-[#84CC16]/12 dark:border-[#84CC16]/12 pointer-events-none" />
 
@@ -67,9 +56,9 @@ export default function Hero() {
           <div className="lg:col-span-3 pt-8 lg:pt-0">
             {/* Eyebrow */}
             <div className="flex items-center gap-3 mb-7">
-              <div className="w-8 h-[2px] rounded-full bg-[#84CC16]" />
+              <div className="w-8 h-0.5 rounded-full bg-[#84CC16]" />
               <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
-                West Africa's Industrial Technology Leader
+                West Africa&apos;s Industrial Technology Leader
               </span>
             </div>
 
@@ -87,15 +76,15 @@ export default function Hero() {
             </h1>
 
             {/* Subtitle */}
-            <p className="text-[#64748B] dark:text-[#94A3B8] text-lg sm:text-xl leading-relaxed max-w-[520px] mb-9">
-              Ghana's most trusted industrial platform. 6,000+ products. 26+ global brands.
+            <p className="text-[#64748B] dark:text-[#94A3B8] text-lg sm:text-xl leading-relaxed max-w-130 mb-9">
+              Ghana&apos;s most trusted industrial platform. 6,000+ products. 26+ global brands.
               15 years of expertise across mining, manufacturing, energy, and construction.
             </p>
 
             {/* Search bar */}
             <form
               onSubmit={handleSearch}
-              className="flex gap-2 p-2 rounded-2xl border border-[#E2E8F0] dark:border-white/12 bg-white dark:bg-white/[0.05] max-w-[560px] mb-4"
+              className="flex gap-2 p-2 rounded-2xl border border-[#E2E8F0] bg-white max-w-140 mb-4"
             >
               <div className="flex flex-1 items-center gap-3 px-2">
                 <svg
@@ -124,7 +113,7 @@ export default function Hero() {
               </button>
             </form>
 
-            <div className="flex flex-wrap items-center gap-2 mb-8 max-w-[560px]">
+            <div className="flex flex-wrap items-center gap-2 mb-8 max-w-140">
               <span className="text-[11px] text-[#94A3B8] dark:text-white/25">Try:</span>
               {SEARCH_SUGGESTIONS.map((s) => (
                 <button
@@ -204,7 +193,7 @@ export default function Hero() {
 
               <div className="mt-8 pt-6 border-t border-[#E2E8F0] dark:border-white/[0.07]">
                 <p className="text-[#94A3B8] dark:text-white/22 text-[11px] leading-relaxed">
-                  Trusted by Ghana's leading mining, manufacturing, and energy companies since 2009.
+                  Trusted by Ghana&apos;s leading mining, manufacturing, and energy companies since 2009.
                 </p>
               </div>
             </div>

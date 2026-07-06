@@ -65,9 +65,9 @@ export function emptyCategoryForm(): CategoryFormData {
 function StringListEditor({
   label, items, placeholder, onChange,
 }: { label: string; items: string[]; placeholder: string; onChange: (items: string[]) => void }) {
-  const update = (idx: number, val: string) => { const next = [...items]; next[idx] = val; onChange(next); };
+  const update = (idx: number, val: string) => { const next = [ ...items ]; next[ idx ] = val; onChange(next); };
   const remove = (idx: number) => onChange(items.filter((_, i) => i !== idx));
-  const add = () => onChange([...items, ""]);
+  const add = () => onChange([ ...items, "" ]);
 
   return (
     <div className="card p-5">
@@ -80,7 +80,7 @@ function StringListEditor({
         {items.map((item, i) => (
           <div key={i} className="flex items-center gap-2">
             <Input value={item} onChange={(e) => update(i, e.target.value)} placeholder={`${placeholder} ${i + 1}`} wrapperClass="flex-1" />
-            <button onClick={() => remove(i)} className="p-1.5 rounded-md hover:bg-red-50 text-red-400 hover:text-red-600 transition-colors flex-shrink-0"><X size={14} /></button>
+            <button onClick={() => remove(i)} className="p-1.5 rounded-md hover:bg-red-50 text-red-400 hover:text-red-600 transition-colors shrink-0"><X size={14} /></button>
           </div>
         ))}
       </div>
@@ -89,9 +89,9 @@ function StringListEditor({
 }
 
 function BenefitsEditor({ benefits, onChange }: { benefits: Benefit[]; onChange: (b: Benefit[]) => void }) {
-  const update = (idx: number, key: keyof Benefit, val: string) => onChange(benefits.map((b, i) => i === idx ? { ...b, [key]: val } : b));
+  const update = (idx: number, key: keyof Benefit, val: string) => onChange(benefits.map((b, i) => i === idx ? { ...b, [ key ]: val } : b));
   const remove = (idx: number) => onChange(benefits.filter((_, i) => i !== idx));
-  const add = () => onChange([...benefits, { title: "", value: "" }]);
+  const add = () => onChange([ ...benefits, { title: "", value: "" } ]);
 
   return (
     <div className="card p-5">
@@ -126,9 +126,9 @@ const DOC_TYPE_OPTIONS = [
 ];
 
 function DocumentsEditor({ documents, onChange }: { documents: CategoryDocument[]; onChange: (d: CategoryDocument[]) => void }) {
-  const update = (idx: number, key: keyof CategoryDocument, val: string) => onChange(documents.map((d, i) => i === idx ? { ...d, [key]: val } : d));
+  const update = (idx: number, key: keyof CategoryDocument, val: string) => onChange(documents.map((d, i) => i === idx ? { ...d, [ key ]: val } : d));
   const remove = (idx: number) => onChange(documents.filter((_, i) => i !== idx));
-  const add = () => onChange([...documents, { type: "other", title: "", url: "", language: "en" }]);
+  const add = () => onChange([ ...documents, { type: "other", title: "", url: "", language: "en" } ]);
 
   return (
     <div className="card p-5">
@@ -161,7 +161,7 @@ export function CategoryFormFields({
   form, set, parentContext, autoSlug = true,
 }: {
   form: CategoryFormData;
-  set: <K extends keyof CategoryFormData>(k: K, v: CategoryFormData[K]) => void;
+  set: <K extends keyof CategoryFormData>(k: K, v: CategoryFormData[ K ]) => void;
   parentContext?: ParentContext;
   /** Re-derive the slug from the name as the user types (only meaningful while creating). */
   autoSlug?: boolean;
@@ -173,7 +173,7 @@ export function CategoryFormFields({
       {parentContext && (
         <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-[12px]" style={{ background: "var(--apt-bg-subtle)", color: "var(--apt-text-secondary)" }}>
           <FolderTree size={13} style={{ color: "var(--apt-text-muted)" }} />
-          New <strong style={{ color: "var(--apt-text-primary)" }}>{LEVEL_LABEL[form.level] ?? form.level}</strong> under {parentContext.path}
+          New <strong style={{ color: "var(--apt-text-primary)" }}>{LEVEL_LABEL[ form.level ] ?? form.level}</strong> under {parentContext.path}
         </div>
       )}
 
@@ -188,11 +188,11 @@ export function CategoryFormFields({
           <Input label="Slug" value={form.slug} hint="auto-generated from name" onChange={(e) => set("slug", e.target.value)} />
           <Input
             label="Level"
-            value={LEVEL_LABEL[form.level] ?? form.level}
+            value={LEVEL_LABEL[ form.level ] ?? form.level}
             disabled
             hint={parentContext ? "Derived from parent — move in the tree to change" : autoSlug ? "New top-level entries are always Groups" : "Move this category in the tree to change its level"}
           />
-          <Select label="Status" value={form.status} onChange={(e) => set("status", e.target.value)} options={[{ value: "active", label: "Active" }, { value: "inactive", label: "Inactive" }]} />
+          <Select label="Status" value={form.status} onChange={(e) => set("status", e.target.value)} options={[ { value: "active", label: "Active" }, { value: "inactive", label: "Inactive" } ]} />
           <Input label="Display Order" type="number" value={String(form.displayOrder)} onChange={(e) => set("displayOrder", parseInt(e.target.value, 10) || 0)} hint="Lower = earlier in lists" />
         </div>
         <Input
@@ -250,18 +250,18 @@ export function CategoryFormFields({
 /** Full-page wrapper used by /dashboard/categories/new and /[id]/edit. */
 export default function CategoryForm({ initial, categoryId, parentContext, onSaved, onCancel }: Props) {
   const router = useRouter();
-  const [, startTransition] = useTransition();
-  const [isPending, setPending] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [ , startTransition ] = useTransition();
+  const [ isPending, setPending ] = useState(false);
+  const [ saved, setSaved ] = useState(false);
+  const [ error, setError ] = useState<string | null>(null);
 
-  const [form, setForm] = useState<CategoryFormData>({
+  const [ form, setForm ] = useState<CategoryFormData>({
     ...emptyCategoryForm(),
     ...initial,
-    level: parentContext ? CHILD_LEVEL[parentContext.level] : (initial?.level ?? "group"),
+    level: parentContext ? CHILD_LEVEL[ parentContext.level ] : (initial?.level ?? "group"),
   });
 
-  const set = <K extends keyof CategoryFormData>(k: K, v: CategoryFormData[K]) => setForm((f) => ({ ...f, [k]: v }));
+  const set = <K extends keyof CategoryFormData>(k: K, v: CategoryFormData[ K ]) => setForm((f) => ({ ...f, [ k ]: v }));
 
   const handleSubmit = async () => {
     if (!form.name.trim()) { setError("Category name is required."); return; }

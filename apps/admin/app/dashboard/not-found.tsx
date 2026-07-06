@@ -20,7 +20,7 @@ export default function DashboardNotFound() {
       </div>
       <Link
         href="/dashboard"
-        className="inline-flex items-center justify-center gap-2 h-9 px-3.5 rounded-md text-[13px] font-medium bg-[#0057b8] text-white hover:bg-[#0049a0] active:bg-[#003d87] shadow-sm transition-colors"
+        className="inline-flex items-center justify-center gap-2 h-9 px-3.5 rounded-md text-[13px] font-medium bg-navy-500 text-white hover:bg-[#0049a0] active:bg-[#003d87] shadow-sm transition-colors"
       >
         <LayoutDashboard size={13} />
         Back to Dashboard

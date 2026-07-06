@@ -76,7 +76,7 @@ export default async function IndustriesPage() {
           <div className="container-apt">
             <div className="max-w-2xl">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                 <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                   Industries We Serve
                 </span>
@@ -124,7 +124,7 @@ export default async function IndustriesPage() {
                 title="Unable to load industries"
                 description="We could not retrieve industry content at this time. Please refresh the page or contact us."
                 action={
-                  <Link href="/contact" className="inline-flex items-center gap-2 h-10 px-5 bg-[#0057b8] text-white text-sm font-semibold rounded-lg hover:bg-[#1a73e8] transition-colors">
+                  <Link href="/contact" className="inline-flex items-center gap-2 h-10 px-5 bg-navy-500 text-white text-sm font-semibold rounded-lg hover:bg-navy-400 transition-colors">
                     Contact Us
                   </Link>
                 }
@@ -135,7 +135,7 @@ export default async function IndustriesPage() {
                 title="Industries coming soon"
                 description="Our industry sector pages are currently being configured. Contact our team to discuss your specific sector requirements."
                 action={
-                  <Link href="/contact" className="inline-flex items-center gap-2 h-10 px-5 bg-[#0057b8] text-white text-sm font-semibold rounded-lg hover:bg-[#1a73e8] transition-colors">
+                  <Link href="/contact" className="inline-flex items-center gap-2 h-10 px-5 bg-navy-500 text-white text-sm font-semibold rounded-lg hover:bg-navy-400 transition-colors">
                     Discuss Your Project
                   </Link>
                 }
@@ -145,7 +145,7 @@ export default async function IndustriesPage() {
               <>
                 <div className="max-w-2xl mb-12">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                    <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                     <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                       Sector Expertise
                     </span>
@@ -201,7 +201,7 @@ export default async function IndustriesPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                  <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                   <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                     Why APT Ghana
                   </span>
@@ -232,7 +232,7 @@ export default async function IndustriesPage() {
                   { title: "Regulatory Aware", detail: "Familiar with Ghana Standards Authority and sector-specific requirements." },
                 ].map((item) => (
                   <div key={item.title} className="bg-white/5 rounded-2xl border border-white/10 p-6">
-                    <div className="w-6 h-[3px] rounded-full bg-[#84CC16] mb-4" />
+                    <div className="w-6 h-0.75 rounded-full bg-[#84CC16] mb-4" />
                     <h4 className="font-bold text-white text-base mb-2" style={{ fontFamily: "var(--font-sora, 'Sora', sans-serif)" }}>
                       {item.title}
                     </h4>

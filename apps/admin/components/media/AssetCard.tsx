@@ -16,7 +16,7 @@ interface Props {
 }
 
 export function AssetCard({ asset, viewMode, selected, onSelect, onClick, onAction }: Props) {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [ menuOpen, setMenuOpen ] = useState(false);
 
   if (viewMode === "list") {
     return (
@@ -29,9 +29,8 @@ export function AssetCard({ asset, viewMode, selected, onSelect, onClick, onActi
         <div className="action-zone shrink-0">
           <button
             onClick={(e) => { e.stopPropagation(); onSelect(asset._id, e.shiftKey || e.metaKey); }}
-            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${
-              selected ? "border-[#0057b8] bg-[#0057b8]" : "border-[var(--apt-border)] bg-white group-hover:border-[#0057b8]"
-            }`}
+            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-colors ${selected ? "border-[#0057b8] bg-navy-500" : "border-[var(--apt-border)] bg-white group-hover:border-[#0057b8]"
+              }`}
           >
             {selected && <Check size={11} color="#fff" strokeWidth={3} />}
           </button>
@@ -104,9 +103,8 @@ export function AssetCard({ asset, viewMode, selected, onSelect, onClick, onActi
         <div className="action-zone shrink-0">
           <button
             onClick={(e) => { e.stopPropagation(); onSelect(asset._id, e.shiftKey || e.metaKey); }}
-            className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${
-              selected ? "border-[#0057b8] bg-[#0057b8]" : "border-[var(--apt-border)]"
-            }`}
+            className={`w-4 h-4 rounded border flex items-center justify-center transition-colors ${selected ? "border-[#0057b8] bg-navy-500" : "border-[var(--apt-border)]"
+              }`}
           >
             {selected && <Check size={9} color="#fff" strokeWidth={3} />}
           </button>
@@ -127,9 +125,8 @@ export function AssetCard({ asset, viewMode, selected, onSelect, onClick, onActi
   // Grid view
   return (
     <div
-      className={`relative rounded-xl overflow-hidden cursor-pointer transition-all group ${
-        selected ? "ring-2 ring-[#0057b8] ring-offset-2" : "hover:shadow-md"
-      }`}
+      className={`relative rounded-xl overflow-hidden cursor-pointer transition-all group ${selected ? "ring-2 ring-[#0057b8] ring-offset-2" : "hover:shadow-md"
+        }`}
       style={{ border: "1px solid var(--apt-border)", background: "var(--apt-bg)" }}
       onClick={(e) => { if ((e.target as HTMLElement).closest(".action-zone")) return; onClick(asset); }}
     >
@@ -137,11 +134,10 @@ export function AssetCard({ asset, viewMode, selected, onSelect, onClick, onActi
       <div className="action-zone absolute top-2 left-2 z-10">
         <button
           onClick={(e) => { e.stopPropagation(); onSelect(asset._id, e.shiftKey || e.metaKey); }}
-          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all shadow-sm ${
-            selected
-              ? "border-[#0057b8] bg-[#0057b8] opacity-100"
+          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all shadow-sm ${selected
+              ? "border-[#0057b8] bg-navy-500 opacity-100"
               : "border-white/70 bg-white/80 opacity-0 group-hover:opacity-100"
-          }`}
+            }`}
         >
           {selected && <Check size={11} color="#fff" strokeWidth={3} />}
         </button>
@@ -197,9 +193,9 @@ export function AssetCard({ asset, viewMode, selected, onSelect, onClick, onActi
         style={{ background: "linear-gradient(to top, rgba(15,23,42,0.85), transparent)" }}
       >
         <ActionBtn icon={<Download size={12} />} title="Download" onClick={(e) => { e.stopPropagation(); onAction("download", asset); }} />
-        <ActionBtn icon={<Copy size={12} />}     title="Copy URL"  onClick={(e) => { e.stopPropagation(); onAction("copy-url", asset); }} />
-        <ActionBtn icon={<Archive size={12} />}  title="Archive"   onClick={(e) => { e.stopPropagation(); onAction("archive", asset); }} />
-        <ActionBtn icon={<Trash2 size={12} />}   title="Delete"    onClick={(e) => { e.stopPropagation(); onAction("delete", asset); }} destructive />
+        <ActionBtn icon={<Copy size={12} />} title="Copy URL" onClick={(e) => { e.stopPropagation(); onAction("copy-url", asset); }} />
+        <ActionBtn icon={<Archive size={12} />} title="Archive" onClick={(e) => { e.stopPropagation(); onAction("archive", asset); }} />
+        <ActionBtn icon={<Trash2 size={12} />} title="Delete" onClick={(e) => { e.stopPropagation(); onAction("delete", asset); }} destructive />
       </div>
     </div>
   );
@@ -233,12 +229,12 @@ function ContextMenu({
   onClose: () => void;
 }) {
   const items = [
-    { label: "Copy URL",   icon: <Copy size={13} />,    action: "copy-url"  },
-    { label: "Download",   icon: <Download size={13} />, action: "download"  },
-    { label: "Duplicate",  icon: <Copy size={13} />,     action: "duplicate" },
-    { label: "Move",       icon: <Move size={13} />,     action: "move"      },
-    { label: "Archive",    icon: <Archive size={13} />,  action: "archive"   },
-    { label: "Delete",     icon: <Trash2 size={13} />,   action: "delete", destructive: true },
+    { label: "Copy URL", icon: <Copy size={13} />, action: "copy-url" },
+    { label: "Download", icon: <Download size={13} />, action: "download" },
+    { label: "Duplicate", icon: <Copy size={13} />, action: "duplicate" },
+    { label: "Move", icon: <Move size={13} />, action: "move" },
+    { label: "Archive", icon: <Archive size={13} />, action: "archive" },
+    { label: "Delete", icon: <Trash2 size={13} />, action: "delete", destructive: true },
   ];
 
   return (

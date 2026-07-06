@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
 async function getData(id: string) {
   await connectDB();
-  const [doc, children] = await Promise.all([
+  const [ doc, children ] = await Promise.all([
     CategoryModel.findById(id).lean(),
     CategoryModel.find({ parentId: id }).select("name slug status level displayOrder").sort({ displayOrder: 1, name: 1 }).lean(),
   ]);
@@ -62,10 +62,10 @@ export default async function SolutionDetailPage({ params }: { params: Promise<{
   const { doc, children } = await getData(id);
   if (!doc) notFound();
 
-  const benefits     = doc.benefits     ?? [];
+  const benefits = doc.benefits ?? [];
   const bulletPoints = doc.bulletPoints ?? [];
-  const products     = doc.products     ?? [];
-  const brands       = doc.brands       ?? [];
+  const products = doc.products ?? [];
+  const brands = doc.brands ?? [];
   const applications = doc.applications ?? [];
 
   return (
@@ -172,7 +172,7 @@ export default async function SolutionDetailPage({ params }: { params: Promise<{
                       </td>
                       <td>
                         <span className="text-[12px]" style={{ color: "var(--apt-text-muted)" }}>
-                          {LEVEL_LABEL[c.level] ?? c.level}
+                          {LEVEL_LABEL[ c.level ] ?? c.level}
                         </span>
                       </td>
                       <td>
@@ -228,7 +228,7 @@ export default async function SolutionDetailPage({ params }: { params: Promise<{
               <div className="space-y-1.5">
                 {brands.map((b, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#84CC16] flex-shrink-0" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#84CC16] shrink-0" />
                     <span className="text-[12px]" style={{ color: "var(--apt-text-secondary)" }}>{b}</span>
                   </div>
                 ))}
@@ -245,7 +245,7 @@ export default async function SolutionDetailPage({ params }: { params: Promise<{
               <div className="space-y-1.5">
                 {applications.map((a, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: "var(--apt-text-muted)" }} />
+                    <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: "var(--apt-text-muted)" }} />
                     <span className="text-[12px]" style={{ color: "var(--apt-text-secondary)" }}>{a}</span>
                   </div>
                 ))}
@@ -265,7 +265,7 @@ export default async function SolutionDetailPage({ params }: { params: Promise<{
               <ul className="space-y-1.5">
                 {bulletPoints.map((pt, i) => (
                   <li key={i} className="flex items-start gap-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#84CC16] flex-shrink-0 mt-1.5" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#84CC16] shrink-0 mt-1.5" />
                     <span className="text-[12px]" style={{ color: "var(--apt-text-secondary)" }}>{pt}</span>
                   </li>
                 ))}

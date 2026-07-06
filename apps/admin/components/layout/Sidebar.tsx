@@ -99,7 +99,7 @@ function NavItemLink({ item, active, collapsed }: { item: NavItem; active: boole
       ].join(" ")}
     >
       {active && (
-        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-[#0057b8]" />
+        <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-navy-500" />
       )}
       <span className={`shrink-0 ${active ? "text-white" : "text-white/45 group-hover:text-white/70"}`}>
         {item.icon}
@@ -164,7 +164,7 @@ export default function Sidebar({ mobileOpen, onMobileClose, role, permissions, 
     items: section.items
       .filter((item) => canView(item.href))
       .map((item) => {
-        const badge = BADGES[item.href];
+        const badge = BADGES[ item.href ];
         return badge?.value ? { ...item, badge: badge.value, badgeTone: badge.tone } : item;
       }),
   })).filter((section) => section.items.length > 0);

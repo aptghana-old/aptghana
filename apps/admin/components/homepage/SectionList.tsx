@@ -32,7 +32,7 @@ const SECTION_ICONS: Record<string, string> = {
   cta: "📣",
 };
 
-const ADDABLE_TYPES: Array<{ type: HpSection["type"]; label: string }> = [
+const ADDABLE_TYPES: Array<{ type: HpSection[ "type" ]; label: string }> = [
   { type: "services_bar", label: "Services Bar" },
   { type: "quick_access", label: "Quick Access Bar" },
   { type: "promo_banners", label: "Promotional Banners" },
@@ -53,12 +53,12 @@ interface Props {
   onSelect: (id: string) => void;
   onToggle: (id: string, enabled: boolean) => void;
   onMove: (id: string, dir: -1 | 1) => void;
-  onAdd: (type: HpSection["type"]) => void;
+  onAdd: (type: HpSection[ "type" ]) => void;
   onRemove: (id: string) => void;
 }
 
 export default function SectionList({ selectedId, sections, onSelect, onToggle, onMove, onAdd, onRemove }: Props) {
-  const sorted = [...sections].sort((a, b) => a.order - b.order);
+  const sorted = [ ...sections ].sort((a, b) => a.order - b.order);
 
   return (
     <div className="flex flex-col h-full">
@@ -103,15 +103,15 @@ export default function SectionList({ selectedId, sections, onSelect, onToggle, 
                   onChange={(e) => onToggle(section.id, e.target.checked)}
                   className="sr-only peer"
                 />
-                <div className="w-7 h-4 rounded-full transition-colors peer-checked:bg-[#0057b8] bg-gray-300 dark:bg-gray-600 peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--apt-border-focus)]" />
+                <div className="w-7 h-4 rounded-full transition-colors peer-checked:bg-navy-500 bg-gray-300 dark:bg-gray-600 peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--apt-border-focus)]" />
                 <div className="absolute left-0.5 top-0.5 w-3 h-3 rounded-full bg-white transition-transform peer-checked:translate-x-3" />
               </label>
 
               {/* Label */}
               <button className="flex-1 flex items-center gap-2 min-w-0 text-left" onClick={() => onSelect(section.id)}>
-                <span className="text-sm shrink-0">{SECTION_ICONS[section.type] ?? "📄"}</span>
+                <span className="text-sm shrink-0">{SECTION_ICONS[ section.type ] ?? "📄"}</span>
                 <span className={`text-[13px] truncate ${section.enabled ? "" : "opacity-50"}`} style={{ color: "var(--apt-text-primary)" }}>
-                  {section.label || SECTION_LABELS[section.type] || section.type}
+                  {section.label || SECTION_LABELS[ section.type ] || section.type}
                 </span>
               </button>
 
@@ -137,7 +137,7 @@ export default function SectionList({ selectedId, sections, onSelect, onToggle, 
               className="text-[11px] px-2 py-1.5 rounded border text-left transition-colors hover:border-[var(--apt-border-strong)] truncate"
               style={{ borderColor: "var(--apt-border)", color: "var(--apt-text-secondary)", background: "var(--apt-bg)" }}
             >
-              {SECTION_ICONS[t.type]} {t.label}
+              {SECTION_ICONS[ t.type ]} {t.label}
             </button>
           ))}
         </div>

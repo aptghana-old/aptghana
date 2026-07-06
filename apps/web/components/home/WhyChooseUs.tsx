@@ -47,11 +47,11 @@ export default function WhyChooseUs() {
         {/* Header */}
         <div className="text-center max-w-2xl mx-auto mb-14">
           <div className="inline-flex items-center gap-3 mb-4">
-            <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+            <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
             <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
               Why Choose APT Ghana?
             </span>
-            <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+            <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
           </div>
           <h2
             className="text-4xl lg:text-5xl font-extrabold tracking-tight text-[#0F172A] dark:text-[#F1F5F9]"
@@ -88,7 +88,7 @@ export default function WhyChooseUs() {
           {/* Right — award cards with images */}
           <div>
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+              <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
               <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                 Awards & Recognitions
               </span>
@@ -103,7 +103,7 @@ export default function WhyChooseUs() {
               {AWARDS.map((award) => (
                 <div
                   key={award.title}
-                  className="bg-white flex sm:flex-col dark:bg-[#111827] rounded-xl border border-[#E2E8F0] dark:border-white/10 overflow-hidden hover:shadow-lg transition-all duration-200"
+                  className="bg-white flex sm:flex-col dark:bg-surface-900 rounded-xl border border-[#E2E8F0] dark:border-white/10 overflow-hidden hover:shadow-lg transition-all duration-200"
                 >
                   <div className="relative overflow-hidden bg-[#F8FAFC] dark:bg-[#0A0F1E] aspect-square">
                     <Image

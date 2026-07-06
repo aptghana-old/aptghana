@@ -53,7 +53,7 @@ export default async function StoreBrandsPage() {
           title="Unable to load brands"
           description="We could not retrieve our brand directory at this time. Please refresh the page or contact us directly."
           action={
-            <Link href="/contact" className="inline-flex items-center gap-2 h-10 px-5 bg-[#0057b8] text-white text-sm font-semibold rounded-xl hover:bg-[#1a73e8] transition-colors">
+            <Link href="/contact" className="inline-flex items-center gap-2 h-10 px-5 bg-navy-500 text-white text-sm font-semibold rounded-xl hover:bg-navy-400 transition-colors">
               Contact Us
             </Link>
           }
@@ -69,7 +69,7 @@ export default async function StoreBrandsPage() {
           title="No brands listed yet"
           description="Our brand directory is being updated. Contact our team to enquire about available products and manufacturer partnerships."
           action={
-            <Link href="/rfq" className="inline-flex items-center gap-2 h-10 px-5 bg-[#0057b8] text-white text-sm font-semibold rounded-xl hover:bg-[#1a73e8] transition-colors">
+            <Link href="/rfq" className="inline-flex items-center gap-2 h-10 px-5 bg-navy-500 text-white text-sm font-semibold rounded-xl hover:bg-navy-400 transition-colors">
               Request a Quote
             </Link>
           }

@@ -39,7 +39,7 @@ export default function WhoWeAre() {
 
             {/* 15+ years badge */}
             <div
-              className="flex items-start gap-4 p-5 rounded-2xl border-l-4 mb-8 bg-[#F8FAFC] dark:bg-[#111827]"
+              className="flex items-start gap-4 p-5 rounded-2xl border-l-4 mb-8 bg-[#F8FAFC] dark:bg-surface-900"
               style={{ borderLeftColor: "#84CC16" }}
             >
               <div>

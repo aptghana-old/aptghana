@@ -11,7 +11,7 @@ export default function Error({ error, reset }: ErrorProps) {
   useEffect(() => {
     // Log error to console in development; production should use an error reporting service
     console.error("[APT Ghana] Application error:", error);
-  }, [error]);
+  }, [ error ]);
 
   return (
     <div className="min-h-screen bg-[#0A0F1E] flex items-center justify-center px-6">
@@ -35,11 +35,11 @@ export default function Error({ error, reset }: ErrorProps) {
 
         {/* Eyebrow */}
         <div className="flex items-center justify-center gap-3 mb-4">
-          <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+          <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
           <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
             Something Went Wrong
           </span>
-          <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+          <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
         </div>
 
         {/* Heading */}

@@ -180,7 +180,7 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
       <Header />
       <main>
         {/* Hero */}
-        <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] pt-32 pb-20">
+        <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] py-20">
           <div className="container-apt">
             <div className="flex items-center gap-2 text-xs text-[#0F172A]/40 dark:text-white/40 mb-6">
               <Link href="/industries" className="hover:text-[#0F172A]/60 dark:hover:text-white/70 transition-colors">
@@ -191,7 +191,7 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
             </div>
             <div className="max-w-2xl">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                 <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                   {industry.tagline}
                 </span>
@@ -234,7 +234,7 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
           <section className="py-14 bg-[#F8FAFC] dark:bg-[#0D1526]">
             <div className="container-apt max-w-3xl">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                 <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                   The Challenge
                 </span>
@@ -251,7 +251,7 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
               {/* Solutions grid */}
               <div className="lg:col-span-2">
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                  <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                   <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">What We Provide</span>
                 </div>
                 <h2
@@ -262,8 +262,8 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
                 </h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {industry.solutions.map((sol) => (
-                    <div key={sol} className="flex items-start gap-3 p-5 bg-[#F8FAFC] dark:bg-[#111827] rounded-xl border border-[#E2E8F0] dark:border-white/10">
-                      <span className="flex-shrink-0 mt-1 w-5 h-5 rounded-full bg-[#84CC16]/15 flex items-center justify-center">
+                    <div key={sol} className="flex items-start gap-3 p-5 bg-[#F8FAFC] dark:bg-surface-900 rounded-xl border border-[#E2E8F0] dark:border-white/10">
+                      <span className="shrink-0 mt-1 w-5 h-5 rounded-full bg-[#84CC16]/15 flex items-center justify-center">
                         <svg className="w-3 h-3 text-[#84CC16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                         </svg>
@@ -279,7 +279,7 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
                 {industry.brands.length > 0 && (
                   <div className="bg-[#0A0F1E] rounded-2xl p-7 text-white">
                     <div className="flex items-center gap-3 mb-5">
-                      <div className="w-5 h-[2px] rounded-full bg-[#84CC16]" />
+                      <div className="w-5 h-0.5 rounded-full bg-[#84CC16]" />
                       <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">Key Brands</span>
                     </div>
                     <div className="space-y-3">
@@ -327,7 +327,7 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
             <div className="bg-white/5 rounded-2xl border border-white/10 p-10 lg:p-14 flex flex-col lg:flex-row items-center justify-between gap-8">
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                  <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                   <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">Get Started</span>
                 </div>
                 <h2 className="text-3xl font-extrabold tracking-tight text-white mb-3" style={{ fontFamily: "var(--font-sora, 'Sora', sans-serif)" }}>
@@ -337,7 +337,7 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
                   Our {industry.name} specialists are available to discuss your requirements and deliver the right solution.
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+              <div className="flex flex-col sm:flex-row gap-3 shrink-0">
                 <Link href={STORE_URL + "/rfq"} className="inline-flex items-center gap-2 h-12 px-7 bg-[#84CC16] text-[#0A0F1E] font-bold text-sm rounded-xl hover:bg-[#78B800] transition-colors whitespace-nowrap">
                   Request a Quote →
                 </Link>
@@ -365,7 +365,7 @@ export default async function IndustryDetailPage({ params }: { params: Promise<{
                   <Link
                     key={s}
                     href={`/industries/${s}`}
-                    className="inline-flex items-center gap-2 h-10 px-5 bg-white dark:bg-[#111827] border border-[#E2E8F0] dark:border-white/10 rounded-xl text-sm font-medium text-[#0F172A] dark:text-[#94A3B8] hover:border-[#84CC16]/50 hover:bg-[#84CC16]/5 transition-colors"
+                    className="inline-flex items-center gap-2 h-10 px-5 bg-white dark:bg-surface-900 border border-[#E2E8F0] dark:border-white/10 rounded-xl text-sm font-medium text-[#0F172A] dark:text-[#94A3B8] hover:border-[#84CC16]/50 hover:bg-[#84CC16]/5 transition-colors"
                   >
                     {label}
                   </Link>

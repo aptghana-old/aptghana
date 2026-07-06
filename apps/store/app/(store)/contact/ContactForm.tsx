@@ -6,8 +6,8 @@ import { EMAIL_SALES } from "@apt/config";
 type FormState = "idle" | "submitting" | "success" | "error";
 
 export default function ContactForm() {
-  const [state, setState] = useState<FormState>("idle");
-  const [form, setForm] = useState({
+  const [ state, setState ] = useState<FormState>("idle");
+  const [ form, setForm ] = useState({
     name: "",
     company: "",
     email: "",
@@ -19,7 +19,7 @@ export default function ContactForm() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    setForm((prev) => ({ ...prev, [ e.target.name ]: e.target.value }));
   };
 
   const handleSubmit = async (e: FormEvent) => {
@@ -46,7 +46,7 @@ export default function ContactForm() {
 
   if (state === "success") {
     return (
-      <div className="bg-white dark:bg-[#111827] rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-10 text-center">
+      <div className="bg-white dark:bg-surface-900 rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-10 text-center">
         <div className="flex items-center justify-center w-16 h-16 rounded-2xl bg-[#84CC16]/10 border border-[#84CC16]/20 mx-auto mb-6">
           <svg className="w-8 h-8 text-[#84CC16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
@@ -73,7 +73,7 @@ export default function ContactForm() {
   const labelClass = "block text-sm font-semibold text-[#0F172A] dark:text-[#F1F5F9] mb-1.5";
 
   return (
-    <form onSubmit={handleSubmit} className="bg-white dark:bg-[#111827] rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-8 lg:p-10 space-y-5">
+    <form onSubmit={handleSubmit} className="bg-white dark:bg-surface-900 rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-8 lg:p-10 space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div>
           <label htmlFor="name" className={labelClass}>

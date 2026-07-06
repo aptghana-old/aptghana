@@ -102,11 +102,11 @@ export default async function ResourcesPage() {
       <Header />
       <main>
         {/* Hero */}
-        <section className="bg-[#F8FAFC] pt-32 pb-20">
+        <section className="bg-[#F8FAFC] py-20">
           <div className="container-apt">
             <div className="max-w-2xl">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                 <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                   Technical Resources
                 </span>
@@ -133,7 +133,7 @@ export default async function ResourcesPage() {
                 title="Unable to load resources"
                 description="We could not retrieve the resources library at this time. Please refresh the page or contact us."
                 action={
-                  <Link href="/contact" className="inline-flex items-center gap-2 h-10 px-5 bg-[#0057b8] text-white text-sm font-semibold rounded-lg hover:bg-[#1a73e8] transition-colors">
+                  <Link href="/contact" className="inline-flex items-center gap-2 h-10 px-5 bg-navy-500 text-white text-sm font-semibold rounded-lg hover:bg-navy-400 transition-colors">
                     Contact Us
                   </Link>
                 }
@@ -144,7 +144,7 @@ export default async function ResourcesPage() {
                 title="Resources coming soon"
                 description="Our technical resources library is currently being populated. Contact our team for specific documentation or technical support."
                 action={
-                  <Link href="/contact" className="inline-flex items-center gap-2 h-10 px-5 bg-[#0057b8] text-white text-sm font-semibold rounded-lg hover:bg-[#1a73e8] transition-colors">
+                  <Link href="/contact" className="inline-flex items-center gap-2 h-10 px-5 bg-navy-500 text-white text-sm font-semibold rounded-lg hover:bg-navy-400 transition-colors">
                     Request Documentation
                   </Link>
                 }
@@ -160,7 +160,7 @@ export default async function ResourcesPage() {
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-[#0A0F1E] text-[#84CC16]">
-                        {typeIcons[res.type] ?? defaultIcon}
+                        {typeIcons[ res.type ] ?? defaultIcon}
                       </div>
                       <span className="inline-flex items-center px-2.5 py-1 rounded-full bg-[#84CC16]/10 text-[10px] font-bold text-[#84CC16] uppercase tracking-wider">
                         {res.badge}

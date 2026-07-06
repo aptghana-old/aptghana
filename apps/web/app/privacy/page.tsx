@@ -90,10 +90,10 @@ export default async function PrivacyPage() {
       <Header />
       <main>
         {/* Hero */}
-        <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] pt-32 pb-16">
+        <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] pt-20 pb-16">
           <div className="container-apt max-w-3xl">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+              <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
               <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                 {data.tagline}
               </span>
@@ -135,7 +135,7 @@ export default async function PrivacyPage() {
               {(data.contactBlockName || data.contactBlockEmail) && (
                 <div className="bg-[#0A0F1E] rounded-2xl p-8 text-white">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                    <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                     <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                       Contact Our DPO
                     </span>

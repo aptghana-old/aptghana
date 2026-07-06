@@ -41,17 +41,6 @@ interface Benefit {
   value: string;
 }
 
-interface SolutionData {
-  name: string;
-  tagline: string;
-  desc: string;
-  products: string[];
-  brands: string[];
-  applications: string[];
-  benefits: Benefit[];
-  bulletPoints: string[];
-}
-
 // ─── Static top-level data (fallback for the 6 main solution pages) ───────────
 
 // ─── DB fetch: category + ancestors + children ────────────────────────────────
@@ -159,7 +148,7 @@ function BenefitsSection({ benefits, name }: { benefits: Benefit[]; name: string
     <section className="section-py bg-white dark:bg-[#0A0F1E]">
       <div className="container-apt">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+          <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
           <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
             Key Benefits
           </span>
@@ -174,9 +163,9 @@ function BenefitsSection({ benefits, name }: { benefits: Benefit[]; name: string
           {benefits.map((b) => (
             <div
               key={b.title}
-              className="flex gap-5 p-6 bg-[#F8FAFC] dark:bg-[#111827] rounded-2xl border border-[#E2E8F0] dark:border-white/10 hover:border-[#84CC16]/40 transition-colors"
+              className="flex gap-5 p-6 bg-[#F8FAFC] dark:bg-surface-900 rounded-2xl border border-[#E2E8F0] dark:border-white/10 hover:border-[#84CC16]/40 transition-colors"
             >
-              <span className="flex-shrink-0 mt-0.5 w-8 h-8 rounded-xl bg-[#84CC16]/15 flex items-center justify-center">
+              <span className="shrink-0 mt-0.5 w-8 h-8 rounded-xl bg-[#84CC16]/15 flex items-center justify-center">
                 <svg className="w-4 h-4 text-[#84CC16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
@@ -204,7 +193,7 @@ function BulletPointsSection({ points }: { points: string[] }) {
   return (
     <div className="bg-[#0A0F1E] rounded-2xl p-7">
       <div className="flex items-center gap-3 mb-5">
-        <div className="w-5 h-[2px] rounded-full bg-[#84CC16]" />
+        <div className="w-5 h-0.5 rounded-full bg-[#84CC16]" />
         <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
           Why APT Ghana
         </span>
@@ -212,7 +201,7 @@ function BulletPointsSection({ points }: { points: string[] }) {
       <ul className="space-y-3">
         {points.map((pt) => (
           <li key={pt} className="flex items-start gap-3">
-            <span className="flex-shrink-0 mt-0.5 w-5 h-5 rounded-full bg-[#84CC16]/15 flex items-center justify-center">
+            <span className="shrink-0 mt-0.5 w-5 h-5 rounded-full bg-[#84CC16]/15 flex items-center justify-center">
               <svg className="w-2.5 h-2.5 text-[#84CC16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
               </svg>
@@ -232,7 +221,7 @@ function ChildrenGrid({ children, heading }: { children: ChildCategory[]; headin
     <section className="section-py bg-[#F8FAFC] dark:bg-[#0D1526]">
       <div className="container-apt">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+          <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
           <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
             Product Categories
           </span>
@@ -248,7 +237,7 @@ function ChildrenGrid({ children, heading }: { children: ChildCategory[]; headin
             <Link
               key={child._id}
               href={`/solutions/${child.slug}`}
-              className="group bg-white dark:bg-[#111827] rounded-2xl border border-[#E2E8F0] dark:border-white/10 overflow-hidden hover:border-[#84CC16]/50 hover:-translate-y-1 transition-all"
+              className="group bg-white dark:bg-surface-900 rounded-2xl border border-[#E2E8F0] dark:border-white/10 overflow-hidden hover:border-[#84CC16]/50 hover:-translate-y-1 transition-all"
             >
               {child.image.url && (
                 <div className="h-44 bg-[#F8FAFC] dark:bg-[#0A0F1E] flex items-center justify-center border-b border-[#E2E8F0] dark:border-white/10 p-5">
@@ -297,7 +286,7 @@ function SolutionCTA({ name }: { name: string }) {
         <div className="bg-white/5 rounded-2xl border border-white/10 p-10 lg:p-14 flex flex-col lg:flex-row items-center justify-between gap-8">
           <div>
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+              <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
               <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                 Request a Quote
               </span>
@@ -313,7 +302,7 @@ function SolutionCTA({ name }: { name: string }) {
               technical proposal. Contact us today.
             </p>
           </div>
-          <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+          <div className="flex flex-col sm:flex-row gap-3 shrink-0">
             <Link
               href={STORE_URL + "/rfq"}
               className="inline-flex items-center gap-2 h-12 px-7 bg-[#84CC16] text-[#0A0F1E] font-bold text-sm rounded-xl hover:bg-[#78B800] transition-colors whitespace-nowrap"
@@ -391,14 +380,14 @@ export default async function SolutionDetailPage({
       <Header />
       <main>
         {/* Hero */}
-        <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] pt-32 pb-20">
+        <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] py-20">
           <div className="container-apt">
             <Breadcrumb ancestors={cat.ancestors} current={cat.name} />
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
               <div className="max-w-2xl">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
-                  <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16] capitalize">
+                  <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
+                  <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                     {cat.level}
                   </span>
                 </div>
@@ -417,7 +406,7 @@ export default async function SolutionDetailPage({
 
               {/* Hero image if available */}
               {cat.image.url && (
-                <div className="hidden lg:flex items-center justify-center h-64 bg-white dark:bg-[#111827] rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-8">
+                <div className="hidden lg:flex items-center justify-center h-64 bg-white dark:bg-surface-900 rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-8">
                   <Image
                     src={cat.image.url}
                     alt={cat.image.alt}
@@ -434,7 +423,7 @@ export default async function SolutionDetailPage({
 
         {/* Mobile hero image */}
         {cat.image.url && (
-          <div className="lg:hidden bg-[#F8FAFC] dark:bg-[#111827] border-y border-[#E2E8F0] dark:border-white/10 flex items-center justify-center h-52 p-6">
+          <div className="lg:hidden bg-[#F8FAFC] dark:bg-surface-900 border-y border-[#E2E8F0] dark:border-white/10 flex items-center justify-center h-52 p-6">
             <Image
               src={cat.image.url}
               alt={cat.image.alt}
@@ -458,7 +447,7 @@ export default async function SolutionDetailPage({
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <div className="lg:col-span-2">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                    <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                     <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                       Shop Products
                     </span>
@@ -512,14 +501,14 @@ export default async function SolutionDetailPage({
                   <Link
                     key={a.slug}
                     href={`/solutions/${a.slug}`}
-                    className="inline-flex items-center gap-2 h-10 px-5 bg-white dark:bg-[#111827] border border-[#E2E8F0] dark:border-white/10 rounded-xl text-sm font-medium text-[#0F172A] dark:text-[#94A3B8] hover:border-[#84CC16]/50 hover:bg-[#84CC16]/5 transition-colors"
+                    className="inline-flex items-center gap-2 h-10 px-5 bg-white dark:bg-surface-900 border border-[#E2E8F0] dark:border-white/10 rounded-xl text-sm font-medium text-[#0F172A] dark:text-[#94A3B8] hover:border-[#84CC16]/50 hover:bg-[#84CC16]/5 transition-colors"
                   >
                     {a.name}
                   </Link>
                 ))}
                 <Link
                   href="/solutions"
-                  className="inline-flex items-center gap-2 h-10 px-5 bg-white dark:bg-[#111827] border border-[#E2E8F0] dark:border-white/10 rounded-xl text-sm font-medium text-[#0F172A] dark:text-[#94A3B8] hover:border-[#84CC16]/50 hover:bg-[#84CC16]/5 transition-colors"
+                  className="inline-flex items-center gap-2 h-10 px-5 bg-white dark:bg-surface-900 border border-[#E2E8F0] dark:border-white/10 rounded-xl text-sm font-medium text-[#0F172A] dark:text-[#94A3B8] hover:border-[#84CC16]/50 hover:bg-[#84CC16]/5 transition-colors"
                 >
                   All Solutions
                 </Link>

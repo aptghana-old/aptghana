@@ -60,7 +60,7 @@ export default function Industries() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-14">
           <div className="max-w-xl">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+              <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
               <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                 Sectors We Serve
               </span>

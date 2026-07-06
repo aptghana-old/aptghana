@@ -13,41 +13,41 @@ import {
 // ─────────────────────────────────────────────────────────────────────────────
 
 export interface LibraryAsset {
-  _id:          string;
-  key:          string;
-  url:          string;
-  filename:     string;
+  _id: string;
+  key: string;
+  url: string;
+  filename: string;
   originalName: string;
-  mimetype:     string;
-  size:         number;
-  folder:       string;
-  tags:         string[];
-  altText?:     string;
+  mimetype: string;
+  size: number;
+  folder: string;
+  tags: string[];
+  altText?: string;
   description?: string;
   downloadCount: number;
-  viewCount:    number;
-  createdAt:    string;
+  viewCount: number;
+  createdAt: string;
 }
 
 export interface ResourceType {
-  id:       string;
-  title:    string;
-  desc:     string;
-  count:    number;
-  icon:     React.ReactNode;
-  color:    string;
-  bgColor:  string;
+  id: string;
+  title: string;
+  desc: string;
+  count: number;
+  icon: React.ReactNode;
+  color: string;
+  bgColor: string;
 }
 
 interface Props {
   initialAssets: LibraryAsset[];
-  initialTotal:  number;
-  counts:        Record<string, number>;
+  initialTotal: number;
+  counts: Record<string, number>;
   resourceTypes: ResourceType[];
   popularBrands: string[];
-  activeType:    string;
-  activeQuery:   string;
-  activeBrand:   string;
+  activeType: string;
+  activeQuery: string;
+  activeBrand: string;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -57,9 +57,9 @@ interface Props {
 function formatBytes(bytes: number): string {
   if (bytes === 0) return "0 B";
   const k = 1024;
-  const units = ["B", "KB", "MB", "GB"];
+  const units = [ "B", "KB", "MB", "GB" ];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / k ** i).toFixed(1))} ${units[i]}`;
+  return `${parseFloat((bytes / k ** i).toFixed(1))} ${units[ i ]}`;
 }
 
 function formatDate(dateStr: string): string {
@@ -71,29 +71,29 @@ function getExtension(filename: string): string {
 }
 
 function getMimeColor(mimetype: string): { bg: string; text: string } {
-  if (mimetype === "application/pdf")            return { bg: "#fee2e2", text: "#dc2626" };
-  if (mimetype.startsWith("video/"))             return { bg: "#fee2e2", text: "#dc2626" };
+  if (mimetype === "application/pdf") return { bg: "#fee2e2", text: "#dc2626" };
+  if (mimetype.startsWith("video/")) return { bg: "#fee2e2", text: "#dc2626" };
   if (mimetype.includes("wordprocessingml") || mimetype.includes("msword"))
-                                                  return { bg: "#dbeafe", text: "#1d4ed8" };
+    return { bg: "#dbeafe", text: "#1d4ed8" };
   if (mimetype.includes("spreadsheetml") || mimetype.includes("vnd.ms-excel"))
-                                                  return { bg: "#dcfce7", text: "#15803d" };
-  if (mimetype.startsWith("image/"))             return { bg: "#ede9fe", text: "#7c3aed" };
+    return { bg: "#dcfce7", text: "#15803d" };
+  if (mimetype.startsWith("image/")) return { bg: "#ede9fe", text: "#7c3aed" };
   if (mimetype.includes("zip") || mimetype.includes("compressed"))
-                                                  return { bg: "#fef3c7", text: "#d97706" };
+    return { bg: "#fef3c7", text: "#d97706" };
   return { bg: "#f3f4f6", text: "#6b7280" };
 }
 
 function getTypeIcon(id: string, size = 18): React.ReactNode {
   const props = { size, strokeWidth: 1.75 };
   switch (id) {
-    case "datasheets":    return <FileText   {...props} />;
-    case "manuals":       return <BookOpen   {...props} />;
-    case "guides":        return <Lightbulb  {...props} />;
-    case "videos":        return <Film       {...props} />;
-    case "faqs":          return <HelpCircle {...props} />;
-    case "software":      return <Code2      {...props} />;
-    case "certificates":  return <Award      {...props} />;
-    default:              return <FileText   {...props} />;
+    case "datasheets": return <FileText   {...props} />;
+    case "manuals": return <BookOpen   {...props} />;
+    case "guides": return <Lightbulb  {...props} />;
+    case "videos": return <Film       {...props} />;
+    case "faqs": return <HelpCircle {...props} />;
+    case "software": return <Code2      {...props} />;
+    case "certificates": return <Award      {...props} />;
+    default: return <FileText   {...props} />;
   }
 }
 
@@ -102,10 +102,10 @@ function getTypeIcon(id: string, size = 18): React.ReactNode {
 // ─────────────────────────────────────────────────────────────────────────────
 
 function AssetCard({ asset, onDownload }: { asset: LibraryAsset; onDownload: (id: string, url: string) => void }) {
-  const ext     = getExtension(asset.filename);
-  const colors  = getMimeColor(asset.mimetype);
+  const ext = getExtension(asset.filename);
+  const colors = getMimeColor(asset.mimetype);
   const isVideo = asset.mimetype.startsWith("video/");
-  const label   = asset.altText || asset.description || asset.filename.replace(/[-_]/g, " ").replace(/\.[^.]+$/, "");
+  const label = asset.altText || asset.description || asset.filename.replace(/[-_]/g, " ").replace(/\.[^.]+$/, "");
 
   return (
     <div
@@ -195,7 +195,7 @@ function AssetCard({ asset, onDownload }: { asset: LibraryAsset; onDownload: (id
             rel="noreferrer"
             download={asset.filename}
             onClick={() => onDownload(asset._id, asset.url)}
-            className="flex items-center justify-center gap-2 w-full h-10 rounded-xl text-[12px] font-semibold transition-colors bg-[#0057b8] hover:bg-[#1a73e8] text-white"
+            className="flex items-center justify-center gap-2 w-full h-10 rounded-xl text-[12px] font-semibold transition-colors bg-navy-500 hover:bg-navy-400 text-white"
           >
             <Download size={13} />
             Download
@@ -220,25 +220,25 @@ export function LibraryBrowser({
   activeQuery,
   activeBrand,
 }: Props) {
-  const router        = useRouter();
-  const searchParams  = useSearchParams();
-  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const [ isPending, startTransition ] = useTransition();
 
   // Client-side "load more" state
-  const [extraAssets, setExtraAssets]   = useState<LibraryAsset[]>([]);
-  const [loadedPages, setLoadedPages]   = useState(1);
-  const [loadingMore, setLoadingMore]   = useState(false);
-  const [hasMore, setHasMore]           = useState(initialTotal > initialAssets.length);
+  const [ extraAssets, setExtraAssets ] = useState<LibraryAsset[]>([]);
+  const [ loadedPages, setLoadedPages ] = useState(1);
+  const [ loadingMore, setLoadingMore ] = useState(false);
+  const [ hasMore, setHasMore ] = useState(initialTotal > initialAssets.length);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const allAssets = [...initialAssets, ...extraAssets];
+  const allAssets = [ ...initialAssets, ...extraAssets ];
   const totalShown = allAssets.length;
 
   // Navigate with new filters (SSR refetch)
   const navigate = useCallback(
     (updates: Record<string, string | undefined>) => {
       const params = new URLSearchParams(searchParams.toString());
-      for (const [k, v] of Object.entries(updates)) {
+      for (const [ k, v ] of Object.entries(updates)) {
         if (v) params.set(k, v); else params.delete(k);
       }
       // Reset extra state on filter change
@@ -246,7 +246,7 @@ export function LibraryBrowser({
       setLoadedPages(1);
       startTransition(() => { router.push(`/library?${params.toString()}`); });
     },
-    [router, searchParams],
+    [ router, searchParams ],
   );
 
   // Fetch additional pages client-side
@@ -255,14 +255,14 @@ export function LibraryBrowser({
     const nextPage = loadedPages + 1;
     try {
       const params = new URLSearchParams();
-      if (activeType)  params.set("type",  activeType);
-      if (activeQuery) params.set("q",     activeQuery);
+      if (activeType) params.set("type", activeType);
+      if (activeQuery) params.set("q", activeQuery);
       if (activeBrand) params.set("brand", activeBrand);
-      params.set("page",  String(nextPage));
+      params.set("page", String(nextPage));
       params.set("limit", "24");
-      const res  = await fetch(`/api/library?${params}`);
+      const res = await fetch(`/api/library?${params}`);
       const json = await res.json() as { assets: LibraryAsset[]; total: number; pages: number };
-      setExtraAssets((prev) => [...prev, ...json.assets]);
+      setExtraAssets((prev) => [ ...prev, ...json.assets ]);
       setLoadedPages(nextPage);
       setHasMore(nextPage < json.pages);
     } catch {
@@ -275,9 +275,9 @@ export function LibraryBrowser({
   // Track download without blocking UI
   const trackDownload = (id: string, _url: string) => {
     void fetch(`/api/assets/${id}`, {
-      method:  "POST",
+      method: "POST",
       headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify({ action: "increment-download" }),
+      body: JSON.stringify({ action: "increment-download" }),
     });
   };
 
@@ -314,7 +314,7 @@ export function LibraryBrowser({
 
             {resourceTypes.map((rt) => {
               const isActive = activeType === rt.id;
-              const count    = counts[rt.id] ?? 0;
+              const count = counts[ rt.id ] ?? 0;
               return (
                 <button
                   key={rt.id}
@@ -430,15 +430,15 @@ export function LibraryBrowser({
               className="h-10 px-4 rounded-l-xl text-[13px] outline-none w-full sm:w-64 transition-colors"
               style={{
                 background: "var(--bg-surface)",
-                border:     "1px solid var(--border)",
+                border: "1px solid var(--border)",
                 borderRight: "none",
-                color:      "var(--text-1)",
+                color: "var(--text-1)",
               }}
             />
             <button
               type="submit"
               disabled={isPending}
-              className="h-10 px-4 rounded-r-xl text-[12px] font-semibold text-white transition-colors bg-[#0057b8] hover:bg-[#1a73e8] shrink-0 flex items-center gap-1.5"
+              className="h-10 px-4 rounded-r-xl text-[12px] font-semibold text-white transition-colors bg-navy-500 hover:bg-navy-400 shrink-0 flex items-center gap-1.5"
             >
               {isPending ? <Loader2 size={14} className="animate-spin" /> : <Search size={14} />}
             </button>
@@ -512,8 +512,8 @@ export function LibraryBrowser({
               className="flex items-center gap-2 h-11 px-8 rounded-xl text-[13px] font-semibold transition-colors"
               style={{
                 background: "var(--bg-surface)",
-                border:     "1px solid var(--border)",
-                color:      "var(--text-2)",
+                border: "1px solid var(--border)",
+                color: "var(--text-2)",
               }}
             >
               {loadingMore ? (
@@ -545,21 +545,21 @@ function CategoryCards({
   onSelect,
 }: {
   resourceTypes: ResourceType[];
-  counts:        Record<string, number>;
-  onSelect:      (id: string) => void;
+  counts: Record<string, number>;
+  onSelect: (id: string) => void;
 }) {
   return (
     <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
       {resourceTypes.map((rt) => {
-        const count = counts[rt.id] ?? 0;
+        const count = counts[ rt.id ] ?? 0;
         return (
           <button
             key={rt.id}
             onClick={() => onSelect(rt.id)}
             className="group flex items-start gap-4 p-5 text-left rounded-2xl border transition-all duration-200 hover:shadow-[var(--shadow-2)] hover:-translate-y-0.5"
             style={{
-              background:   "var(--bg-surface)",
-              borderColor:  "var(--border)",
+              background: "var(--bg-surface)",
+              borderColor: "var(--border)",
             }}
           >
             <div
@@ -602,7 +602,7 @@ function DocumentGrid({
   assets,
   onDownload,
 }: {
-  assets:     LibraryAsset[];
+  assets: LibraryAsset[];
   onDownload: (id: string, url: string) => void;
 }) {
   return (
@@ -621,8 +621,8 @@ function DocumentGrid({
 function EmptyState({
   type, query, onClear,
 }: {
-  type:    string;
-  query:   string;
+  type: string;
+  query: string;
   onClear: () => void;
 }) {
   return (
@@ -647,7 +647,7 @@ function EmptyState({
       <div className="flex flex-wrap gap-3 justify-center">
         <button
           onClick={onClear}
-          className="h-10 px-5 rounded-xl text-[13px] font-semibold transition-colors bg-[#0057b8] text-white hover:bg-[#1a73e8]"
+          className="h-10 px-5 rounded-xl text-[13px] font-semibold transition-colors bg-navy-500 text-white hover:bg-navy-400"
         >
           Browse All Documents
         </button>

@@ -39,17 +39,6 @@ function ServiceIcon({ name, className = "w-6 h-6" }: { name: string; className?
   return <Icon className={className} strokeWidth={1.5} />;
 }
 
-// ─── Types ─────────────────────────────────────────────────────────────────────
-
-interface ServiceItem {
-  _id: string;
-  title: string;
-  description: string;
-  section: string;
-  iconName: string;
-  displayOrder: number;
-}
-
 // ─── Static fallbacks (used if DB is unreachable) ──────────────────────────────
 
 const fallbackPillars = [
@@ -138,11 +127,11 @@ export default async function ServicesPage() {
       <Header />
       <main>
         {/* ── Hero ── */}
-        <section className="bg-white dark:bg-[#0A0F1E] pt-32 pb-20">
+        <section className="bg-white dark:bg-[#0A0F1E] py-20">
           <div className="container-apt">
             <div className="max-w-2xl">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                 <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                   Engineering Services
                 </span>
@@ -168,7 +157,7 @@ export default async function ServicesPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                  <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                   <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                     Pre-Sales Consulting
                   </span>
@@ -194,7 +183,7 @@ export default async function ServicesPage() {
                 <ul className="space-y-3">
                   {preSalesBullets.map((item) => (
                     <li key={item} className="flex items-start gap-3 text-sm text-[#0F172A] dark:text-[#94A3B8]">
-                      <span className="mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-[#84CC16]/15 flex items-center justify-center">
+                      <span className="mt-0.5 shrink-0 w-5 h-5 rounded-full bg-[#84CC16]/15 flex items-center justify-center">
                         <svg className="w-3 h-3 text-[#84CC16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                         </svg>
@@ -246,11 +235,11 @@ export default async function ServicesPage() {
           <div className="container-apt">
             <div className="max-w-3xl mx-auto text-center mb-14">
               <div className="flex items-center justify-center gap-3 mb-4">
-                <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                 <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                   Technical Assistance & Training
                 </span>
-                <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
               </div>
               <h2
                 className="text-4xl lg:text-5xl font-extrabold tracking-tight text-[#0F172A] dark:text-[#F1F5F9] mb-5"
@@ -266,7 +255,7 @@ export default async function ServicesPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {technical.map((item) => (
-                <div key={item.title} className="bg-[#F8FAFC] dark:bg-[#111827] rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-7 hover:border-[#84CC16]/40 transition-colors">
+                <div key={item.title} className="bg-[#F8FAFC] dark:bg-surface-900 rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-7 hover:border-[#84CC16]/40 transition-colors">
                   <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#84CC16]/10 text-[#84CC16] mb-5">
                     <ServiceIcon name={item.iconName} />
                   </div>
@@ -288,7 +277,7 @@ export default async function ServicesPage() {
                 <div className="space-y-6">
                   {assembly.map((item) => (
                     <div key={item.title} className="flex items-start gap-4">
-                      <span className="flex-shrink-0 mt-1 w-5 h-5 rounded-full bg-[#84CC16]/20 flex items-center justify-center">
+                      <span className="shrink-0 mt-1 w-5 h-5 rounded-full bg-[#84CC16]/20 flex items-center justify-center">
                         <svg className="w-3 h-3 text-[#84CC16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                         </svg>
@@ -303,7 +292,7 @@ export default async function ServicesPage() {
               </div>
               <div className="order-1 lg:order-2">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                  <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                   <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                     Customised Assembly
                   </span>
@@ -335,11 +324,11 @@ export default async function ServicesPage() {
           <div className="container-apt">
             <div className="max-w-2xl mx-auto text-center mb-12">
               <div className="flex items-center justify-center gap-3 mb-4">
-                <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                 <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                   Our Approach
                 </span>
-                <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
               </div>
               <h2
                 className="text-4xl font-extrabold tracking-tight text-[#0F172A] dark:text-[#F1F5F9]"
@@ -350,7 +339,7 @@ export default async function ServicesPage() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {pillars.map((card) => (
-                <div key={card.title} className="bg-[#F8FAFC] dark:bg-[#111827] rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-8">
+                <div key={card.title} className="bg-[#F8FAFC] dark:bg-surface-900 rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-8">
                   <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#1E3A5F]/10 dark:bg-[#84CC16]/10 text-[#1E3A5F] dark:text-[#84CC16] mb-5">
                     <ServiceIcon name={card.iconName} />
                   </div>
@@ -369,11 +358,11 @@ export default async function ServicesPage() {
           <div className="container-apt">
             <div className="max-w-3xl mx-auto text-center mb-12">
               <div className="flex items-center justify-center gap-3 mb-4">
-                <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                 <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                   What We Offer
                 </span>
-                <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
               </div>
               <h2
                 className="text-4xl lg:text-5xl font-extrabold tracking-tight text-white"
@@ -385,7 +374,7 @@ export default async function ServicesPage() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
               {whatWeOffer.map((item) => (
                 <div key={item.title} className="bg-white/5 rounded-2xl border border-white/10 p-8">
-                  <div className="w-8 h-[3px] rounded-full bg-[#84CC16] mb-6" />
+                  <div className="w-8 h-0.75 rounded-full bg-[#84CC16] mb-6" />
                   <h3
                     className="font-bold text-white text-xl mb-3"
                     style={{ fontFamily: "var(--font-sora, 'Sora', sans-serif)" }}

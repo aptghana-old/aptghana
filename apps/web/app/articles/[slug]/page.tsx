@@ -47,7 +47,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: article.title,
       description: article.excerpt,
       url: `${SITE_URL}/articles/${slug}`,
-      images: article.seo?.ogImage || article.featuredImage?.url ? [article.seo?.ogImage || article.featuredImage!.url!] : undefined,
+      images: article.seo?.ogImage || article.featuredImage?.url ? [ article.seo?.ogImage || article.featuredImage!.url! ] : undefined,
     },
     alternates: { canonical: `${SITE_URL}/articles/${slug}` },
   };
@@ -62,7 +62,7 @@ export default async function ArticleDetailPage({ params }: { params: Promise<{ 
     <>
       <Header />
       <main>
-        <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] pt-32 pb-12">
+        <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] pt-20 pb-12">
           <div className="container-apt max-w-3xl">
             <div className="flex items-center gap-2 text-xs text-[#0F172A]/40 dark:text-white/40 mb-6">
               <Link href="/resources" className="hover:text-[#0F172A]/60 dark:hover:text-white/70 transition-colors">Articles</Link>

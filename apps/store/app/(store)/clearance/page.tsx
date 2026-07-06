@@ -55,7 +55,7 @@ export default async function ClearancePage() {
             </svg>
             <h2 className="text-xl font-bold text-[#0a1628] mb-2">No Clearance Items Right Now</h2>
             <p className="text-[#6b7280] max-w-md mb-6">There are no clearance products available at the moment. Check back soon, or browse our full product catalogue.</p>
-            <Link href="/catalog" className="inline-flex items-center gap-2 h-11 px-7 bg-[#0057b8] hover:bg-[#1a73e8] text-white font-semibold text-sm rounded-xl transition-colors">
+            <Link href="/catalog" className="inline-flex items-center gap-2 h-11 px-7 bg-navy-500 hover:bg-navy-400 text-white font-semibold text-sm rounded-xl transition-colors">
               Browse All Products
             </Link>
           </div>

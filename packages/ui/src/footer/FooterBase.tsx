@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { FooterConfig } from "./types";
 
 interface Props {
@@ -44,52 +45,15 @@ export default function FooterBase({ config }: Props) {
         <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-12">
 
           {/* Brand column — left-border accent, slight tinted bg in dark */}
-          <div
-            className="
-              border-l-2 pl-5 pt-1 pb-1
-              border-[#3DCD58]/20 dark:border-[#3DCD58]/25
-              dark:bg-[#3DCD58]/[0.03] dark:rounded-r-lg
-            "
-          >
-            <Link
-              href={brand.href}
-              className="inline-flex items-center gap-2.5 mb-4 group"
-            >
-              <div
-                className="
-                  w-9 h-9 rounded-[10px] bg-[#3DCD58] flex items-center justify-center
-                  text-white font-extrabold text-[11px] tracking-wide shrink-0
-                  transition-all duration-200
-                  group-hover:bg-[#2AA347] group-hover:scale-105
-                "
-              >
-                {brand.logoText}
-              </div>
-              <div>
-                <div
-                  className="
-                    font-bold text-[13.5px] leading-tight tracking-tight
-                    text-slate-900 group-hover:text-[#3DCD58]
-                    dark:text-white/95 dark:group-hover:text-[#3DCD58]
-                    transition-colors duration-200
-                  "
-                >
-                  {brand.name}
-                </div>
-                <div
-                  className="
-                    text-[9px] mt-0.5 uppercase tracking-[0.12em] font-medium
-                    text-slate-400 dark:text-white/30
-                  "
-                >
-                  {brand.tagline}
-                </div>
-              </div>
+          <div className="pl-5 pt-1 pb-1" >
+            <Link href="/" className="flex items-center shrink-0">
+              <Image src="/images/logo.png" alt="APT Ghana" width={140} height={69}
+                className="h-10 w-auto object-contain dark:invert" priority />
             </Link>
 
             <p
               className="
-                text-xs leading-relaxed mb-5 max-w-[240px]
+                text-xs leading-relaxed mb-5 max-w-60
                 text-slate-400 dark:text-white/45
               "
             >
@@ -111,7 +75,7 @@ export default function FooterBase({ config }: Props) {
                     "
                   >
                     <svg
-                      className="w-[13px] h-[13px] shrink-0 mt-0.5 opacity-70"
+                      className="size-3.25 shrink-0 mt-0.5 opacity-70"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -135,13 +99,13 @@ export default function FooterBase({ config }: Props) {
                   rel="noopener noreferrer"
                   aria-label={s.label}
                   className="
-                    size-11 sm:size-8 rounded-[8px] flex items-center justify-center
+                    size-11 sm:size-8 rounded-md flex items-center justify-center
                     transition-all duration-200
                     focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3DCD58]
                     bg-slate-100 border border-slate-200/80 text-slate-400
                     hover:bg-slate-200 hover:border-slate-300 hover:text-slate-700 hover:-translate-y-px
-                    dark:bg-white/[0.045] dark:border-white/[0.07] dark:text-white/35
-                    dark:hover:bg-white/[0.09] dark:hover:border-white/[0.13] dark:hover:text-white
+                    dark:bg-white/4.5 dark:border-white/[0.07] dark:text-white/35
+                    dark:hover:bg-white/9 dark:hover:border-white/13 dark:hover:text-white
                     dark:hover:-translate-y-px
                   "
                 >
@@ -177,7 +141,7 @@ export default function FooterBase({ config }: Props) {
                 <h3
                   className="
                     flex items-center gap-1.5
-                    text-[9.5px] font-bold uppercase tracking-[0.10em] mb-3.5
+                    text-[9.5px] font-bold uppercase tracking-widest mb-3.5
                     text-slate-900 dark:text-white/95
                   "
                 >
@@ -207,7 +171,7 @@ export default function FooterBase({ config }: Props) {
                         {link.label}
                         {link.external && (
                           <svg
-                            className="w-[9px] h-[9px] opacity-40 shrink-0"
+                            className="size-2.25 opacity-40 shrink-0"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -234,7 +198,7 @@ export default function FooterBase({ config }: Props) {
           <div
             className="
               mt-8 pt-6
-              border-t border-slate-200/80 dark:border-white/[0.055]
+              border-t border-slate-200/80 
             "
           >
             <p
@@ -251,12 +215,12 @@ export default function FooterBase({ config }: Props) {
                   key={b.name}
                   href={b.href}
                   className="
-                    px-3 py-[5px] text-[11.5px] font-medium rounded-full
+                    px-3 py-1.25 text-[11.5px] font-medium rounded-full
                     transition-all duration-200
                     text-slate-400 border border-slate-200/80
                     hover:text-slate-600 hover:border-slate-300 hover:bg-slate-50
-                    dark:text-white/35 dark:border-white/[0.09]
-                    dark:hover:text-white/65 dark:hover:border-white/20 dark:hover:bg-white/[0.04]
+                    dark:text-white/35 dark:border-white/9
+                    dark:hover:text-white/65 dark:hover:border-white/20 dark:hover:bg-white/4
                   "
                 >
                   {b.name}
@@ -271,7 +235,7 @@ export default function FooterBase({ config }: Props) {
           <div
             className="
               mt-8 pt-6
-              border-t border-slate-200/80 dark:border-white/[0.055]
+              border-t border-slate-200/80 dark:border-white/5.5
             "
           >
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5 justify-between">
@@ -304,7 +268,7 @@ export default function FooterBase({ config }: Props) {
                     focus:outline-none
                     bg-slate-100 border border-slate-200/80 text-slate-800 placeholder-slate-300
                     focus:border-[#3DCD58]/50
-                    dark:bg-white/[0.05] dark:border-white/[0.09] dark:text-white
+                    dark:bg-white/5 dark:border-white/9 dark:text-white
                     dark:placeholder-white/20 dark:focus:border-[#3DCD58]/40
                   "
                 />
@@ -329,7 +293,7 @@ export default function FooterBase({ config }: Props) {
         className="
           border-t
           border-slate-100 bg-slate-50/70
-          dark:border-white/[0.045] dark:bg-[#0f2035]/60
+          dark:border-white/4.5 dark:bg-[#0f2035]/60
         "
       >
         <div
@@ -368,7 +332,7 @@ export default function FooterBase({ config }: Props) {
             <div
               className="
                 flex items-center gap-2.5
-                text-[9.5px] font-semibold uppercase tracking-[0.10em]
+                text-[9.5px] font-semibold uppercase tracking-widest
                 text-slate-300 dark:text-white/18
               "
             >
@@ -376,7 +340,7 @@ export default function FooterBase({ config }: Props) {
                 <span key={cert} className="flex items-center gap-2.5">
                   {i > 0 && (
                     <span
-                      className="w-px h-2.5 bg-slate-200 dark:bg-white/[0.08]"
+                      className="w-px h-2.5 bg-slate-200 dark:bg-white/8"
                       aria-hidden="true"
                     />
                   )}

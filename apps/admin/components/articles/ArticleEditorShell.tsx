@@ -18,8 +18,8 @@ import TagInput from "./TagInput";
 import type { ArticleAnalytics } from "@/lib/articleAnalytics";
 
 export interface MediaRef { url: string; alt?: string }
-export interface VideoRef { [key: string]: string | undefined; url: string; title?: string }
-export interface AttachmentRef { [key: string]: string | undefined; name: string; url: string }
+export interface VideoRef { [ key: string ]: string | undefined; url: string; title?: string }
+export interface AttachmentRef { [ key: string ]: string | undefined; name: string; url: string }
 
 export interface ArticleFormData {
   title: string;
@@ -61,14 +61,14 @@ const STATUS_OPTIONS = [
 
 export default function ArticleEditorShell({ articleId, initial, canEdit, analytics }: Props) {
   const router = useRouter();
-  const [form, setForm] = useState<ArticleFormData>(initial);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState(false);
-  const [pickerFor, setPickerFor] = useState<"featured" | "gallery" | "og" | null>(null);
+  const [ form, setForm ] = useState<ArticleFormData>(initial);
+  const [ saving, setSaving ] = useState(false);
+  const [ saved, setSaved ] = useState(false);
+  const [ error, setError ] = useState<string | null>(null);
+  const [ deleting, setDeleting ] = useState(false);
+  const [ pickerFor, setPickerFor ] = useState<"featured" | "gallery" | "og" | null>(null);
 
-  const set = <K extends keyof ArticleFormData>(k: K, v: ArticleFormData[K]) => { setForm((f) => ({ ...f, [k]: v })); setSaved(false); };
+  const set = <K extends keyof ArticleFormData>(k: K, v: ArticleFormData[ K ]) => { setForm((f) => ({ ...f, [ k ]: v })); setSaved(false); };
 
   async function save(overrides: Partial<ArticleFormData> = {}) {
     setSaving(true);
@@ -105,12 +105,12 @@ export default function ArticleEditorShell({ articleId, initial, canEdit, analyt
   }
 
   function handlePicked(assets: Asset[]) {
-    if (pickerFor === "featured" && assets[0]) {
-      set("featuredImage", { url: assets[0].url, alt: assets[0].altText ?? assets[0].filename ?? "" });
+    if (pickerFor === "featured" && assets[ 0 ]) {
+      set("featuredImage", { url: assets[ 0 ].url, alt: assets[ 0 ].altText ?? assets[ 0 ].filename ?? "" });
     } else if (pickerFor === "gallery") {
-      set("gallery", [...form.gallery, ...assets.map((a) => ({ url: a.url, alt: a.altText ?? a.filename ?? "" }))]);
-    } else if (pickerFor === "og" && assets[0]) {
-      set("ogImage", assets[0].url);
+      set("gallery", [ ...form.gallery, ...assets.map((a) => ({ url: a.url, alt: a.altText ?? a.filename ?? "" })) ]);
+    } else if (pickerFor === "og" && assets[ 0 ]) {
+      set("ogImage", assets[ 0 ].url);
     }
     setPickerFor(null);
   }
@@ -224,7 +224,7 @@ export default function ArticleEditorShell({ articleId, initial, canEdit, analyt
                 items={form.videos}
                 canEdit={canEdit}
                 onChange={(v) => set("videos", v)}
-                fields={[{ key: "url", placeholder: "Video URL" }, { key: "title", placeholder: "Title (optional)" }]}
+                fields={[ { key: "url", placeholder: "Video URL" }, { key: "title", placeholder: "Title (optional)" } ]}
                 addLabel="Add video"
               />
 
@@ -233,7 +233,7 @@ export default function ArticleEditorShell({ articleId, initial, canEdit, analyt
                 items={form.attachments}
                 canEdit={canEdit}
                 onChange={(v) => set("attachments", v)}
-                fields={[{ key: "name", placeholder: "File name" }, { key: "url", placeholder: "File URL" }]}
+                fields={[ { key: "name", placeholder: "File name" }, { key: "url", placeholder: "File URL" } ]}
                 addLabel="Add attachment"
               />
             </div>
@@ -363,14 +363,14 @@ function ListEditor<T extends Record<string, string | undefined>>({
   addLabel: string;
 }) {
   function update(idx: number, key: keyof T, value: string) {
-    onChange(items.map((it, i) => (i === idx ? { ...it, [key]: value } : it)));
+    onChange(items.map((it, i) => (i === idx ? { ...it, [ key ]: value } : it)));
   }
   function remove(idx: number) {
     onChange(items.filter((_, i) => i !== idx));
   }
   function add() {
-    const blank = Object.fromEntries(fields.map((f) => [f.key, ""])) as T;
-    onChange([...items, blank]);
+    const blank = Object.fromEntries(fields.map((f) => [ f.key, "" ])) as T;
+    onChange([ ...items, blank ]);
   }
 
   return (
@@ -386,9 +386,9 @@ function ListEditor<T extends Record<string, string | undefined>>({
           {items.map((item, i) => (
             <div key={i} className="flex items-center gap-2">
               {fields.map((f) => (
-                <Input key={String(f.key)} value={item[f.key] ?? ""} disabled={!canEdit} onChange={(e) => update(i, f.key, e.target.value)} placeholder={f.placeholder} wrapperClass="flex-1" />
+                <Input key={String(f.key)} value={item[ f.key ] ?? ""} disabled={!canEdit} onChange={(e) => update(i, f.key, e.target.value)} placeholder={f.placeholder} wrapperClass="flex-1" />
               ))}
-              {canEdit && <button onClick={() => remove(i)} className="p-1.5 rounded-md hover:bg-red-50 text-red-400 hover:text-red-600 transition-colors flex-shrink-0"><X size={14} /></button>}
+              {canEdit && <button onClick={() => remove(i)} className="p-1.5 rounded-md hover:bg-red-50 text-red-400 hover:text-red-600 transition-colors shrink-0"><X size={14} /></button>}
             </div>
           ))}
         </div>

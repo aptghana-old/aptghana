@@ -4,27 +4,27 @@ import { useState } from "react";
 import { Plus, Trash2, Pencil, Check, X } from "lucide-react";
 
 interface Stat {
-  _id:          string;
-  value:        string;
-  label:        string;
+  _id: string;
+  value: string;
+  label: string;
   displayOrder: number;
-  status:       string;
+  status: string;
 }
 
 interface Props { initialStats: Stat[] }
 
 export default function CompanyStatsEditor({ initialStats }: Props) {
-  const [stats, setStats]   = useState<Stat[]>(initialStats);
-  const [editId, setEditId] = useState<string | null>(null);
-  const [editBuf, setEditBuf] = useState<Pick<Stat, "value" | "label" | "displayOrder">>({
+  const [ stats, setStats ] = useState<Stat[]>(initialStats);
+  const [ editId, setEditId ] = useState<string | null>(null);
+  const [ editBuf, setEditBuf ] = useState<Pick<Stat, "value" | "label" | "displayOrder">>({
     value: "", label: "", displayOrder: 0,
   });
-  const [newBuf, setNewBuf] = useState<Pick<Stat, "value" | "label" | "displayOrder">>({
+  const [ newBuf, setNewBuf ] = useState<Pick<Stat, "value" | "label" | "displayOrder">>({
     value: "", label: "", displayOrder: 0,
   });
-  const [addOpen, setAddOpen] = useState(false);
-  const [error, setError]    = useState<string | null>(null);
-  const [saving, setSaving]  = useState(false);
+  const [ addOpen, setAddOpen ] = useState(false);
+  const [ error, setError ] = useState<string | null>(null);
+  const [ saving, setSaving ] = useState(false);
 
   const startEdit = (s: Stat) => {
     setEditId(s._id);
@@ -80,7 +80,7 @@ export default function CompanyStatsEditor({ initialStats }: Props) {
       });
       if (!res.ok) throw new Error((await res.json()).error ?? "Create failed");
       const { id } = await res.json();
-      setStats((prev) => [...prev, { _id: id, ...newBuf, status: "active" }]);
+      setStats((prev) => [ ...prev, { _id: id, ...newBuf, status: "active" } ]);
       setNewBuf({ value: "", label: "", displayOrder: 0 });
       setAddOpen(false);
       setError(null);
@@ -215,7 +215,7 @@ export default function CompanyStatsEditor({ initialStats }: Props) {
           <div className="flex gap-2">
             <button
               onClick={addStat} disabled={saving}
-              className="h-7 px-3 rounded-md text-[12px] font-semibold bg-[#0057b8] text-white hover:bg-[#0046a0] transition-colors disabled:opacity-50"
+              className="h-7 px-3 rounded-md text-[12px] font-semibold bg-navy-500 text-white hover:bg-[#0046a0] transition-colors disabled:opacity-50"
             >
               Save
             </button>

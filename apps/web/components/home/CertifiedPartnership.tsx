@@ -70,7 +70,7 @@ export default function CertifiedPartnership() {
 
             {/* Trust statement */}
             <div
-              className="p-5 rounded-2xl border-l-4 mb-8 bg-white dark:bg-[#111827]"
+              className="p-5 rounded-2xl border-l-4 mb-8 bg-white dark:bg-surface-900"
               style={{ borderLeftColor: "#84CC16", boxShadow: "0 4px 20px rgba(0,0,0,0.06)" }}
             >
               <p className="font-semibold text-[#0F172A] dark:text-[#F1F5F9] leading-snug mb-1">

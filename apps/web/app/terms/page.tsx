@@ -9,38 +9,38 @@ export const revalidate = 3600;
 interface Section { heading: string; body: string }
 
 interface TermsData {
-  title:        string;
-  tagline:      string;
-  lastUpdated:  string;
-  intro:        string;
-  sections:     Section[];
-  contactBlockName:     string;
-  contactBlockEmail:    string;
-  contactBlockAddress:  string;
+  title: string;
+  tagline: string;
+  lastUpdated: string;
+  intro: string;
+  sections: Section[];
+  contactBlockName: string;
+  contactBlockEmail: string;
+  contactBlockAddress: string;
   contactBlockFootnote: string;
-  metaTitle:       string;
+  metaTitle: string;
   metaDescription: string;
 }
 
 const STATIC: TermsData = {
-  title:       "Terms of Service",
-  tagline:     "Legal",
+  title: "Terms of Service",
+  tagline: "Legal",
   lastUpdated: "1 June 2025",
   intro: "These Terms of Service (\"Terms\") govern the supply of products and engineering services by APT Ghana Limited (\"APT Ghana\") to customers. By placing an order or entering into any business relationship with APT Ghana, you agree to be bound by these Terms.",
   sections: [
-    { heading: "1. Acceptance of Terms",   body: "By submitting a purchase order or proceeding with a transaction, you confirm you are authorised to enter contracts, are at least 18 years of age, and have read and agreed to these Terms." },
-    { heading: "2. Products & Pricing",    body: "Product descriptions are provided for informational purposes. Prices are in GHS or USD, exclusive of VAT. Quotations are valid for 30 days." },
-    { heading: "3. Payment Terms",         body: "Payment is due within 30 days of invoice for approved credit customers. New customers pay in full prior to despatch. Late balances accrue 2% interest per month." },
-    { heading: "4. Delivery",              body: "Stocked items are dispatched within 2–3 business days. Non-stocked items are subject to lead times quoted individually." },
-    { heading: "5. Returns & Warranty",    body: "Stocked items may be returned within 14 days in original unopened packaging. A 15% restocking fee applies. Special-order items are non-returnable unless defective." },
+    { heading: "1. Acceptance of Terms", body: "By submitting a purchase order or proceeding with a transaction, you confirm you are authorised to enter contracts, are at least 18 years of age, and have read and agreed to these Terms." },
+    { heading: "2. Products & Pricing", body: "Product descriptions are provided for informational purposes. Prices are in GHS or USD, exclusive of VAT. Quotations are valid for 30 days." },
+    { heading: "3. Payment Terms", body: "Payment is due within 30 days of invoice for approved credit customers. New customers pay in full prior to despatch. Late balances accrue 2% interest per month." },
+    { heading: "4. Delivery", body: "Stocked items are dispatched within 2–3 business days. Non-stocked items are subject to lead times quoted individually." },
+    { heading: "5. Returns & Warranty", body: "Stocked items may be returned within 14 days in original unopened packaging. A 15% restocking fee applies. Special-order items are non-returnable unless defective." },
     { heading: "6. Limitation of Liability", body: "APT Ghana's total liability shall not exceed the purchase price of the relevant goods. We are not liable for indirect, consequential, or punitive losses." },
-    { heading: "7. Governing Law",         body: "These Terms are governed by the laws of the Republic of Ghana. Disputes shall be resolved in the courts of Ghana, with mediation attempted first." },
+    { heading: "7. Governing Law", body: "These Terms are governed by the laws of the Republic of Ghana. Disputes shall be resolved in the courts of Ghana, with mediation attempted first." },
   ],
-  contactBlockName:     "APT Ghana Limited",
-  contactBlockEmail:    EMAIL_SALES,
-  contactBlockAddress:  "North Industrial Area, Plot 7 Block 5, Dadeban Street, Accra, Ghana",
+  contactBlockName: "APT Ghana Limited",
+  contactBlockEmail: EMAIL_SALES,
+  contactBlockAddress: "North Industrial Area, Plot 7 Block 5, Dadeban Street, Accra, Ghana",
   contactBlockFootnote: "These Terms were last updated on 1 June 2025. APT Ghana reserves the right to update these Terms at any time.",
-  metaTitle:       "Terms of Service | APT Ghana",
+  metaTitle: "Terms of Service | APT Ghana",
   metaDescription: "APT Ghana Limited's terms and conditions governing the supply of industrial products and engineering services. Policies on pricing, payment, delivery, returns, and warranty.",
 };
 
@@ -52,10 +52,10 @@ async function getData(): Promise<TermsData> {
 export async function generateMetadata(): Promise<Metadata> {
   const data = await getData();
   return {
-    title:       data.metaTitle,
+    title: data.metaTitle,
     description: data.metaDescription,
-    openGraph:   { title: data.metaTitle, url: `${SITE_URL}/terms` },
-    alternates:  { canonical: `${SITE_URL}/terms` },
+    openGraph: { title: data.metaTitle, url: `${SITE_URL}/terms` },
+    alternates: { canonical: `${SITE_URL}/terms` },
   };
 }
 
@@ -96,10 +96,10 @@ export default async function TermsPage() {
       <Header />
       <main>
         {/* Hero */}
-        <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] pt-32 pb-16">
+        <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] pt-20 pb-16">
           <div className="container-apt max-w-3xl">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+              <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
               <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                 {data.tagline}
               </span>
@@ -149,15 +149,15 @@ export default async function TermsPage() {
               {(data.contactBlockName || data.contactBlockFootnote) && (
                 <div className="bg-[#0A0F1E] rounded-2xl p-8 text-white">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                    <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                     <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                       Contact
                     </span>
                   </div>
                   <div className="space-y-2 text-sm text-white/70">
-                    {data.contactBlockName    && <p className="font-semibold text-white">{data.contactBlockName}</p>}
+                    {data.contactBlockName && <p className="font-semibold text-white">{data.contactBlockName}</p>}
                     {data.contactBlockAddress && <p>{data.contactBlockAddress}</p>}
-                    {data.contactBlockEmail   && (
+                    {data.contactBlockEmail && (
                       <p>Email: <a href={`mailto:${data.contactBlockEmail}`} className="text-[#84CC16] hover:underline">{data.contactBlockEmail}</a></p>
                     )}
                   </div>

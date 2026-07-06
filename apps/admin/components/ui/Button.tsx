@@ -13,11 +13,11 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const VARIANT_STYLES: Record<Variant, string> = {
-  primary:     "bg-[#0057b8] text-white hover:bg-[#0049a0] active:bg-[#003d87] shadow-sm",
-  secondary:   "bg-[var(--apt-bg)] text-[var(--apt-text-primary)] border border-[var(--apt-border)] hover:bg-[var(--apt-bg-raised)] shadow-xs",
-  ghost:       "text-[var(--apt-text-secondary)] hover:bg-[var(--apt-bg-raised)] hover:text-[var(--apt-text-primary)]",
+  primary: "bg-navy-500 text-white hover:bg-[#0049a0] active:bg-[#003d87] shadow-sm",
+  secondary: "bg-[var(--apt-bg)] text-[var(--apt-text-primary)] border border-[var(--apt-border)] hover:bg-[var(--apt-bg-raised)] shadow-xs",
+  ghost: "text-[var(--apt-text-secondary)] hover:bg-[var(--apt-bg-raised)] hover:text-[var(--apt-text-primary)]",
   destructive: "bg-[#dc2626] text-white hover:bg-[#b91c1c] active:bg-[#991b1b] shadow-sm",
-  outline:     "border border-[var(--apt-border-strong)] text-[var(--apt-text-primary)] hover:bg-[var(--apt-bg-raised)]",
+  outline: "border border-[var(--apt-border-strong)] text-[var(--apt-text-primary)] hover:bg-[var(--apt-bg-raised)]",
 };
 
 const SIZE_STYLES: Record<Size, string> = {
@@ -47,8 +47,8 @@ export function Button({
         "inline-flex items-center justify-center font-medium transition-colors select-none",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--apt-border-focus)] focus-visible:ring-offset-1",
         "disabled:opacity-50 disabled:cursor-not-allowed",
-        VARIANT_STYLES[variant],
-        SIZE_STYLES[size],
+        VARIANT_STYLES[ variant ],
+        SIZE_STYLES[ size ],
         className,
       ].join(" ")}
       {...props}

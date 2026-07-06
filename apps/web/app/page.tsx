@@ -9,7 +9,6 @@ import WhoWeAre from "@/components/home/WhoWeAre";
 import CertifiedPartnership from "@/components/home/CertifiedPartnership";
 import Solutions from "@/components/home/Solutions";
 import Industries from "@/components/home/Industries";
-import Brands from "@/components/home/Brands";
 import WhyChooseUs from "@/components/home/WhyChooseUs";
 import ContactSection from "@/components/home/ContactSection";
 
@@ -108,8 +107,6 @@ export default function HomePage() {
         <Solutions />
         {/* 6. Industries with real photography */}
         <Industries />
-        {/* 8. Brand partners */}
-        <Brands />
         {/* 9. Awards, recognitions, why choose APT */}
         <WhyChooseUs />
         {/* 10. Contact cards + quote CTA */}

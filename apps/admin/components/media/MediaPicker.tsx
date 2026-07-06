@@ -60,33 +60,33 @@ export function MediaPicker({
   defaultFolder,
   title = "Select Asset",
 }: MediaPickerProps) {
-  const [assets, setAssets]           = useState<Asset[]>([]);
-  const [total, setTotal]             = useState(0);
-  const [page, setPage]               = useState(1);
-  const [loading, setLoading]         = useState(false);
-  const [query, setQuery]             = useState("");
-  const [folder, setFolder]           = useState<string>(defaultFolder ?? "");
-  const [mediaType, setMediaType]     = useState<string>("");
-  const [sort, setSort]               = useState<SortOption>("newest");
-  const [viewMode, setViewMode]       = useState<ViewMode>("grid");
-  const [selected, setSelected]       = useState<Set<string>>(new Set());
-  const [uploadOpen, setUploadOpen]   = useState(false);
-  const [preview, setPreview]         = useState<Asset | null>(null);
-  const [mounted, setMounted]         = useState(false);
+  const [ assets, setAssets ] = useState<Asset[]>([]);
+  const [ total, setTotal ] = useState(0);
+  const [ page, setPage ] = useState(1);
+  const [ loading, setLoading ] = useState(false);
+  const [ query, setQuery ] = useState("");
+  const [ folder, setFolder ] = useState<string>(defaultFolder ?? "");
+  const [ mediaType, setMediaType ] = useState<string>("");
+  const [ sort, setSort ] = useState<SortOption>("newest");
+  const [ viewMode, setViewMode ] = useState<ViewMode>("grid");
+  const [ selected, setSelected ] = useState<Set<string>>(new Set());
+  const [ uploadOpen, setUploadOpen ] = useState(false);
+  const [ preview, setPreview ] = useState<Asset | null>(null);
+  const [ mounted, setMounted ] = useState(false);
 
-  const abortRef  = useRef<AbortController | null>(null);
-  const inputRef  = useRef<HTMLInputElement>(null);
-  const gridRef   = useRef<HTMLDivElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
 
   const acceptArr = useMemo<MediaType[] | undefined>(
     () =>
       accept == null
         ? undefined
         : Array.isArray(accept)
-        ? accept
-        : [accept],
+          ? accept
+          : [ accept ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(accept)],
+    [ JSON.stringify(accept) ],
   );
 
   // ── Reset & refetch on open ─────────────────────────────────────────────
@@ -100,9 +100,9 @@ export function MediaPicker({
     setPreview(null);
     setQuery("");
     setFolder(defaultFolder ?? "");
-    setMediaType(acceptArr?.length === 1 ? acceptArr[0] : "");
+    setMediaType(acceptArr?.length === 1 ? acceptArr[ 0 ] : "");
     setTimeout(() => inputRef.current?.focus(), 50);
-  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [ open ]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Fetch assets ────────────────────────────────────────────────────────
   const fetchAssets = useCallback(
@@ -114,16 +114,16 @@ export function MediaPicker({
 
       try {
         const params = new URLSearchParams();
-        params.set("page",  String(pg));
+        params.set("page", String(pg));
         params.set("limit", "48");
-        params.set("sort",  sort);
+        params.set("sort", sort);
         params.set("status", "active");
-        if (q)         params.set("query",     q);
-        if (folder)    params.set("folder",    folder);
+        if (q) params.set("query", q);
+        if (folder) params.set("folder", folder);
         if (mediaType) params.set("mediaType", mediaType);
 
         const endpoint = q ? "/api/assets/search" : "/api/assets";
-        const res      = await fetch(`${endpoint}?${params}`, {
+        const res = await fetch(`${endpoint}?${params}`, {
           signal: abortRef.current.signal,
         });
         if (!res.ok) throw new Error("Fetch failed");
@@ -141,7 +141,7 @@ export function MediaPicker({
           ? enriched.filter((a) => acceptArr.includes(a.mediaType as MediaType))
           : enriched;
 
-        setAssets((prev) => (reset ? filtered : [...prev, ...filtered]));
+        setAssets((prev) => (reset ? filtered : [ ...prev, ...filtered ]));
         setTotal(json.total);
         setPage(pg);
       } catch (err) {
@@ -150,7 +150,7 @@ export function MediaPicker({
         setLoading(false);
       }
     },
-    [sort, folder, mediaType, query, acceptArr], // eslint-disable-line react-hooks/exhaustive-deps
+    [ sort, folder, mediaType, query, acceptArr ], // eslint-disable-line react-hooks/exhaustive-deps
   );
 
   // ── Debounced query search ──────────────────────────────────────────────
@@ -161,7 +161,7 @@ export function MediaPicker({
   useEffect(() => {
     if (!open) return;
     fetchAssets(true, 1);
-  }, [open, sort, folder, mediaType]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [ open, sort, folder, mediaType ]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Keyboard: Escape closes ─────────────────────────────────────────────
   useEffect(() => {
@@ -171,14 +171,14 @@ export function MediaPicker({
     };
     window.addEventListener("keydown", handle);
     return () => window.removeEventListener("keydown", handle);
-  }, [open, onClose]);
+  }, [ open, onClose ]);
 
   // ── Infinite scroll ─────────────────────────────────────────────────────
   const sentinelRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (!sentinelRef.current) return;
     const obs = new IntersectionObserver(
-      ([entry]) => {
+      ([ entry ]) => {
         if (entry.isIntersecting && !loading && assets.length < total) {
           void fetchAssets(false, page + 1);
         }
@@ -187,12 +187,12 @@ export function MediaPicker({
     );
     obs.observe(sentinelRef.current);
     return () => obs.disconnect();
-  }, [loading, assets.length, total, page, fetchAssets]);
+  }, [ loading, assets.length, total, page, fetchAssets ]);
 
   // ── Selection helpers ───────────────────────────────────────────────────
   const toggleSelect = (id: string) => {
     if (!multiple) {
-      setSelected(new Set([id]));
+      setSelected(new Set([ id ]));
       setPreview(assets.find((a) => a._id === id) ?? null);
       return;
     }
@@ -213,12 +213,12 @@ export function MediaPicker({
 
   const handleUploadComplete = (uploaded: Asset[]) => {
     if (uploaded.length > 0) {
-      setAssets((prev) => [...uploaded, ...prev]);
+      setAssets((prev) => [ ...uploaded, ...prev ]);
       setTotal((t) => t + uploaded.length);
       // Auto-select the newly uploaded asset(s)
       const ids = new Set(uploaded.map((a) => a._id));
       setSelected(ids);
-      setPreview(uploaded[0] ?? null);
+      setPreview(uploaded[ 0 ] ?? null);
     }
   };
 
@@ -227,8 +227,8 @@ export function MediaPicker({
   const typeOptions: Array<{ value: string; label: string }> = [
     { value: "", label: "All Types" },
     ...(acceptArr
-      ? acceptArr.map((t) => ({ value: t, label: MEDIA_TYPE_LABELS[t] ?? t }))
-      : Object.entries(MEDIA_TYPE_LABELS).map(([v, l]) => ({ value: v, label: l }))),
+      ? acceptArr.map((t) => ({ value: t, label: MEDIA_TYPE_LABELS[ t ] ?? t }))
+      : Object.entries(MEDIA_TYPE_LABELS).map(([ v, l ]) => ({ value: v, label: l }))),
   ];
 
   return createPortal(
@@ -266,7 +266,7 @@ export function MediaPicker({
 
           {/* View toggles */}
           <div className="hidden sm:flex items-center gap-1 p-1 rounded-lg" style={{ background: "var(--apt-bg-subtle)" }}>
-            {(["grid", "list", "compact"] as const).map((m) => {
+            {([ "grid", "list", "compact" ] as const).map((m) => {
               const icons = { grid: <Grid3X3 size={14} />, list: <List size={14} />, compact: <LayoutList size={14} /> };
               return (
                 <button
@@ -279,7 +279,7 @@ export function MediaPicker({
                     boxShadow: viewMode === m ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
                   }}
                 >
-                  {icons[m]}
+                  {icons[ m ]}
                 </button>
               );
             })}
@@ -485,15 +485,15 @@ export function MediaPicker({
               className="px-5 py-2 rounded-lg text-[13px] font-semibold transition-all"
               style={{
                 background: selected.size > 0 ? "#0057b8" : "var(--apt-bg-raised)",
-                color:      selected.size > 0 ? "#ffffff"  : "var(--apt-text-muted)",
-                cursor:     selected.size > 0 ? "pointer"  : "not-allowed",
+                color: selected.size > 0 ? "#ffffff" : "var(--apt-text-muted)",
+                cursor: selected.size > 0 ? "pointer" : "not-allowed",
               }}
             >
               {selected.size > 1
                 ? `Select ${selected.size} assets`
                 : selected.size === 1
-                ? "Select asset"
-                : "Select"}
+                  ? "Select asset"
+                  : "Select"}
             </button>
           </div>
         </div>
@@ -523,16 +523,14 @@ function PickerGridCard({
     <button
       type="button"
       onClick={() => onToggle(asset._id)}
-      className={`relative rounded-xl overflow-hidden text-left transition-all w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0057b8] ${
-        selected ? "ring-2 ring-[#0057b8] ring-offset-1" : "hover:shadow-md"
-      }`}
+      className={`relative rounded-xl overflow-hidden text-left transition-all w-full focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#0057b8] ${selected ? "ring-2 ring-[#0057b8] ring-offset-1" : "hover:shadow-md"
+        }`}
       style={{ border: "1px solid var(--apt-border)", background: "var(--apt-bg)" }}
     >
       {/* Check badge */}
       <div
-        className={`absolute top-1.5 left-1.5 z-10 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-          selected ? "border-[#0057b8] bg-[#0057b8]" : "border-white/70 bg-white/80 opacity-0 group-hover:opacity-100"
-        }`}
+        className={`absolute top-1.5 left-1.5 z-10 w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${selected ? "border-[#0057b8] bg-navy-500" : "border-white/70 bg-white/80 opacity-0 group-hover:opacity-100"
+          }`}
       >
         {selected && <Check size={11} color="#fff" strokeWidth={3} />}
       </div>
@@ -562,14 +560,12 @@ function PickerListRow({
     <button
       type="button"
       onClick={() => onToggle(asset._id)}
-      className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors border-b last:border-0 focus-visible:outline-none ${
-        selected ? "bg-blue-50 dark:bg-blue-950/30" : "hover:bg-[var(--apt-bg-subtle)]"
-      }`}
+      className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors border-b last:border-0 focus-visible:outline-none ${selected ? "bg-blue-50 dark:bg-blue-950/30" : "hover:bg-[var(--apt-bg-subtle)]"
+        }`}
       style={{ borderColor: "var(--apt-border)" }}
     >
-      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${
-        selected ? "border-[#0057b8] bg-[#0057b8]" : "border-[var(--apt-border)]"
-      }`}>
+      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-colors ${selected ? "border-[#0057b8] bg-navy-500" : "border-[var(--apt-border)]"
+        }`}>
         {selected && <Check size={11} color="#fff" strokeWidth={3} />}
       </div>
 
@@ -606,13 +602,11 @@ function PickerCompactRow({
     <button
       type="button"
       onClick={() => onToggle(asset._id)}
-      className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left transition-colors focus-visible:outline-none ${
-        selected ? "bg-blue-50 dark:bg-blue-950/30" : "hover:bg-[var(--apt-bg-subtle)]"
-      }`}
+      className={`w-full flex items-center gap-2 px-2 py-1.5 rounded-lg text-left transition-colors focus-visible:outline-none ${selected ? "bg-blue-50 dark:bg-blue-950/30" : "hover:bg-[var(--apt-bg-subtle)]"
+        }`}
     >
-      <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${
-        selected ? "border-[#0057b8] bg-[#0057b8]" : "border-[var(--apt-border)]"
-      }`}>
+      <div className={`w-4 h-4 rounded border flex items-center justify-center shrink-0 transition-colors ${selected ? "border-[#0057b8] bg-navy-500" : "border-[var(--apt-border)]"
+        }`}>
         {selected && <Check size={9} color="#fff" strokeWidth={3} />}
       </div>
       <div className="w-6 h-6 rounded overflow-hidden shrink-0">
@@ -648,12 +642,12 @@ function PreviewPanel({
         </p>
         <dl className="grid grid-cols-[auto,1fr] gap-x-3 gap-y-1">
           {[
-            ["Type",    MEDIA_TYPE_LABELS[asset.mediaType] ?? asset.mediaType],
-            ["Size",    formatBytes(asset.size)],
-            ...(asset.width && asset.height ? [["Dims", `${asset.width}×${asset.height}`]] : []),
-            ["Folder",  asset.folder],
-            ["Added",   formatRelative(asset.createdAt)],
-          ].map(([k, v]) => (
+            [ "Type", MEDIA_TYPE_LABELS[ asset.mediaType ] ?? asset.mediaType ],
+            [ "Size", formatBytes(asset.size) ],
+            ...(asset.width && asset.height ? [ [ "Dims", `${asset.width}×${asset.height}` ] ] : []),
+            [ "Folder", asset.folder ],
+            [ "Added", formatRelative(asset.createdAt) ],
+          ].map(([ k, v ]) => (
             <div key={k} className="contents">
               <dt className="text-[10px] font-medium" style={{ color: "var(--apt-text-muted)" }}>{k}</dt>
               <dd className="text-[11px] truncate" style={{ color: "var(--apt-text-secondary)" }}>{v}</dd>
@@ -682,8 +676,8 @@ function PreviewPanel({
         className="w-full py-2 rounded-lg text-[12px] font-semibold transition-all"
         style={{
           background: selected ? "#0057b8" : "var(--apt-bg-raised)",
-          color:      selected ? "#ffffff"  : "var(--apt-text-secondary)",
-          border:     `1px solid ${selected ? "#0057b8" : "var(--apt-border)"}`,
+          color: selected ? "#ffffff" : "var(--apt-text-secondary)",
+          border: `1px solid ${selected ? "#0057b8" : "var(--apt-border)"}`,
         }}
       >
         {selected ? (

@@ -49,7 +49,7 @@ export default function Solutions() {
         {/* Header */}
         <div className="max-w-2xl mb-14">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+            <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
             <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
               Our Capabilities
             </span>
@@ -71,10 +71,10 @@ export default function Solutions() {
             <Link
               key={card.title}
               href={card.href}
-              className="group relative flex flex-col p-8 bg-white dark:bg-[#111827] rounded-2xl border border-[#E2E8F0] dark:border-white/10 hover:border-[#84CC16]/40 dark:hover:border-[#84CC16]/40 hover:shadow-xl transition-all duration-300"
+              className="group relative flex flex-col p-8 bg-white dark:bg-surface-900 rounded-2xl border border-[#E2E8F0] dark:border-white/10 hover:border-[#84CC16]/40 dark:hover:border-[#84CC16]/40 hover:shadow-xl transition-all duration-300"
             >
               {/* Top reveal line */}
-              <div className="absolute top-0 left-8 right-8 h-[2px] rounded-full bg-[#84CC16] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute top-0 left-8 right-8 h-0.5 rounded-full bg-[#84CC16] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
               <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-5 bg-[#84CC16]/10 group-hover:bg-[#84CC16]/20 transition-colors">
                 <card.Icon />

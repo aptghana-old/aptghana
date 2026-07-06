@@ -33,7 +33,7 @@ const FALLBACK_COLOR = "#94A3B8";
 const CURRENCY_SYMBOL: Record<string, string> = { GHS: "GH₵", USD: "$", EUR: "€", GBP: "£" };
 
 function sym(currency: string) {
-  return CURRENCY_SYMBOL[currency] ?? `${currency} `;
+  return CURRENCY_SYMBOL[ currency ] ?? `${currency} `;
 }
 
 export function compactMoney(n: number, currency: string) {
@@ -84,7 +84,7 @@ export default function DealOverview({ kind, kpis, analytics, currency, rangeLab
   const chartSub = isOrder ? "Daily GMV" : "Daily quoted value";
 
   const statusLabel = (s: string) =>
-    statusLabels?.[s] ?? s.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
+    statusLabels?.[ s ] ?? s.replace(/_/g, " ").replace(/^\w/, (c) => c.toUpperCase());
 
   const statusTotal = analytics.byStatus.reduce((n, s) => n + s.count, 0);
   const delivered = analytics.byStatus.find((s) => s.status === "delivered")?.count ?? 0;
@@ -104,12 +104,12 @@ export default function DealOverview({ kind, kpis, analytics, currency, rangeLab
   }));
   const linePath = pts.map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ");
   const areaPath = pts.length > 0
-    ? `${linePath} L${pts[pts.length - 1].x.toFixed(1)},${BOTTOM} L${pts[0].x.toFixed(1)},${BOTTOM} Z`
+    ? `${linePath} L${pts[ pts.length - 1 ].x.toFixed(1)},${BOTTOM} L${pts[ 0 ].x.toFixed(1)},${BOTTOM} Z`
     : "";
   const fmtDay = (iso: string) =>
     new Date(`${iso}T00:00:00`).toLocaleDateString("en-GH", { month: "short", day: "numeric" });
   const xLabels = trend.length >= 2
-    ? [trend[0].date, trend[Math.floor((trend.length - 1) / 2)].date, trend[trend.length - 1].date].map(fmtDay)
+    ? [ trend[ 0 ].date, trend[ Math.floor((trend.length - 1) / 2) ].date, trend[ trend.length - 1 ].date ].map(fmtDay)
     : trend.map((t) => fmtDay(t.date));
   const gradientId = `dealrev-${kind}`;
 
@@ -122,7 +122,7 @@ export default function DealOverview({ kind, kpis, analytics, currency, rangeLab
     const before = analytics.byChannel.slice(0, i).reduce((n, x) => n + x.count, 0);
     const from = (before / Math.max(1, channelTotal)) * 100;
     const to = ((before + c.count) / Math.max(1, channelTotal)) * 100;
-    return `${CHANNEL_COLORS[c.channel] ?? FALLBACK_COLOR} ${from.toFixed(2)}% ${to.toFixed(2)}%`;
+    return `${CHANNEL_COLORS[ c.channel ] ?? FALLBACK_COLOR} ${from.toFixed(2)}% ${to.toFixed(2)}%`;
   });
 
   return (
@@ -140,7 +140,7 @@ export default function DealOverview({ kind, kpis, analytics, currency, rangeLab
         </div>
 
         <div className="card px-4.5 py-4 relative overflow-hidden">
-          <div className="absolute top-0 left-4 right-4 h-[2px] rounded-b" style={{ background: "#12B76A" }} />
+          <div className="absolute top-0 left-4 right-4 h-0.5 rounded-b" style={{ background: "#12B76A" }} />
           <div className="flex items-center justify-between gap-2">
             <span className="text-[11.5px] font-medium" style={{ color: "var(--apt-text-muted)" }}>{valueLabel} · {rangeLabel}</span>
             <DeltaBadge value={kpis.monthlyGrowth} />
@@ -199,12 +199,12 @@ export default function DealOverview({ kind, kpis, analytics, currency, rangeLab
                     <stop offset="100%" stopColor="#12B76A" stopOpacity="0" />
                   </linearGradient>
                 </defs>
-                {[40, 90, 140].map((y) => (
+                {[ 40, 90, 140 ].map((y) => (
                   <line key={y} x1="0" y1={y} x2={W} y2={y} stroke="var(--apt-border)" strokeWidth="1" />
                 ))}
                 {pts.length > 1 && <path d={areaPath} fill={`url(#${gradientId})`} />}
                 <path d={linePath} fill="none" stroke="#12B76A" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" />
-                {pts.length === 1 && <circle cx={pts[0].x} cy={pts[0].y} r="3.5" fill="#12B76A" />}
+                {pts.length === 1 && <circle cx={pts[ 0 ].x} cy={pts[ 0 ].y} r="3.5" fill="#12B76A" />}
               </svg>
               <div className="flex justify-between px-3 pb-3 pt-0.5 font-mono text-[10px]" style={{ color: "var(--apt-text-disabled)" }}>
                 {xLabels.map((l, i) => <span key={`${l}-${i}`}>{l}</span>)}
@@ -229,7 +229,7 @@ export default function DealOverview({ kind, kpis, analytics, currency, rangeLab
                   <div className="h-[7px] rounded-full overflow-hidden" style={{ background: "var(--apt-bg-raised)" }}>
                     <div
                       className="h-full rounded-full"
-                      style={{ width: `${Math.max(2, (s.count / maxStatus) * 100)}%`, background: STATUS_COLORS[s.status] ?? FALLBACK_COLOR }}
+                      style={{ width: `${Math.max(2, (s.count / maxStatus) * 100)}%`, background: STATUS_COLORS[ s.status ] ?? FALLBACK_COLOR }}
                     />
                   </div>
                 </div>
@@ -262,7 +262,7 @@ export default function DealOverview({ kind, kpis, analytics, currency, rangeLab
               <div className="flex flex-col gap-2 flex-1 min-w-[120px]">
                 {analytics.byChannel.map((c) => (
                   <div key={c.channel} className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-[3px] shrink-0" style={{ background: CHANNEL_COLORS[c.channel] ?? FALLBACK_COLOR }} />
+                    <span className="w-2 h-2 rounded-[3px] shrink-0" style={{ background: CHANNEL_COLORS[ c.channel ] ?? FALLBACK_COLOR }} />
                     <span className="text-[11.5px] flex-1 capitalize" style={{ color: "var(--apt-text-secondary)" }}>{c.channel}</span>
                     <span className="font-mono text-[11px] font-semibold tabular-nums" style={{ color: "var(--apt-text-primary)" }}>
                       {((c.count / channelTotal) * 100).toFixed(0)}%

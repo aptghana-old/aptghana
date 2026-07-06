@@ -330,10 +330,6 @@ const SUPPORT_GROUP: ResourceGroup = {
   ],
 };
 
-/* ─── Static resource groups removed — nav now uses DB-only data ─── */
-
-// ─── Main component ───────────────────────────────────────────────────────────
-
 interface Props {
   groups: SolutionGroup[];
   navIndustries: NavIndustry[];
@@ -353,9 +349,6 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
     const meta = SOLUTION_META[ g.slug ] ?? SOLUTION_META_DEFAULT;
     return { slug: g.slug, name: g.name, desc: g.description, img: g.image, ...meta };
   });
-
-  // Active featured solution (hovered or first)
-  const activeFeat = displaySolutions.find((s) => s.slug === hoveredSol) ?? displaySolutions[ 0 ];
 
   // Industries: DB docs enriched with icon/color
   const displayIndustries: Industry[] = navIndustries.map((ind) => ({
@@ -450,7 +443,6 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
                 aria-expanded={activeMenu === "industries"} aria-haspopup="true">
                 Industries <IcoChevronDown open={activeMenu === "industries"} />
               </button>
-              <Link href="/brands" className="px-3 py-2 text-sm font-medium text-[#475569] dark:text-white/80 hover:text-[#0F172A] dark:hover:text-white hover:bg-[#F1F5F9] dark:hover:bg-white/10 transition-colors rounded-md" onMouseEnter={() => openMenu(null)}>Brands</Link>
               <Link href="/services" className="px-3 py-2 text-sm font-medium text-[#475569] dark:text-white/80 hover:text-[#0F172A] dark:hover:text-white hover:bg-[#F1F5F9] dark:hover:bg-white/10 transition-colors rounded-md" onMouseEnter={() => openMenu(null)}>Services</Link>
               <button className={navBtn("resources")}
                 onMouseEnter={() => openMenu("resources")}
@@ -606,7 +598,7 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
                   </Link>
                   <Link
                     href={STORE_URL + "/rfq"}
-                    className="flex items-center gap-2 px-4 py-1.5 text-[12px] font-semibold text-white bg-[#0057b8] hover:bg-[#0046a0] rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-4 py-1.5 text-[12px] font-semibold text-white bg-navy-500 hover:bg-[#0046a0] rounded-lg transition-colors"
                     onClick={() => setActiveMenu(null)}
                   >
                     Get a Quote
@@ -715,7 +707,7 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
                 </div>
                 <Link
                   href="/contact"
-                  className="flex items-center gap-2 px-4 py-1.5 text-[12px] font-semibold text-white bg-[#0057b8] hover:bg-[#0046a0] rounded-lg transition-colors"
+                  className="flex items-center gap-2 px-4 py-1.5 text-[12px] font-semibold text-white bg-navy-500 hover:bg-[#0046a0] rounded-lg transition-colors"
                   onClick={() => setActiveMenu(null)}
                 >
                   Request Technical Consultation
@@ -831,7 +823,7 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
           MOBILE MENU
       ══════════════════════════════════════════════════════════════════════ */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 bg-white dark:bg-[#080f1e] pt-[105px] overflow-y-auto lg:hidden">
+        <div className="fixed inset-0 z-40 bg-white dark:bg-[#080f1e] pt-10 overflow-y-auto lg:hidden">
           <nav className="container-apt py-4 flex flex-col" aria-label="Mobile navigation">
 
             {/* ── Solutions accordion ── */}
@@ -869,7 +861,7 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
                   <div className="flex gap-2">
                     <Link
                       href="/solutions"
-                      className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#0057b8] text-white text-[13px] font-semibold"
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-navy-500 text-white text-[13px] font-semibold"
                       onClick={() => setMobileOpen(false)}
                     >
                       Browse All <IcoArrowRight />
@@ -915,7 +907,7 @@ export default function HeaderClient({ groups, navIndustries, navResItems }: Pro
                       ))}
                     </div>
                   )}
-                  <Link href="/industries" className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-[#0057b8] text-white text-[13px] font-semibold" onClick={() => setMobileOpen(false)}>
+                  <Link href="/industries" className="flex items-center justify-center gap-1.5 py-2.5 rounded-xl bg-navy-500 text-white text-[13px] font-semibold" onClick={() => setMobileOpen(false)}>
                     All Industries <IcoArrowRight />
                   </Link>
                 </div>

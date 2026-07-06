@@ -4,6 +4,7 @@ import Image from "next/image";
 import Header from "@/components/navigation/Header";
 import Footer from "@/components/navigation/Footer";
 import { SITE_URL } from "@apt/config";
+import { notFound } from "next/navigation";
 
 export const revalidate = 3600;
 
@@ -36,43 +37,10 @@ interface DbStat {
   status: string;
 }
 
-const STATIC_SECTIONS = [
-  {
-    slug: "about",
-    title: "About APT Ghana",
-    desc: "Our story, mission, values, and the journey from a startup to West Africa's premier industrial technology platform.",
-    icon: "🏢",
-  },
-  {
-    slug: "team",
-    title: "Our Team",
-    desc: "Meet the engineers, sales professionals, and operations specialists who power APT Ghana's operations.",
-    icon: "👥",
-  },
-  {
-    slug: "careers",
-    title: "Careers",
-    desc: "Join APT Ghana's growing team. We're looking for passionate people to help us serve West Africa's industries.",
-    icon: "💼",
-  },
-  {
-    slug: "partnerships",
-    title: "Partnerships",
-    desc: "Our certified partnerships with Schneider Electric, WEG, Camozzi, and 26+ world-leading manufacturers.",
-    icon: "🤝",
-  },
-  {
-    slug: "csr",
-    title: "Corporate Social Responsibility",
-    desc: "How APT Ghana contributes to Ghana's industrial development, skills training, and community investment.",
-    icon: "🌱",
-  },
-];
-
 const STATIC_STATS = [
   { value: "2009", label: "Year Founded" },
-  { value: "15+",  label: "Years in Business" },
-  { value: "26+",  label: "Brand Partnerships" },
+  { value: "15+", label: "Years in Business" },
+  { value: "26+", label: "Brand Partnerships" },
   { value: "6,000+", label: "Products Stocked" },
 ];
 
@@ -80,7 +48,7 @@ async function getDbData(): Promise<{ sections: DbPage[]; stats: DbStat[] }> {
   try {
     const { connectDB, CompanyPageModel, CompanyStatModel } = await import("@apt/db");
     await connectDB();
-    const [rawPages, rawStats] = await Promise.all([
+    const [ rawPages, rawStats ] = await Promise.all([
       CompanyPageModel.find({ status: "active" })
         .select("slug title tagline icon cardDescription displayOrder status")
         .sort({ displayOrder: 1, title: 1 })
@@ -93,21 +61,21 @@ async function getDbData(): Promise<{ sections: DbPage[]; stats: DbStat[] }> {
 
     type RawPage = { slug: string; title: string; tagline?: string; icon?: string; cardDescription?: string; displayOrder?: number; status?: string };
     const sections: DbPage[] = (rawPages as unknown as RawPage[]).map((d) => ({
-      slug:            d.slug,
-      title:           d.title,
-      tagline:         d.tagline ?? "",
-      icon:            d.icon ?? "",
+      slug: d.slug,
+      title: d.title,
+      tagline: d.tagline ?? "",
+      icon: d.icon ?? "",
       cardDescription: d.cardDescription ?? "",
-      displayOrder:    d.displayOrder ?? 0,
-      status:          d.status ?? "active",
+      displayOrder: d.displayOrder ?? 0,
+      status: d.status ?? "active",
     }));
 
     type RawStat = { value: string; label: string; displayOrder?: number; status?: string };
     const stats: DbStat[] = (rawStats as unknown as RawStat[]).map((d) => ({
-      value:        d.value,
-      label:        d.label,
+      value: d.value,
+      label: d.label,
       displayOrder: d.displayOrder ?? 0,
-      status:       d.status ?? "active",
+      status: d.status ?? "active",
     }));
 
     return { sections, stats };
@@ -119,24 +87,24 @@ async function getDbData(): Promise<{ sections: DbPage[]; stats: DbStat[] }> {
 export default async function CompanyPage() {
   const db = await getDbData();
 
-  const sections = db.sections.length > 0
-    ? db.sections.map((s) => ({ slug: s.slug, title: s.title, desc: s.cardDescription, icon: s.icon }))
-    : STATIC_SECTIONS;
+  const sections = db.sections.map((s) => ({ slug: s.slug, title: s.title, desc: s.cardDescription, icon: s.icon }));
 
   const stats = db.stats.length > 0
     ? db.stats.map((s) => ({ value: s.value, label: s.label }))
     : STATIC_STATS;
+
+  if (sections.length === 0) return notFound();
 
   return (
     <>
       <Header />
       <main>
         {/* Hero */}
-        <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] pt-32 pb-20">
+        <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] py-20">
           <div className="container-apt">
             <div className="max-w-2xl">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                 <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                   About Us
                 </span>
@@ -181,7 +149,7 @@ export default async function CompanyPage() {
             <div className="grid lg:grid-cols-2 gap-14 items-center mb-16">
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                  <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                   <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                     Our Story
                   </span>
@@ -208,7 +176,7 @@ export default async function CompanyPage() {
                   fast-moving items and can source specialized equipment within 2–6 weeks.
                 </p>
               </div>
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3]">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-4/3">
                 <Image
                   src="/images/about/about-us.jpg"
                   alt="APT Ghana Team"
@@ -217,7 +185,7 @@ export default async function CompanyPage() {
                   sizes="(max-width: 1024px) 100vw, 50vw"
                   loading="lazy"
                 />
-                <div className="absolute bottom-0 inset-x-0 h-[3px] bg-[#84CC16]" />
+                <div className="absolute bottom-0 inset-x-0 h-0.75 bg-[#84CC16]" />
               </div>
             </div>
 
@@ -227,7 +195,7 @@ export default async function CompanyPage() {
                 <Link
                   key={s.slug}
                   href={`/company/${s.slug}`}
-                  className="group flex flex-col gap-4 p-7 bg-[#F8FAFC] dark:bg-[#111827] rounded-2xl border border-[#E2E8F0] dark:border-white/10 hover:border-[#84CC16]/40 hover:shadow-lg hover:-translate-y-1 transition-all"
+                  className="group flex flex-col gap-4 p-7 bg-[#F8FAFC] dark:bg-surface-900 rounded-2xl border border-[#E2E8F0] dark:border-white/10 hover:border-[#84CC16]/40 hover:shadow-lg hover:-translate-y-1 transition-all"
                 >
                   <div className="text-3xl">{s.icon}</div>
                   <div>
@@ -257,7 +225,7 @@ export default async function CompanyPage() {
             <div className="bg-white/5 rounded-2xl border border-white/10 p-10 lg:p-14 flex flex-col lg:flex-row items-center justify-between gap-8">
               <div>
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                  <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                   <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                     Work with Us
                   </span>
@@ -272,7 +240,7 @@ export default async function CompanyPage() {
                   Whether you&apos;re a customer, supplier, or prospective employee — we&apos;d love to hear from you.
                 </p>
               </div>
-              <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+              <div className="flex flex-col sm:flex-row gap-3 shrink-0">
                 <Link
                   href="/contact"
                   className="inline-flex items-center gap-2 h-12 px-7 bg-[#84CC16] text-[#0A0F1E] font-bold text-sm rounded-xl hover:bg-[#78B800] transition-colors whitespace-nowrap"

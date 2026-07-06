@@ -1,6 +1,6 @@
 import { FooterBase } from "@apt/ui";
 import type { FooterConfig } from "@apt/ui";
-import { EMAIL_SALES, CONTACT_PHONE, CONTACT_PHONE_HREF, CONTACT_ADDRESS, CONTACT_MAPS_URL, SOCIAL_LINKS } from "@apt/config";
+import { EMAIL_SALES, CONTACT_PHONE, CONTACT_PHONE_HREF, CONTACT_ADDRESS, CONTACT_MAPS_URL, SOCIAL_LINKS, STORE_URL } from "@apt/config";
 
 const WEB_FOOTER_CONFIG: FooterConfig = {
   brand: {
@@ -95,7 +95,6 @@ const WEB_FOOTER_CONFIG: FooterConfig = {
       links: [
         { label: "About APT Ghana", href: "/company/about" },
         { label: "Our Services", href: "/services" },
-        { label: "Brand Partners", href: "/brands" },
         { label: "Careers", href: "/company/careers" },
         { label: "Contact Us", href: "/contact" },
       ],
@@ -103,13 +102,13 @@ const WEB_FOOTER_CONFIG: FooterConfig = {
   ],
 
   featuredBrands: [
-    { name: "Schneider Electric", href: "/brands/schneider-electric" },
-    { name: "WEG", href: "/brands/weg" },
-    { name: "Camozzi", href: "/brands/camozzi" },
-    { name: "Telemecanique", href: "/brands/telemecanique" },
-    { name: "Provulco", href: "/brands/provulco" },
-    { name: "EMC", href: "/brands/emc" },
-    { name: "View all brands →", href: "/brands" },
+    { name: "Schneider Electric", href: STORE_URL + "/brands/schneider-electric" },
+    { name: "WEG", href: STORE_URL + "/brands/weg" },
+    { name: "Camozzi", href: STORE_URL + "/brands/camozzi" },
+    { name: "Telemecanique", href: STORE_URL + "/brands/telemecanique" },
+    { name: "Provulco", href: STORE_URL + "/brands/provulco" },
+    { name: "EMC", href: STORE_URL + "/brands/emc" },
+    { name: "View all brands →", href: STORE_URL + "/brands" },
   ],
 
   legalLinks: [
@@ -118,7 +117,7 @@ const WEB_FOOTER_CONFIG: FooterConfig = {
     { label: "Sitemap", href: "/sitemap.xml" },
   ],
 
-  certifications: ["ISO 9001", "GSA Registered"],
+  certifications: [ "ISO 9001", "GSA Registered" ],
 
   containerClass: "container-apt",
 };

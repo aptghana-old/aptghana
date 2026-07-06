@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   useEffect(() => {
     console.error(error);
-  }, [error]);
+  }, [ error ]);
 
   return (
     <div className="min-h-screen bg-[#f9fafb] flex items-center justify-center">
@@ -23,7 +23,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
         <div className="flex flex-wrap justify-center gap-3">
           <button
             onClick={reset}
-            className="inline-flex items-center gap-2 h-10 px-6 bg-[#0057b8] hover:bg-[#1a73e8] text-white font-semibold text-sm rounded-xl transition-colors"
+            className="inline-flex items-center gap-2 h-10 px-6 bg-navy-500 hover:bg-navy-400 text-white font-semibold text-sm rounded-xl transition-colors"
           >
             Try Again
           </button>

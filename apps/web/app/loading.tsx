@@ -13,7 +13,7 @@ export default function Loading() {
 
       {/* Logo mark */}
       <div className="flex items-center gap-2 opacity-40">
-        <div className="flex items-center justify-center w-6 h-6 rounded-md bg-[#ff6b00] text-white font-bold text-xs">
+        <div className="flex items-center justify-center w-6 h-6 rounded-md bg-orange-500 text-white font-bold text-xs">
           APT
         </div>
         <span className="text-white/60 text-xs font-medium tracking-widest uppercase">

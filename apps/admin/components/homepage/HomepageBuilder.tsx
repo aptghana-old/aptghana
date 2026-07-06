@@ -49,9 +49,9 @@ const SECTION_LABELS: Record<HpSectionType, string> = {
 interface HistoryEntry { _id: string; version: number; publishedAt: string; publishedBy: string }
 
 function HistoryModal({ onClose, onRestore }: { onClose: () => void; onRestore: (v: number) => void }) {
-  const [entries, setEntries] = useState<HistoryEntry[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [restoring, setRestoring] = useState<number | null>(null);
+  const [ entries, setEntries ] = useState<HistoryEntry[]>([]);
+  const [ loading, setLoading ] = useState(true);
+  const [ restoring, setRestoring ] = useState<number | null>(null);
 
   useEffect(() => {
     fetch("/api/homepage/history")
@@ -114,14 +114,14 @@ interface Props {
 }
 
 export default function HomepageBuilder({ initialDraft, publishedVersion }: Props) {
-  const [draft, setDraft] = useState<HomepageConfigData>(initialDraft);
-  const [selectedId, setSelectedId] = useState<string | null>("carousel");
-  const [saving, setSaving] = useState(false);
-  const [publishing, setPublishing] = useState(false);
-  const [isDirty, setIsDirty] = useState(false);
-  const [toast, setToast] = useState<string | null>(null);
-  const [showHistory, setShowHistory] = useState(false);
-  const [pubVersion, setPubVersion] = useState(publishedVersion);
+  const [ draft, setDraft ] = useState<HomepageConfigData>(initialDraft);
+  const [ selectedId, setSelectedId ] = useState<string | null>("carousel");
+  const [ saving, setSaving ] = useState(false);
+  const [ publishing, setPublishing ] = useState(false);
+  const [ isDirty, setIsDirty ] = useState(false);
+  const [ toast, setToast ] = useState<string | null>(null);
+  const [ showHistory, setShowHistory ] = useState(false);
+  const [ pubVersion, setPubVersion ] = useState(publishedVersion);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function showToast(msg: string) {
@@ -187,11 +187,11 @@ export default function HomepageBuilder({ initialDraft, publishedVersion }: Prop
   }
 
   function moveSection(id: string, dir: -1 | 1) {
-    const arr = [...draft.sections].sort((a, b) => a.order - b.order);
+    const arr = [ ...draft.sections ].sort((a, b) => a.order - b.order);
     const idx = arr.findIndex((s) => s.id === id);
     const nxt = idx + dir;
     if (nxt < 0 || nxt >= arr.length) return;
-    [arr[idx].order, arr[nxt].order] = [arr[nxt].order, arr[idx].order];
+    [ arr[ idx ].order, arr[ nxt ].order ] = [ arr[ nxt ].order, arr[ idx ].order ];
     updateDraft({ ...draft, sections: arr });
   }
 
@@ -199,10 +199,10 @@ export default function HomepageBuilder({ initialDraft, publishedVersion }: Prop
     const id = `sec-${Date.now()}`;
     const order = draft.sections.length;
     const section: HpSection = {
-      id, type, label: SECTION_LABELS[type], enabled: true, order,
-      config: NEW_SECTION_DEFAULTS[type](),
+      id, type, label: SECTION_LABELS[ type ], enabled: true, order,
+      config: NEW_SECTION_DEFAULTS[ type ](),
     };
-    updateDraft({ ...draft, sections: [...draft.sections, section] });
+    updateDraft({ ...draft, sections: [ ...draft.sections, section ] });
     setSelectedId(id);
   }
 
@@ -301,7 +301,7 @@ export default function HomepageBuilder({ initialDraft, publishedVersion }: Prop
           ) : selectedSection ? (
             <div className="max-w-2xl mx-auto">
               <EditorCard
-                title={selectedSection.label || SECTION_LABELS[selectedSection.type] || selectedSection.type}
+                title={selectedSection.label || SECTION_LABELS[ selectedSection.type ] || selectedSection.type}
                 desc={`Type: ${selectedSection.type}`}
                 onToggle={() => toggleSection(selectedSection.id, !selectedSection.enabled)}
                 enabled={selectedSection.enabled}
@@ -349,7 +349,7 @@ function EditorCard({
   enabled?: boolean; onToggle?: () => void;
   onLabelChange?: (l: string) => void; label?: string;
 }) {
-  const [editingLabel, setEditingLabel] = useState(false);
+  const [ editingLabel, setEditingLabel ] = useState(false);
 
   return (
     <div className="rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: "var(--apt-border)", background: "var(--apt-bg)" }}>
@@ -381,7 +381,7 @@ function EditorCard({
           <label className="relative flex items-center gap-2 cursor-pointer shrink-0" title={enabled ? "Section enabled" : "Section disabled"}>
             <span className="text-[12px]" style={{ color: "var(--apt-text-muted)" }}>{enabled ? "Enabled" : "Disabled"}</span>
             <input type="checkbox" checked={enabled} onChange={onToggle} className="sr-only peer" />
-            <div className="w-9 h-5 rounded-full transition-colors peer-checked:bg-[#0057b8] bg-gray-300 dark:bg-gray-600" />
+            <div className="w-9 h-5 rounded-full transition-colors peer-checked:bg-navy-500 bg-gray-300 dark:bg-gray-600" />
             <div className="absolute right-0.5 top-0.5 w-4 h-4 rounded-full bg-white transition-transform peer-checked:-translate-x-4" />
           </label>
         )}
@@ -394,20 +394,20 @@ function EditorCard({
 /* ─── Section editor router ───────────────────────────────────────────────── */
 function SectionEditor({ section, onChange }: { section: HpSection; onChange: (s: HpSection) => void }) {
   switch (section.type) {
-    case "promo_banners":   return <PromoBannersEditor section={section} onChange={onChange} />;
+    case "promo_banners": return <PromoBannersEditor section={section} onChange={onChange} />;
     case "featured_products": return <FeaturedProductsEditor section={section} onChange={onChange} />;
     case "full_width_banner": return <FullWidthBannerEditor section={section} onChange={onChange} />;
-    case "why_choose":     return <WhyChooseEditor section={section} onChange={onChange} />;
-    case "stats":          return <StatsEditor section={section} onChange={onChange} />;
-    case "cta":            return <CTAEditor section={section} onChange={onChange} />;
-    case "resources":      return <ResourcesEditor section={section} onChange={onChange} />;
-    case "services_bar":   return <ServicesBarEditor section={section} onChange={onChange} />;
+    case "why_choose": return <WhyChooseEditor section={section} onChange={onChange} />;
+    case "stats": return <StatsEditor section={section} onChange={onChange} />;
+    case "cta": return <CTAEditor section={section} onChange={onChange} />;
+    case "resources": return <ResourcesEditor section={section} onChange={onChange} />;
+    case "services_bar": return <ServicesBarEditor section={section} onChange={onChange} />;
     case "categories":
-      return <SectionTextEditor section={section} onChange={onChange} fields={["label", "title", "subtitle", "showViewAll", "limit"]} hint="Categories are pulled live from the database. Configure display options here." />;
+      return <SectionTextEditor section={section} onChange={onChange} fields={[ "label", "title", "subtitle", "showViewAll", "limit" ]} hint="Categories are pulled live from the database. Configure display options here." />;
     case "brands_ticker":
-      return <SectionTextEditor section={section} onChange={onChange} fields={["title", "subtitle", "showViewAll"]} hint="Brand logos are pulled live from the database." />;
+      return <SectionTextEditor section={section} onChange={onChange} fields={[ "title", "subtitle", "showViewAll" ]} hint="Brand logos are pulled live from the database." />;
     case "industries":
-      return <SectionTextEditor section={section} onChange={onChange} fields={["label", "title", "subtitle"]} hint="Industries are pulled live from the database." />;
+      return <SectionTextEditor section={section} onChange={onChange} fields={[ "label", "title", "subtitle" ]} hint="Industries are pulled live from the database." />;
     case "quick_access":
       return (
         <div className="text-[13px] p-3 rounded-lg border" style={{ borderColor: "var(--apt-border)", color: "var(--apt-text-muted)", background: "var(--apt-bg-raised)" }}>

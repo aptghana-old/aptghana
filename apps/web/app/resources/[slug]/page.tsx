@@ -87,7 +87,7 @@ export default async function ResourceDetailPage({ params }: { params: Promise<{
       <Header />
       <main>
         {/* Hero */}
-        <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] pt-32 pb-20">
+        <section className="bg-[#F8FAFC] dark:bg-[#0A0F1E] py-20">
           <div className="container-apt">
             <div className="flex items-center gap-2 text-xs text-[#0F172A]/40 dark:text-white/40 mb-6">
               <Link href="/resources" className="hover:text-[#0F172A]/60 dark:hover:text-white/70 transition-colors">Resources</Link>
@@ -96,7 +96,7 @@ export default async function ResourceDetailPage({ params }: { params: Promise<{
             </div>
             <div className="max-w-2xl">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                 <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">{page.tagline}</span>
               </div>
               <h1
@@ -123,7 +123,7 @@ export default async function ResourceDetailPage({ params }: { params: Promise<{
               {page.items.map((item, i) => (
                 <div
                   key={item._id || i}
-                  className="flex flex-col p-7 bg-[#F8FAFC] dark:bg-[#111827] rounded-2xl border border-[#E2E8F0] dark:border-white/10 hover:border-[#84CC16]/30 hover:shadow-lg transition-all"
+                  className="flex flex-col p-7 bg-[#F8FAFC] dark:bg-surface-900 rounded-2xl border border-[#E2E8F0] dark:border-white/10 hover:border-[#84CC16]/30 hover:shadow-lg transition-all"
                 >
                   <div className="flex items-center gap-2.5 mb-4">
                     <span className="w-2 h-2 rounded-full bg-[#84CC16] shrink-0" />
@@ -155,7 +155,7 @@ export default async function ResourceDetailPage({ params }: { params: Promise<{
               </h2>
               <p className="text-white/50 text-sm">Our technical team can source any documentation or resource.</p>
             </div>
-            <div className="flex gap-3 flex-shrink-0">
+            <div className="flex gap-3 shrink-0">
               <Link href={page.cta.href} className="inline-flex items-center gap-2 h-12 px-7 bg-[#84CC16] text-[#0A0F1E] font-bold text-sm rounded-xl hover:bg-[#78B800] transition-colors whitespace-nowrap">
                 {page.cta.label} →
               </Link>

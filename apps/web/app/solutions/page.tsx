@@ -69,11 +69,11 @@ export default async function SolutionsPage() {
       <Header />
       <main>
         {/* Hero */}
-        <section className="bg-[#F8FAFC] pt-32 pb-20">
+        <section className="bg-[#F8FAFC] py-20">
           <div className="container-apt">
             <div className="max-w-2xl">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+                <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
                 <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
                   Engineering Solutions
                 </span>
@@ -102,7 +102,7 @@ export default async function SolutionsPage() {
                 title="Unable to load solutions"
                 description="We could not retrieve our solutions content at this time. Please refresh the page or contact us."
                 action={
-                  <Link href="/contact" className="inline-flex items-center gap-2 h-10 px-5 bg-[#0057b8] text-white text-sm font-semibold rounded-lg hover:bg-[#1a73e8] transition-colors">
+                  <Link href="/contact" className="inline-flex items-center gap-2 h-10 px-5 bg-navy-500 text-white text-sm font-semibold rounded-lg hover:bg-navy-400 transition-colors">
                     Contact Us
                   </Link>
                 }
@@ -113,7 +113,7 @@ export default async function SolutionsPage() {
                 title="Solutions coming soon"
                 description="Our engineering solutions directory is currently being configured. Contact our team to discuss your specific project requirements."
                 action={
-                  <Link href="/contact" className="inline-flex items-center gap-2 h-10 px-5 bg-[#0057b8] text-white text-sm font-semibold rounded-lg hover:bg-[#1a73e8] transition-colors">
+                  <Link href="/contact" className="inline-flex items-center gap-2 h-10 px-5 bg-navy-500 text-white text-sm font-semibold rounded-lg hover:bg-navy-400 transition-colors">
                     Discuss Your Project
                   </Link>
                 }
@@ -125,11 +125,10 @@ export default async function SolutionsPage() {
                   <Link
                     key={sol.slug}
                     href={`/solutions/${sol.slug}`}
-                    className={`group rounded-2xl border p-8 flex flex-col gap-6 transition-all hover:shadow-lg hover:-translate-y-1 ${
-                      i % 2 === 0
-                        ? "bg-[#F8FAFC] border-[#E2E8F0] hover:border-[#84CC16]/40"
-                        : "bg-white border-[#E2E8F0] hover:border-[#84CC16]/40"
-                    }`}
+                    className={`group rounded-2xl border p-8 flex flex-col gap-6 transition-all hover:shadow-lg hover:-translate-y-1 ${i % 2 === 0
+                      ? "bg-[#F8FAFC] border-[#E2E8F0] hover:border-[#84CC16]/40"
+                      : "bg-white border-[#E2E8F0] hover:border-[#84CC16]/40"
+                      }`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-4">
@@ -168,7 +167,7 @@ export default async function SolutionsPage() {
                         </div>
                       </div>
                       <svg
-                        className="w-5 h-5 text-[#94A3B8] group-hover:text-[#84CC16] transition-colors flex-shrink-0 mt-1"
+                        className="w-5 h-5 text-[#94A3B8] group-hover:text-[#84CC16] transition-colors shrink-0 mt-1"
                         fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
                       >
                         <path strokeLinecap="round" strokeLinejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
@@ -203,9 +202,9 @@ export default async function SolutionsPage() {
         <section className="section-py bg-[#0A0F1E]">
           <div className="container-apt text-center">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+              <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
               <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">Start Your Project</span>
-              <div className="w-6 h-[2px] rounded-full bg-[#84CC16]" />
+              <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
             </div>
             <h2
               className="text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-5 max-w-2xl mx-auto"
