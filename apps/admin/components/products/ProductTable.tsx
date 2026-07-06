@@ -7,6 +7,7 @@ import { Package, Clock, FolderTree } from "lucide-react";
 import { Badge, statusVariant } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import CategoryMoveModal from "./CategoryMoveModal";
+import ProductQuickActions from "./CustomerQuickActions";
 
 export interface ProductRow {
   id: string;
@@ -33,8 +34,8 @@ interface Props {
 
 export default function ProductTable({ rows, canEdit }: Props) {
   const router = useRouter();
-  const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [moveOpen, setMoveOpen] = useState(false);
+  const [ selected, setSelected ] = useState<Set<string>>(new Set());
+  const [ moveOpen, setMoveOpen ] = useState(false);
 
   const allSelected = rows.length > 0 && selected.size === rows.length;
 
@@ -100,13 +101,14 @@ export default function ProductTable({ rows, canEdit }: Props) {
                     <Link href={`/dashboard/products/${p.id}`} className="flex items-center gap-3 group">
                       <div className="w-9 h-9 rounded-md shrink-0 overflow-hidden flex items-center justify-center" style={{ background: "var(--apt-bg-raised)" }}>
                         {p.imageUrl ? (
+                          // eslint-disable-next-line @next/next/no-img-element
                           <img src={p.imageUrl} alt={p.imageAlt ?? p.name} className="w-full h-full object-contain p-0.5" />
                         ) : (
                           <Package size={15} style={{ color: "var(--apt-text-muted)" }} />
                         )}
                       </div>
                       <div className="min-w-0">
-                        <div className="text-[13px] font-medium truncate group-hover:text-[#0057b8] transition-colors max-w-[160px] sm:max-w-[220px]" style={{ color: "var(--apt-text-primary)" }}>
+                        <div className="text-[13px] font-medium truncate group-hover:text-navy-500 transition-colors max-w-40 sm:max-w-55" style={{ color: "var(--apt-text-primary)" }}>
                           {p.name}
                         </div>
                         {p.mpn && <div className="text-[11px]" style={{ color: "var(--apt-text-muted)" }}>MPN: {p.mpn}</div>}
@@ -147,9 +149,7 @@ export default function ProductTable({ rows, canEdit }: Props) {
                     </span>
                   </td>
                   <td>
-                    <Link href={`/dashboard/products/${p.id}/edit`} className="text-[12px] px-2 py-1 rounded hover:bg-[var(--apt-bg-raised)] transition-colors" style={{ color: "var(--apt-text-muted)" }}>
-                      Edit
-                    </Link>
+                    <ProductQuickActions product={p} canEdit={canEdit} canExport={true} />
                   </td>
                 </tr>
               );
