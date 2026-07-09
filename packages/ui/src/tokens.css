@@ -6,30 +6,45 @@
 
 @layer base {
   :root {
-    /* ── Background surfaces ────────────────────────────────────── */
-    --apt-bg:          #ffffff;
-    --apt-bg-subtle:   #F8FAFC;
-    --apt-bg-raised:   #F1F5F9;
-    --apt-bg-sunken:   #E2E8F0;
-    --apt-bg-error:    #FEF2F2;
-    --apt-bg-info:     #EFF6FF;
-    --apt-bg-success:  #F0FDF4;
-    --apt-bg-warning:  #FFFBEB;
+    --apt-bg: #ffffff;
+    --apt-bg-subtle: #f9fafb;
+    --apt-bg-raised: #f3f4f6;
+    --apt-bg-sunken: #e5e7eb;
+    --apt-bg-error: #fef2f2;
+    --apt-bg-info: #eff6ff;
+    --apt-bg-success: #f0fdf4;
+    --apt-bg-warning: #fffbeb;
+    --apt-border: #e5e7eb;
+    --apt-border-hi: #d1d5db;
+    --apt-text: #0a1628;
+    --apt-text-2: #374151;
+    --apt-text-3: #6b7280;
+    --apt-text-muted: #9ca3af;
+    --apt-color-error: #dc2626;
+    --apt-color-info: #0057b8;
+    --apt-color-success: #16a34a;
+    --apt-color-warning: #d97706;
+  }
 
-    /* ── Borders ────────────────────────────────────────────────── */
-    --apt-border:    #E2E8F0;
-    --apt-border-hi: #CBD5E1;
-
-    /* ── Text ───────────────────────────────────────────────────── */
-    --apt-text:       #0F172A;
-    --apt-text-2:     #374151;
-    --apt-text-3:     #6B7280;
-    --apt-text-muted: #94A3B8;
-
-    /* ── Status icon colors ─────────────────────────────────────── */
-    --apt-color-error:   #DC2626;
-    --apt-color-info:    #0057B8;
-    --apt-color-success: #16A34A;
-    --apt-color-warning: #D97706;
+  /* Dark mode */
+  [data-theme="dark"] {
+    --apt-bg: #0f172a;
+    --apt-bg-subtle: #1e293b;
+    --apt-bg-raised: #334155;
+    --apt-bg-sunken: #475569;
+    --apt-bg-error: #472d2d;
+    --apt-bg-info: #1e293b;
+    --apt-bg-success: #0f172a;
+    --apt-bg-warning: #473502;
+    --apt-border: #334155;
+    --apt-border-hi: #475569;
+    --apt-text: #f8fafc;
+    --apt-text-2: #e2e8f0;
+    --apt-text-3: #cbd5e1;
+    --apt-text-muted: #94a3b8;
+    --apt-color-error: #f87171;
+    --apt-color-info: #60a5fa; /* Blue in dark */
+    --apt-color-success: #34d399;
+    --apt-color-warning: #fbbf24;
   }
 }

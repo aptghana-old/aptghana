@@ -96,7 +96,7 @@ export default function Recommendations({ currentSku }: { currentSku: string }) 
       </div>
 
       {/* Desktop */}
-      <div className="hidden sm:grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+      <div className="hidden sm:grid grid-cols-2 gap-3 lg:gap-6 lg:grid-cols-3 2xl:grid-cols-4">
         {products.map((p) => (
           <div key={p.id} className="shrink-0 min-w-72">
             <ProductCard product={p} layout="grid" />
