@@ -32,8 +32,8 @@ export default function RfqWorkspace({
 }: RfqWorkspaceProps) {
   const draft = useRfqDraft();
 
-  const [contact, setContact] = useState(prefill);
-  const [customFormOpen, setCustomFormOpen] = useState(false);
+  const [ contact, setContact ] = useState(prefill);
+  const [ customFormOpen, setCustomFormOpen ] = useState(false);
   const { submit, submitting, error, success } = useRequestSubmission("rfq");
 
   /* Seed a single product from ?product= / ?sku= (idempotent, additive) */
@@ -43,14 +43,14 @@ export default function RfqWorkspace({
     seedApplied.current = true;
     const wasEmpty = draft.items.length === 0;
     draft.addItems(
-      [{ ...seedItem, qty: seedItem.minQty }],
+      [ { ...seedItem, qty: seedItem.minQty } ],
       wasEmpty ? "single_product" : undefined,
     );
-  }, [draft, seedItem]);
+  }, [ draft, seedItem ]);
 
   const totalUnits = draft.items.reduce((n, i) => n + i.qty, 0);
-  const hasCustom  = draft.items.some((i) => i.custom);
-  const source     = hasCustom ? "custom" : draft.items.length === 1 ? "single_product" : draft.source;
+  const hasCustom = draft.items.some((i) => i.custom);
+  const source = hasCustom ? "custom" : draft.items.length === 1 ? "single_product" : draft.source;
 
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -80,7 +80,7 @@ export default function RfqWorkspace({
   return (
     <main className="flex-1" style={{ background: "var(--bg-base)" }}>
       {/* Hero */}
-      <div className="bg-navy-900 py-10">
+      <div className="bg-navy-300 py-10">
         <div className="container-store">
           <p className="text-xs font-semibold text-se-green uppercase tracking-widest mb-2">Quotation</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">Request for Quotation</h1>
@@ -106,10 +106,10 @@ export default function RfqWorkspace({
             email={success.email}
             isAuthenticated={isAuthenticated}
             steps={[
-              ["Review",   "Our engineers review your requirements and check availability."],
-              ["Quote",    "You receive an itemized quotation with pricing and lead times."],
-              ["Confirm",  "Approve the quote and pay securely online."],
-              ["Delivery", "Products shipped nationwide or ready for collection."],
+              [ "Review", "Our engineers review your requirements and check availability." ],
+              [ "Quote", "You receive an itemized quotation with pricing and lead times." ],
+              [ "Confirm", "Approve the quote and pay securely online." ],
+              [ "Delivery", "Products shipped nationwide or ready for collection." ],
             ]}
           />
         ) : (
@@ -173,7 +173,7 @@ export default function RfqWorkspace({
                     onRemove={draft.remove}
                     footer={customFormOpen ? (
                       <CustomItemForm
-                        onAdd={(item) => draft.addItems([item], "custom")}
+                        onAdd={(item) => draft.addItems([ item ], "custom")}
                         onClose={() => setCustomFormOpen(false)}
                       />
                     ) : null}
@@ -192,7 +192,7 @@ export default function RfqWorkspace({
 
                   <ContactCard
                     contact={contact}
-                    onChange={(field, value) => setContact((c) => ({ ...c, [field]: value }))}
+                    onChange={(field, value) => setContact((c) => ({ ...c, [ field ]: value }))}
                     isAuthenticated={isAuthenticated}
                   />
                 </div>
@@ -203,7 +203,7 @@ export default function RfqWorkspace({
                   totalUnits={totalUnits}
                   sourceLabel={
                     hasCustom ? "Includes unlisted products"
-                    : draft.items.length === 1 ? "Single product" : "Multiple products"
+                      : draft.items.length === 1 ? "Single product" : "Multiple products"
                   }
                   submitLabel="Submit RFQ"
                   submitting={submitting}
