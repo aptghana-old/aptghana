@@ -135,7 +135,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
         className={`sticky top-0 z-50 transition-shadow duration-200 ${scrolled ? "shadow-[0_4px_24px_rgba(0,0,0,0.4)]" : ""}`}
       >
         {/* ── Desktop header row (lg+): Logo · Search · Actions ── */}
-        <div className="hidden lg:block bg-navy-900">
+        <div className="hidden lg:block bg-[var(--apt-bg)]">
           <div className="container-store">
             <div className="flex items-center gap-3 h-15">
 
@@ -156,12 +156,12 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
 
                 <Link
                   href="/cart"
-                  className="relative p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                  className="relative p-2 text-[var(--apt-text-muted)] hover:text-[var(--apt-text)] hover:bg-[var(--apt-bg-subtle)] rounded-lg transition-all"
                   aria-label="Cart"
                 >
                   <Icon d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" size={20} />
                   {cartCount > 0 && (
-                    <span className="absolute top-1 right-1 w-3.5 h-3.5 text-[9px] font-bold bg-apt-orange text-white rounded-full flex items-center justify-center">
+                    <span className="absolute top-1 right-1 w-3.5 h-3.5 text-[9px] font-bold bg-[var(--apt-color-primary)] text-white rounded-full flex items-center justify-center">
                       {cartCount}
                     </span>
                   )}
@@ -169,7 +169,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
 
                 <Link
                   href="/rfq"
-                  className="flex items-center gap-1.5 h-9 px-4 bg-apt-orange hover:bg-apt-orange-hover text-white text-[13px] font-bold rounded-lg ml-1 transition-colors shadow-md shadow-orange-900/30"
+                  className="flex items-center gap-1.5 h-9 px-4 bg-[var(--apt-color-primary)] hover:bg-[var(--apt-color-primary)_/90] text-white text-[13px] font-bold rounded-lg ml-1 transition-colors shadow-md"
                 >
                   <Icon d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25M9 16.5v.75m3-3v3M15 12v5.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" size={16} />
                   RFQ
@@ -195,12 +195,12 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
 
                 <Link
                   href="/cart"
-                  className="relative p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                  className="relative p-2 text-[var(--apt-text-muted)] hover:text-[var(--apt-text)] hover:bg-[var(--apt-bg-subtle)] rounded-lg transition-all"
                   aria-label="Cart"
                 >
                   <Icon d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" size={20} />
                   {cartCount > 0 && (
-                    <span className="absolute top-1 right-1 w-3.5 h-3.5 text-[9px] font-bold bg-apt-orange text-white rounded-full flex items-center justify-center">
+                    <span className="absolute top-1 right-1 w-3.5 h-3.5 text-[9px] font-bold bg-[var(--apt-color-primary)] text-white rounded-full flex items-center justify-center">
                       {cartCount}
                     </span>
                   )}
@@ -208,7 +208,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
 
                 <button
                   onClick={() => setMobileOpen(!mobileOpen)}
-                  className="p-2 text-white/50 hover:text-white hover:bg-white/10 rounded-lg ml-0.5 transition-all"
+                  className="p-2 text-[var(--apt-text-muted)] hover:text-[var(--apt-text)] hover:bg-[var(--apt-bg-subtle)] rounded-lg ml-0.5 transition-all"
                   aria-label="Menu"
                 >
                   {mobileOpen
@@ -227,7 +227,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
         </div>
 
         {/* Desktop nav strip */}
-        <div className="hidden lg:block bg-navy-800 border-t border-white/[0.05]">
+        <div className="hidden lg:block bg-[var(--apt-bg-subtle)] border-t border-[var(--apt-border)]/[0.05]">
           <div className="container-store">
             <nav
               className="flex items-center h-10 gap-0.5"
@@ -241,13 +241,13 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                   onClick={() => { setMegaOpen(true); setActiveGroup(0); }}
                   aria-expanded={megaOpen}
                   aria-label="Catalogue menu"
-                  className={`group flex items-center gap-1 h-full px-3.5 text-[13px] font-medium rounded-md transition-colors ${megaOpen ? "text-white bg-white/10" : "text-white/60 hover:text-white hover:bg-white/[0.06]"}`}
+                  className={`group flex items-center gap-1 h-full px-3.5 text-[13px] font-medium rounded-md transition-colors ${megaOpen ? "text-[var(--apt-text)] bg-[var(--apt-bg)]/[0.1]" : "text-[var(--apt-text-muted)] hover:text-[var(--apt-text)] hover:bg-[var(--apt-bg)]/[0.06]"}`}
                 >
                   Catalogue
                   <Icon d="M19.5 8.25l-7.5 7.5-7.5-7.5" size={14} strokeWidth={2.5} className={`transition-transform duration-200 ${megaOpen ? "rotate-180" : ""}`} />
                 </button>
               ) : (
-                <Link href="/catalog" className="h-full px-3.5 flex items-center text-[13px] font-medium text-white/60 hover:text-white hover:bg-white/[0.06] rounded-md transition-colors">
+                <Link href="/catalog" className="h-full px-3.5 flex items-center text-[13px] font-medium text-[var(--apt-text-muted)] hover:text-[var(--apt-text)] hover:bg-[var(--apt-bg)]/[0.06] rounded-md transition-colors">
                   Catalogue
                 </Link>
               )}
@@ -257,18 +257,18 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                   key={link.href}
                   href={link.href}
                   onMouseEnter={delayedCloseMega}
-                  className="h-full px-3.5 flex items-center text-[13px] font-medium text-white/60 hover:text-white hover:bg-white/[0.06] rounded-md transition-colors"
+                  className="h-full px-3.5 flex items-center text-[13px] font-medium text-[var(--apt-text-muted)] hover:text-[var(--apt-text)] hover:bg-[var(--apt-bg)]/[0.06] rounded-md transition-colors"
                 >
                   {link.label}
                 </Link>
               ))}
 
-              <div className="ml-auto flex items-center gap-3 text-[11px] text-white/30 font-medium">
+              <div className="ml-auto flex items-center gap-3 text-[11px] text-[var(--apt-text-muted)]/60 font-medium">
                 <span className="hidden xl:block">6,000+ Products</span>
-                <span className="w-px h-3 bg-white/10 hidden xl:block" />
+                <span className="w-px h-3 bg-[var(--apt-border)]/[0.2] hidden xl:block" />
                 <span>26 Global Brands</span>
-                <span className="w-px h-3 bg-white/10" />
-                <a href="tel:+233303964346" className="hover:text-white/60 transition-colors">+233 30 396 4346</a>
+                <span className="w-px h-3 bg-[var(--apt-border)]/[0.2]" />
+                <a href="tel:+233303964346" className="hover:text-[var(--apt-text)] transition-colors">+233 30 396 4346</a>
               </div>
             </nav>
           </div>
@@ -293,14 +293,16 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                       onMouseEnter={() => setActiveGroup(i)}
                       onClick={() => { window.location.href = grp.href; setMegaOpen(false); }}
                       className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm rounded-lg text-left transition-all ${activeGroup === i
-                        ? "bg-navy-50 dark:bg-navy-900/60 font-semibold text-navy-900 dark:text-white"
-                        : "text-theme-2 hover:bg-[var(--bg-raised)]"
+                        ? "bg-[var(--apt-bg-subtle)] font-semibold text-[var(--apt-text)]"
+                        : "text-[var(--apt-text-muted)] hover:bg-[var(--apt-bg-raised)]"
                         }`}
                     >
                       {/* Fixed 28×28 icon container prevents layout shift */}
                       <div
                         className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 overflow-hidden transition-all"
-                        style={{ background: activeGroup === i ? grp.color + "20" : "var(--bg-raised)" }}
+                        style={{ background: activeGroup === i ? grp.color + "33" : "var(--apt-bg-subtle" }}
+</parameter=new_string]
+                        style={{ background: activeGroup === i ? grp.color + "33" : "var(--apt-bg-subtle)" }}
                       >
                         {grp.iconImage ? (
                           <Image
@@ -327,7 +329,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                     <Link
                       href="/catalog"
                       onClick={() => setMegaOpen(false)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-navy-500 hover:text-navy-400 transition-colors"
+                      className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-[var(--apt-color-primary)] hover:text-[var(--apt-color-primary)_/80] transition-colors"
                     >
                       Browse Catalogue
                       <Icon d="M17 8l4 4m0 0l-4 4m4-4H3" size={14} strokeWidth={2} />
@@ -366,8 +368,8 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                   </div>
 
                   {/* Quick actions */}
-                  <div className="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-theme">
-                    <span className="text-[11px] text-theme-4 font-medium">Quick:</span>
+                  <div className="flex flex-wrap items-center gap-2 mt-4 pt-3 border-t border-[var(--apt-border)]">
+                    <span className="text-[11px] text-[var(--apt-text-muted)] font-medium">Quick:</span>
                     {[
                       { label: "Browse Catalogue", href: "/catalog" },
                       { label: "Browse by Brand", href: "/brands" },
@@ -379,7 +381,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                         key={q.href}
                         href={q.href}
                         onClick={() => setMegaOpen(false)}
-                        className="px-3 py-1 rounded-full text-[11px] font-medium bg-[var(--bg-raised)] text-theme-2 hover:bg-navy-50 hover:text-navy-600 dark:hover:bg-navy-900/50 dark:hover:text-navy-300 transition-colors border border-theme"
+                        className="px-3 py-1 rounded-full text-[11px] font-medium bg-[var(--apt-bg-subtle)] text-[var(--apt-text)] hover:bg-[var(--apt-color-primary)_/10] hover:text-[var(--apt-color-primary)] transition-colors border border-[var(--apt-border)]"
                       >
                         {q.label}
                       </Link>
