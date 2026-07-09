@@ -300,8 +300,6 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                       {/* Fixed 28×28 icon container prevents layout shift */}
                       <div
                         className="w-7 h-7 rounded-lg flex items-center justify-center shrink-0 overflow-hidden transition-all"
-                        style={{ background: activeGroup === i ? grp.color + "33" : "var(--apt-bg-subtle" }}
-</parameter=new_string]
                         style={{ background: activeGroup === i ? grp.color + "33" : "var(--apt-bg-subtle)" }}
                       >
                         {grp.iconImage ? (
@@ -398,15 +396,15 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
       {mobileOpen && (
         <div className="fixed inset-0 z-[90] lg:hidden">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-[min(100vw,380px)] bg-navy-900 overflow-y-auto flex flex-col">
+          <div className="absolute left-0 top-0 bottom-0 w-[min(100vw,380px)] bg-[var(--apt-bg)] overflow-y-auto flex flex-col">
 
             {/* Mobile header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.08]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--apt-border)]/[0.08]">
               <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-apt-orange flex items-center justify-center text-white font-black text-xs">APT</div>
-                <span className="text-white font-bold text-sm">APT Ghana Store</span>
+                <div className="w-8 h-8 rounded-lg bg-[var(--apt-color-primary)] flex items-center justify-center text-[var(--apt-text)] font-black text-xs">APT</div>
+                <span className="text-[var(--apt-text)] font-bold text-sm">APT Ghana Store</span>
               </Link>
-              <button onClick={() => setMobileOpen(false)} className="w-9 h-9 flex items-center justify-center text-white/50 hover:text-white rounded-lg hover:bg-white/10 transition-all">
+              <button onClick={() => setMobileOpen(false)} className="w-9 h-9 flex items-center justify-center text-[var(--apt-text-muted)]/50 hover:text-[var(--apt-text)] hover:bg-[var(--apt-bg-subtle)] rounded-lg transition-all">
                 <Icon d="M6 18L18 6M6 6l12 12" size={20} strokeWidth={2} />
               </button>
             </div>
@@ -418,18 +416,18 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                 setMobileOpen(false);
                 if (drawerSearch.trim()) window.location.href = `/search?q=${encodeURIComponent(drawerSearch.trim())}`;
               }}
-              className="px-4 py-3 border-b border-white/[0.06]"
+              className="px-4 py-3 border-b border-[var(--apt-border)]/[0.06]"
             >
-              <div className="flex rounded-xl overflow-hidden ring-1 ring-white/10">
+              <div className="flex rounded-xl overflow-hidden ring-1 ring-[var(--apt-border)]/[0.2]">
                 <input
                   type="text"
                   value={drawerSearch}
                   onChange={(e) => setDrawerSearch(e.target.value)}
                   placeholder="Search products..."
-                  className="flex-1 min-w-0 h-11 px-4 bg-white/[0.06] text-sm text-white placeholder-white/30 focus:outline-none"
+                  className="flex-1 min-w-0 h-11 px-4 bg-[var(--apt-bg-subtle)]/[0.06] text-sm text-[var(--apt-text)] placeholder-[var(--apt-text-muted)]/30 focus:outline-none"
                   autoComplete="off"
                 />
-                <button type="submit" className="h-11 px-4 bg-navy-500 text-white shrink-0 transition-colors" aria-label="Search">
+                <button type="submit" className="h-11 px-4 bg-[var(--apt-bg-raised)] text-[var(--apt-text)] shrink-0 transition-colors" aria-label="Search">
                   <Icon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" size={17} strokeWidth={2.5} />
                 </button>
               </div>
@@ -443,13 +441,13 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                   <button
                     onClick={() => setMobileGroup(mobileGroup === -1 ? null : -1)}
                     aria-expanded={mobileGroup === -1}
-                    className="w-full flex items-center justify-between px-3 py-3 text-sm font-semibold text-white/80 hover:text-white rounded-xl hover:bg-white/[0.06] transition-all"
+                    className="w-full flex items-center justify-between px-3 py-3 text-sm font-semibold text-[var(--apt-text)]/80 hover:text-[var(--apt-text)] rounded-xl hover:bg-[var(--apt-bg-subtle)]/[0.06] transition-all"
                   >
                     Catalogue
                     <Icon d="M19.5 8.25l-7.5 7.5-7.5-7.5" size={16} strokeWidth={2.5} className={`transition-transform ${mobileGroup === -1 ? "rotate-180" : ""}`} />
                   </button>
                 ) : (
-                  <Link href="/catalog" onClick={() => setMobileOpen(false)} className="flex items-center justify-between px-3 py-3 text-sm font-semibold text-white/80 hover:text-white rounded-xl hover:bg-white/[0.06] transition-all">
+                  <Link href="/catalog" onClick={() => setMobileOpen(false)} className="flex items-center justify-between px-3 py-3 text-sm font-semibold text-[var(--apt-text)]/80 hover:text-[var(--apt-text)] rounded-xl hover:bg-[var(--apt-bg-subtle)]/[0.06] transition-all">
                     Catalogue
                     <Icon d="M8.25 4.5l7.5 7.5-7.5 7.5" size={16} strokeWidth={2.5} />
                   </Link>
