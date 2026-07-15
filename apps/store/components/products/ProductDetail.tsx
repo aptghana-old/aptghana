@@ -345,7 +345,7 @@ function PurchasePanel({ product, panelRef }: { product: ProductFull; panelRef?:
               <div className="flex items-stretch rounded-xl overflow-hidden shrink-0"
                 style={{ border: "1.5px solid var(--border-hi)" }}>
                 <button onClick={() => handleQty(-1)} disabled={qty <= minQty}
-                  className="w-9 flex items-center justify-center text-lg font-medium transition-colors disabled:opacity-30"
+                  className="w-9 flex items-center justify-center text-lg font-medium transition-colors disabled:opacity-30 disabled:-z-10"
                   style={{ color: "var(--text-2)", background: "var(--bg-raised)" }}
                   aria-label="Decrease quantity">−</button>
                 <input type="number" value={qty} min={minQty} step={minQty}

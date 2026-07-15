@@ -132,7 +132,7 @@ export default function CatalogBrowse({ data }: Props) {
 
         <BrowseLayout totalHits={totalHits} facets={facets} query="" basePath={basePath}>
           {results && results.hits.length > 0 && (
-            <AnimatedProductGrid products={results.hits.map(hitToCard)} view={view} />
+            <AnimatedProductGrid products={results.hits.map(h => hitToCard(h))} view={view} />
           )}
 
           {results && results.hits.length === 0 && !error && (

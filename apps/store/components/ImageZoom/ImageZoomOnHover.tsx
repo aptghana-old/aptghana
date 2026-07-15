@@ -7,7 +7,7 @@ import { useProduct } from "@/components/Product/product-context";
 
 /* ─── Zoom constants ─────────────────────────────────────────────────────── */
 const ZOOM = 2.5;   // magnification factor in hover panel
-const PANEL = 880;  // hover panel size in px (square)
+const PANEL = 600;  // hover panel size in px (square)
 
 /* ─── Icons ──────────────────────────────────────────────────────────────── */
 function Ico({ d, size = 18, sw = 1.75, style }: {
@@ -598,7 +598,7 @@ export default function ImageZoomOnHover() {
           <style>{MODAL_STYLES}</style>
           <div
             ref={modalRef}
-            className="fixed inset-0 z-600 flex flex-col apt-hover-modal-enter"
+            className="fixed inset-0 z-[9999] flex flex-col apt-hover-modal-enter"
             style={{ background: "rgba(4,8,18,0.97)", backdropFilter: "blur(20px)", WebkitBackdropFilter: "blur(20px)" }}
             role="dialog"
             aria-modal="true"
