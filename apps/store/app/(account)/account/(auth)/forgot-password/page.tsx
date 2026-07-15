@@ -1,14 +1,22 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { Suspense, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/AuthCard";
 
 export default function ForgotPasswordPage() {
-  const [email,   setEmail]   = useState("");
-  const [loading, setLoading] = useState(false);
-  const [sent,    setSent]    = useState(false);
-  const [error,   setError]   = useState("");
+  return (
+    <Suspense fallback={<AuthCard title="Check your email" subtitle="Loading…"><div className="py-8" /></AuthCard>}>
+      <ForgotPasswordForm />
+    </Suspense>
+  );
+}
+
+export function ForgotPasswordForm() {
+  const [ email, setEmail ] = useState("");
+  const [ loading, setLoading ] = useState(false);
+  const [ sent, setSent ] = useState(false);
+  const [ error, setError ] = useState("");
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();

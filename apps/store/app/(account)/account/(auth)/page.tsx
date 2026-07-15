@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { Suspense, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -10,18 +10,27 @@ import OTPInput from "@/components/auth/OTPInput";
 
 type Step = "credentials" | "mfa";
 
+
 export default function SignInPage() {
-  const params     = useSearchParams();
-  const router     = useRouter();
+  return (
+    <Suspense fallback={<AuthCard title="Sign in" subtitle="Loading…"><div className="py-8" /></AuthCard>}>
+      <SignInForm />
+    </Suspense>
+  );
+}
+
+export function SignInForm() {
+  const params = useSearchParams();
+  const router = useRouter();
   const callbackUrl = params.get("from") ?? "/account/dashboard";
 
-  const [step,        setStep]        = useState<Step>("credentials");
-  const [email,       setEmail]       = useState("");
-  const [password,    setPassword]    = useState("");
-  const [otp,         setOtp]         = useState("");
-  const [rememberMe,  setRememberMe]  = useState(true);
-  const [loading,     setLoading]     = useState(false);
-  const [error,       setError]       = useState("");
+  const [ step, setStep ] = useState<Step>("credentials");
+  const [ email, setEmail ] = useState("");
+  const [ password, setPassword ] = useState("");
+  const [ otp, setOtp ] = useState("");
+  const [ rememberMe, setRememberMe ] = useState(true);
+  const [ loading, setLoading ] = useState(false);
+  const [ error, setError ] = useState("");
 
   /* ─── Step 1: check credentials + MFA requirement ─── */
   async function handleCredentials(e: FormEvent) {
@@ -75,10 +84,10 @@ export default function SignInPage() {
 
       if (res?.error) {
         const msg: Record<string, string> = {
-          INVALID_OTP:        "Incorrect authentication code. Try again.",
-          CredentialsSignin:  "Sign-in failed. Please try again.",
+          INVALID_OTP: "Incorrect authentication code. Try again.",
+          CredentialsSignin: "Sign-in failed. Please try again.",
         };
-        setError(msg[res.error] ?? "Sign-in failed. Please try again.");
+        setError(msg[ res.error ] ?? "Sign-in failed. Please try again.");
       } else {
         router.push(callbackUrl);
         router.refresh();

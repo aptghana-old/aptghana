@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { Suspense, useState, type FormEvent } from "react";
 import Link from "next/link";
 import { AuthCard } from "@/components/auth/AuthCard";
 import PasswordInput from "@/components/auth/PasswordInput";
@@ -8,15 +8,23 @@ import PasswordInput from "@/components/auth/PasswordInput";
 type Status = "idle" | "loading" | "success" | "error";
 
 export default function RegisterPage() {
-  const [name,         setName]         = useState("");
-  const [email,        setEmail]        = useState("");
-  const [password,     setPassword]     = useState("");
-  const [accountType,  setAccountType]  = useState<"personal" | "business">("business");
-  const [company,      setCompany]      = useState("");
-  const [jobTitle,     setJobTitle]     = useState("");
-  const [businessType, setBusinessType] = useState("");
-  const [status,       setStatus]       = useState<Status>("idle");
-  const [message,      setMessage]      = useState("");
+  return (
+    <Suspense fallback={<AuthCard title="Create account" subtitle="Loading…"><div className="py-8" /></AuthCard>}>
+      <RegisterForm />
+    </Suspense>
+  );
+}
+
+export function RegisterForm() {
+  const [ name, setName ] = useState("");
+  const [ email, setEmail ] = useState("");
+  const [ password, setPassword ] = useState("");
+  const [ accountType, setAccountType ] = useState<"personal" | "business">("business");
+  const [ company, setCompany ] = useState("");
+  const [ jobTitle, setJobTitle ] = useState("");
+  const [ businessType, setBusinessType ] = useState("");
+  const [ status, setStatus ] = useState<Status>("idle");
+  const [ message, setMessage ] = useState("");
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -104,15 +112,14 @@ export default function RegisterPage() {
 
         {/* Account type selector */}
         <div className="grid grid-cols-2 gap-2">
-          {(["business", "personal"] as const).map((t) => (
+          {([ "business", "personal" ] as const).map((t) => (
             <button
               key={t} type="button"
               onClick={() => setAccountType(t)}
-              className={`h-10 rounded-xl text-sm font-semibold border transition-all ${
-                accountType === t
-                  ? "border-navy-500 bg-navy-50 text-navy-500 dark:bg-navy-900/30 dark:text-navy-300"
-                  : "border-(--border) text-(--text-3) hover:border-navy-300"
-              }`}
+              className={`h-10 rounded-xl text-sm font-semibold border transition-all ${accountType === t
+                ? "border-navy-500 bg-navy-50 text-navy-500 dark:bg-navy-900/30 dark:text-navy-300"
+                : "border-(--border) text-(--text-3) hover:border-navy-300"
+                }`}
             >
               {t === "business" ? "🏢 Business" : "👤 Personal"}
             </button>

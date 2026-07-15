@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { AuthCard } from "@/components/auth/AuthCard";
@@ -9,12 +9,20 @@ import PasswordInput from "@/components/auth/PasswordInput";
 type Status = "idle" | "loading" | "success" | "error";
 
 export default function ResetPasswordPage() {
-  const params   = useSearchParams();
-  const token    = params.get("token") ?? "";
-  const [password,  setPassword]  = useState("");
-  const [confirm,   setConfirm]   = useState("");
-  const [status,    setStatus]    = useState<Status>("idle");
-  const [message,   setMessage]   = useState("");
+  return (
+    <Suspense fallback={<AuthCard title="Set new password" subtitle="Loading…"><div className="py-8" /></AuthCard>}>
+      <ResetPasswordForm />
+    </Suspense>
+  );
+}
+
+function ResetPasswordForm() {
+  const params = useSearchParams();
+  const token = params.get("token") ?? "";
+  const [ password, setPassword ] = useState("");
+  const [ confirm, setConfirm ] = useState("");
+  const [ status, setStatus ] = useState<Status>("idle");
+  const [ message, setMessage ] = useState("");
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();

@@ -1,21 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { AuthCard } from "@/components/auth/AuthCard";
 
 export default function VerifyEmailPage() {
-  const params  = useSearchParams();
+  return (
+    <Suspense fallback={<AuthCard title="Email Verification" subtitle="Loading…"><div className="py-8" /></AuthCard>}>
+      <VerifyEmailForm />
+    </Suspense>
+  );
+}
+
+function VerifyEmailForm() {
+  const params = useSearchParams();
   const success = params.get("success") === "true";
-  const error   = params.get("error");
-  const [resendEmail, setResendEmail] = useState("");
-  const [resent, setResent] = useState(false);
+  const error = params.get("error");
+  const [ resendEmail, setResendEmail ] = useState("");
+  const [ resent, setResent ] = useState(false);
 
   const errorMessages: Record<string, string> = {
     missing: "Verification link is missing. Please check your email.",
     invalid: "This verification link is invalid or has already been used.",
-    server:  "Something went wrong. Please try again.",
+    server: "Something went wrong. Please try again.",
   };
 
   async function handleResend() {
@@ -58,7 +66,7 @@ export default function VerifyEmailPage() {
                 <path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
               </svg>
             </div>
-            <p className="text-sm text-(--text-2)">{errorMessages[error] ?? "Verification failed."}</p>
+            <p className="text-sm text-(--text-2)">{errorMessages[ error ] ?? "Verification failed."}</p>
           </div>
 
           {/* Resend form */}
