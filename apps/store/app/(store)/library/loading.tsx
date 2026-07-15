@@ -2,7 +2,7 @@ export default function LibraryLoading() {
   return (
     <main className="min-h-screen" style={{ background: "var(--bg-base)" }}>
       {/* Hero */}
-      <div className="bg-[#0a1628] py-12 sm:py-16">
+      <div className="bg-[#0a1628] pt-6 pb-12 sm:pb-16">
         <div className="container-store">
           <div className="h-3 w-32 rounded-full bg-white/10 mb-3" />
           <div className="h-8 w-72 rounded-xl bg-white/15 mb-3" />
@@ -50,7 +50,7 @@ export default function LibraryLoading() {
             <div className="flex items-center justify-between mb-6">
               <div>
                 <div className="h-5 w-44 rounded-full mb-2" style={{ background: "var(--bg-raised)" }} />
-                <div className="h-3 w-28 rounded-full"      style={{ background: "var(--bg-raised)" }} />
+                <div className="h-3 w-28 rounded-full" style={{ background: "var(--bg-raised)" }} />
               </div>
               <div className="h-10 w-56 rounded-xl" style={{ background: "var(--bg-raised)" }} />
             </div>
@@ -65,8 +65,8 @@ export default function LibraryLoading() {
                     <div className="h-6 w-14 rounded-lg" style={{ background: "var(--bg-raised)" }} />
                   </div>
                   <div className="px-4 space-y-2 pb-4">
-                    <div className="h-4 w-full rounded-full"  style={{ background: "var(--bg-raised)" }} />
-                    <div className="h-4 w-3/4 rounded-full"   style={{ background: "var(--bg-raised)" }} />
+                    <div className="h-4 w-full rounded-full" style={{ background: "var(--bg-raised)" }} />
+                    <div className="h-4 w-3/4 rounded-full" style={{ background: "var(--bg-raised)" }} />
                     <div className="h-3 w-1/2 rounded-full mt-1" style={{ background: "var(--bg-raised)" }} />
                     <div className="flex gap-2 pt-1">
                       <div className="h-5 w-16 rounded-full" style={{ background: "var(--bg-raised)" }} />

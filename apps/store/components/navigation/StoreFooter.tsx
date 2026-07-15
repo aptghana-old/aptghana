@@ -105,11 +105,11 @@ const STORE_FOOTER_CONFIG: FooterConfig = {
     {
       title: "Company",
       links: [
-        { label: "About APT Ghana", href: `${SITE_URL}/company/about`, external: true },
-        { label: "Industries Served", href: `${SITE_URL}/industries`, external: true },
-        { label: "Careers", href: `${SITE_URL}/company/careers`, external: true },
-        { label: "News & Insights", href: `${SITE_URL}/resources/news`, external: true },
-        { label: "Corporate Website", href: SITE_URL, external: true },
+        { label: "About APT Ghana", href: `/company/about`, },
+        { label: "Industries Served", href: `/industries`, },
+        { label: "Careers", href: `/company/careers`, },
+        { label: "News & Insights", href: `/resources/news`, },
+        { label: "Corporate Website", href: SITE_URL, },
       ],
     },
   ],
@@ -127,7 +127,7 @@ const STORE_FOOTER_CONFIG: FooterConfig = {
     { label: "Warranty Policy", href: "/terms#warranty" },
   ],
 
-  certifications: ["ISO 9001", "GSA Registered"],
+  certifications: [ "ISO 9001", "GSA Registered" ],
 
   containerClass: "container-store",
 };

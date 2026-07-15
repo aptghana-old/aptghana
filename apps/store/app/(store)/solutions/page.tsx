@@ -66,7 +66,7 @@ const SOLUTIONS = [
 export default function SolutionsPage() {
   return (
     <>      <main className="min-h-screen bg-[#f9fafb]">
-      <div className="bg-[#0a1628] py-12">
+      <div className="bg-[#0a1628] pt-6 sm:pt-8 pb-12">
         <div className="container-store">
           <p className="text-xs font-semibold text-[#ff8c33] uppercase tracking-widest mb-2">By Industry</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">Industry Solutions</h1>

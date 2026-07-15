@@ -58,14 +58,14 @@ function getBrandMark(name: string): string {
   if (words.length === 1) return name.slice(0, 4).toUpperCase();
   return words
     .filter((w) => w.length > 0)
-    .map((w) => w[0].toUpperCase())
+    .map((w) => w[ 0 ].toUpperCase())
     .join("")
     .slice(0, 4);
 }
 
 export default function BrandsPageContent({ brands, config }: Props) {
   const { containerClass, brandHref, rfqHref, contactHref } = config;
-  const marqueeItems = [...brands, ...brands];
+  const marqueeItems = [ ...brands, ...brands ];
 
   return (
     <main>
@@ -73,7 +73,7 @@ export default function BrandsPageContent({ brands, config }: Props) {
       <style>{`@keyframes brandsMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}`}</style>
 
       {/* ── 1. HERO ── */}
-      <section style={{ background: "var(--bg-surface)", position: "relative", overflow: "hidden" }}>
+      <section style={{ background: "bg-[#0a1628]", position: "relative", overflow: "hidden" }}>
         {/* Subtle lime radial on the right */}
         <div
           style={{
@@ -90,7 +90,7 @@ export default function BrandsPageContent({ brands, config }: Props) {
           className={containerClass}
           style={{
             position: "relative",
-            paddingTop: "clamp(44px,6vw,88px)",
+            // paddingTop: "clamp(44px,6vw,88px)",
             paddingBottom: "clamp(56px,7vw,96px)",
           }}
         >

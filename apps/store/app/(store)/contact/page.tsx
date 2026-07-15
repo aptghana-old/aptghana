@@ -59,6 +59,27 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+/* Small reusable corner-bracket frame — a nod to registration marks on
+   engineering drawings, used as the page's one signature device. */
+function CornerBrackets({ color = "#009E4D" }: { color?: string }) {
+  return (
+    <>
+      <span className="absolute top-3 left-3 w-3 h-3 border-t-2 border-l-2 pointer-events-none" style={{ borderColor: color }} />
+      <span className="absolute bottom-3 right-3 w-3 h-3 border-b-2 border-r-2 pointer-events-none" style={{ borderColor: color }} />
+    </>
+  );
+}
+
+/* Monospace reference tag, styled like a designation label on a wiring
+   diagram or drawing sheet (e.g. "LOC", "TEL"). */
+function RefTag({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="absolute top-3 right-3 font-mono text-[10px] font-bold tracking-[0.2em] text-[#009E4D]/70">
+      {children}
+    </span>
+  );
+}
+
 export default async function ContactPage() {
   const data = await getData();
 
@@ -67,24 +88,33 @@ export default async function ContactPage() {
   return (
     <>
       <main>
-        {/* Hero */}
-        <section className="bg-[#0A0F1E] pt-16 sm:pt-20 lg:pt-32 pb-12 sm:pb-16 lg:pb-20">
-          <div className="container-apt">
+        {/* Hero — always dark, so text is fixed light (not dark:-conditional) */}
+        <section className="relative bg-[#0A1628] pt-16 pb-14 sm:pb-20 lg:pb-24 overflow-hidden">
+          {/* Faint blueprint grid texture */}
+          <div
+            className="absolute inset-0 opacity-[0.05] pointer-events-none"
+            style={{
+              backgroundImage:
+                "linear-gradient(#009E4D 1px, transparent 1px), linear-gradient(90deg, #009E4D 1px, transparent 1px)",
+              backgroundSize: "40px 40px",
+            }}
+          />
+          <div className="container-apt relative">
             <div className="max-w-2xl">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
-                <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
+              <div className="flex items-center gap-3 mb-5">
+                <span className="w-6 h-0.5 rounded-full bg-[#009E4D]" />
+                <span className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-[#009E4D]">
                   {data.tagline}
                 </span>
               </div>
               <h1
-                className="text-4xl lg:text-5xl font-extrabold tracking-tight text-[#0F172A] dark:text-white mb-6"
+                className="text-4xl lg:text-5xl font-extrabold tracking-tight text-white mb-6"
                 style={{ fontFamily: "var(--font-sora, 'Sora', sans-serif)" }}
               >
                 {data.title}
               </h1>
               {data.description && (
-                <p className="text-[#64748B] dark:text-[#94A3B8] text-lg leading-relaxed max-w-xl">
+                <p className="text-white/60 text-lg leading-relaxed max-w-xl">
                   {data.description}
                 </p>
               )}
@@ -97,9 +127,11 @@ export default async function ContactPage() {
           <div className="container-apt">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {/* Visit */}
-              <div className="bg-white dark:bg-surface-900 rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-8 flex flex-col gap-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#84CC16]/10 border border-[#84CC16]/20">
-                  <svg className="w-6 h-6 text-[#84CC16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <div className="relative bg-white dark:bg-[#101B30] rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-8 pt-9 flex flex-col gap-4 transition-shadow hover:shadow-[0_8px_30px_-8px_rgba(0,158,77,0.25)]">
+                <CornerBrackets />
+                <RefTag>LOC</RefTag>
+                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#009E4D]/10 border border-[#009E4D]/20">
+                  <svg className="w-6 h-6 text-[#009E4D]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
                   </svg>
@@ -119,7 +151,7 @@ export default async function ContactPage() {
                     href={data.mapsUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-sm font-semibold text-[#84CC16] hover:underline mt-auto"
+                    className="text-sm font-semibold text-[#009E4D] hover:underline mt-auto"
                   >
                     View on Google Maps →
                   </a>
@@ -127,9 +159,11 @@ export default async function ContactPage() {
               </div>
 
               {/* Email */}
-              <div className="bg-white dark:bg-surface-900 rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-8 flex flex-col gap-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#84CC16]/10 border border-[#84CC16]/20">
-                  <svg className="w-6 h-6 text-[#84CC16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <div className="relative bg-white dark:bg-[#101B30] rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-8 pt-9 flex flex-col gap-4 transition-shadow hover:shadow-[0_8px_30px_-8px_rgba(0,158,77,0.25)]">
+                <CornerBrackets />
+                <RefTag>MAIL</RefTag>
+                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#009E4D]/10 border border-[#009E4D]/20">
+                  <svg className="w-6 h-6 text-[#009E4D]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
                   </svg>
                 </div>
@@ -141,7 +175,7 @@ export default async function ContactPage() {
                     Sales & product enquiries:
                   </p>
                   {data.email && (
-                    <a href={`mailto:${data.email}`} className="text-[#1E3A5F] dark:text-[#84CC16] font-semibold text-sm hover:underline">
+                    <a href={`mailto:${data.email}`} className="text-[#0F172A] dark:text-[#009E4D] font-semibold text-sm hover:underline">
                       {data.email}
                     </a>
                   )}
@@ -152,9 +186,11 @@ export default async function ContactPage() {
               </div>
 
               {/* Phone */}
-              <div className="bg-white dark:bg-surface-900 rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-8 flex flex-col gap-4">
-                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#84CC16]/10 border border-[#84CC16]/20">
-                  <svg className="w-6 h-6 text-[#84CC16]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <div className="relative bg-white dark:bg-[#101B30] rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-8 pt-9 flex flex-col gap-4 transition-shadow hover:shadow-[0_8px_30px_-8px_rgba(0,158,77,0.25)]">
+                <CornerBrackets />
+                <RefTag>TEL</RefTag>
+                <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-[#009E4D]/10 border border-[#009E4D]/20">
+                  <svg className="w-6 h-6 text-[#009E4D]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
                   </svg>
                 </div>
@@ -168,14 +204,14 @@ export default async function ContactPage() {
                   {data.phone && (
                     <a
                       href={`tel:${data.phone.replace(/\s/g, "")}`}
-                      className="text-[#1E3A5F] dark:text-[#84CC16] font-semibold text-sm hover:underline"
+                      className="text-[#0F172A] dark:text-[#009E4D] font-semibold text-sm hover:underline"
                     >
                       {data.phone}
                     </a>
                   )}
                 </div>
                 {data.officeHours.length > 0 && (
-                  <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-auto">
+                  <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mt-auto font-mono tabular-nums">
                     {data.officeHours[ 0 ].day}, {data.officeHours[ 0 ].hours} GMT
                   </p>
                 )}
@@ -185,14 +221,14 @@ export default async function ContactPage() {
         </section>
 
         {/* Form + Hours + Map */}
-        <section className="section-py bg-white dark:bg-[#0A0F1E] py-14 sm:py-16 lg:py-20">
+        <section className="bg-white dark:bg-[#0A1628] py-14 sm:py-16 lg:py-20">
           <div className="container-apt">
             <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
               {/* Form */}
               <div className="lg:col-span-3">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
-                  <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
+                  <span className="w-6 h-0.5 rounded-full bg-[#009E4D]" />
+                  <span className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-[#009E4D]">
                     Send A Message
                   </span>
                 </div>
@@ -207,65 +243,48 @@ export default async function ContactPage() {
 
               {/* Right col */}
               <div className="lg:col-span-2 flex flex-col gap-6">
-                {/* Office Hours */}
+                {/* Office Hours — dark card regardless of site theme, like the hero */}
                 {data.officeHours.length > 0 && (
-                  <div className="bg-[#0A0F1E] rounded-2xl p-8 text-white">
-                    <div className="flex items-center gap-3 mb-4">
-                      <div className="w-6 h-0.5 rounded-full bg-[#84CC16]" />
-                      <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#84CC16]">
-                        Office Hours
-                      </span>
-                    </div>
-                    <div className="space-y-3 text-sm">
-                      {data.officeHours.map((h) => (
-                        <div key={h.day} className="flex items-center justify-between">
-                          <span className="text-white/60">{h.day}</span>
-                          <span className={h.hours === "Closed" ? "text-white/40" : "font-semibold"}>
-                            {h.hours}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-6 pt-5 border-t border-white/10 text-xs text-white/40">
-                      All times are Ghana Mean Time (GMT+0). For urgent support outside office hours, email us and we will respond on the next business day.
+                  <div className="relative bg-[#0A1628] rounded-2xl p-8 text-white overflow-hidden">
+                    <div
+                      className="absolute inset-0 opacity-[0.05] pointer-events-none"
+                      style={{
+                        backgroundImage:
+                          "linear-gradient(#009E4D 1px, transparent 1px), linear-gradient(90deg, #009E4D 1px, transparent 1px)",
+                        backgroundSize: "32px 32px",
+                      }}
+                    />
+                    <div className="relative">
+                      <div className="flex items-center gap-3 mb-5">
+                        <span className="w-6 h-0.5 rounded-full bg-[#009E4D]" />
+                        <span className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-[#009E4D]">
+                          Office Hours
+                        </span>
+                      </div>
+                      <div className="space-y-3 text-sm font-mono tabular-nums">
+                        {data.officeHours.map((h) => (
+                          <div key={h.day} className="flex items-center justify-between border-b border-dashed border-white/10 pb-3 last:border-b-0 last:pb-0">
+                            <span className="text-white/50 font-sans">{h.day}</span>
+                            <span className={h.hours === "Closed" ? "text-white/30" : "font-semibold text-white"}>
+                              {h.hours}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-6 pt-5 border-t border-white/10 text-xs text-white/40">
+                        All times are Ghana Mean Time (GMT+0). For urgent support outside office hours, email us and we will respond on the next business day.
+                      </div>
                     </div>
                   </div>
                 )}
 
-                {/* Map Placeholder */}
+                {/* Map */}
                 <div
                   className="rounded-2xl overflow-hidden border border-[#E2E8F0] dark:border-white/10 relative"
                   style={{ minHeight: "280px" }}
                 >
-                  {/* <div className="absolute inset-0 bg-[#E8F0F8] dark:bg-surface-900 flex flex-col items-center justify-center gap-4">
-                    <div className="flex items-center justify-center w-14 h-14 rounded-full bg-[#1E3A5F]/10 border-2 border-[#1E3A5F]/20">
-                      <svg className="w-7 h-7 text-[#1E3A5F]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-                      </svg>
-                    </div>
-                    <div className="text-center px-6">
-                      <p className="font-semibold text-[#1E3A5F] dark:text-[#84CC16] text-sm mb-1">
-                        {addressLines[ 0 ] ?? "APT Ghana"}
-                      </p>
-                      <p className="text-[#64748B] dark:text-[#94A3B8] text-xs">
-                        {addressLines.slice(1).join(", ")}
-                      </p>
-                    </div>
-                    {data.mapsUrl && (
-                      <a
-                        href={data.mapsUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 h-9 px-5 bg-[#1E3A5F] text-white font-semibold text-xs rounded-lg hover:bg-[#16305e] transition-colors"
-                      >
-                        Open in Google Maps →
-                      </a>
-                    )}
-                  </div> */}
                   <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3970.9273076956165!2d-0.22654112391359407!3d5.577764794402891!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0xfdf9a1e0ba8fd6d%3A0xc33e5a5c917e3550!2sAutomation%20and%20Plant%20technologies%20Ltd!5e0!3m2!1sen!2sgh!4v1732017843100!5m2!1sen!2sgh"
-                    // width="600"
                     height="450"
                     className="w-full"
                     style={{ border: 0 }}
@@ -276,14 +295,14 @@ export default async function ContactPage() {
                 </div>
 
                 {/* Store CTA */}
-                <div className="bg-[#F8FAFC] dark:bg-surface-900 rounded-2xl border border-[#E2E8F0] dark:border-white/10 p-6">
+                <div className="relative bg-[#009E4D]/[0.06] dark:bg-[#009E4D]/10 rounded-2xl border border-[#009E4D]/25 p-6">
                   <p className="text-sm font-semibold text-[#0F172A] dark:text-[#F1F5F9] mb-1">Prefer to shop online?</p>
                   <p className="text-xs text-[#64748B] dark:text-[#94A3B8] mb-4">
                     Browse 6,000+ products on our e-commerce platform with real-time stock availability.
                   </p>
                   <Link
                     href={STORE_URL}
-                    className="inline-flex items-center gap-2 h-10 px-5 bg-[#84CC16] text-[#0A0F1E] font-bold text-xs rounded-xl hover:bg-[#78B800] transition-colors"
+                    className="inline-flex items-center gap-2 h-10 px-5 bg-[#009E4D] text-white font-bold text-xs rounded-xl hover:bg-[#00873F] transition-colors"
                   >
                     Visit the Store →
                   </Link>
