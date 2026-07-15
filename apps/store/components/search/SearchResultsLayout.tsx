@@ -1,6 +1,5 @@
 "use client";
 
-import { Suspense } from "react";
 import BrowseLayout from "./BrowseLayout";
 import { LazyMotion, m } from "framer-motion";
 const loadFramerMotionFeatures = () =>

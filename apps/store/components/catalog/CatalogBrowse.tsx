@@ -9,6 +9,11 @@ import type { ProductSearchHit } from "@apt/search";
 import { STORE_URL } from "@apt/config";
 import { safeJsonLd } from "@apt/auth";
 import AnimatedProductGrid from "../search/AnimatedProductGrid";
+import { LazyMotion, m } from "framer-motion";
+const loadFramerMotionFeatures = () =>
+  import(/* webpackChunkName: 'lib' */ "../../lib/framer-motion-features").then(
+    (mod) => mod.default
+  );
 
 function breadcrumbListLd(breadcrumbs: BreadcrumbItem[]) {
   return {
@@ -129,37 +134,50 @@ export default function CatalogBrowse({ data }: Props) {
             {error}
           </div>
         )}
+        <LazyMotion features={loadFramerMotionFeatures} strict={true}>
+          <m.main
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            variants={{
+              visible: { opacity: 1 },
+              hidden: { opacity: 0 },
+            }}
+          >
+            <BrowseLayout totalHits={totalHits} facets={facets} query="" basePath={basePath}>
+              {results && results.hits.length > 0 && (
+                <AnimatedProductGrid products={results.hits.map(h => hitToCard(h))} view={view} />
+              )}
 
-        <BrowseLayout totalHits={totalHits} facets={facets} query="" basePath={basePath}>
-          {results && results.hits.length > 0 && (
-            <AnimatedProductGrid products={results.hits.map(h => hitToCard(h))} view={view} />
-          )}
+              {results && results.hits.length === 0 && !error && (
+                <ZeroResults query="" />
+              )}
 
-          {results && results.hits.length === 0 && !error && (
-            <ZeroResults query="" />
-          )}
+              {!results && !error && <SkeletonGrid view={view} />}
 
-          {!results && !error && <SkeletonGrid view={view} />}
+              {results && totalPages > 1 && (
+                <Suspense fallback={null}>
+                  <SearchPagination
+                    totalPages={totalPages}
+                    currentPage={pageNum}
+                    basePath={basePath}
+                  />
+                </Suspense>
+              )}
 
-          {results && totalPages > 1 && (
-            <Suspense fallback={null}>
-              <SearchPagination
-                totalPages={totalPages}
-                currentPage={pageNum}
-                basePath={basePath}
-              />
-            </Suspense>
-          )}
+              {results && results.processingTimeMs > 0 && (
+                <p
+                  className="text-center text-[11px] mt-4"
+                  style={{ color: "var(--text-4)" }}
+                >
+                  {totalHits.toLocaleString()} products in {results.processingTimeMs}ms
+                </p>
+              )}
+            </BrowseLayout>
+          </m.main>
+        </LazyMotion>
 
-          {results && results.processingTimeMs > 0 && (
-            <p
-              className="text-center text-[11px] mt-4"
-              style={{ color: "var(--text-4)" }}
-            >
-              {totalHits.toLocaleString()} products in {results.processingTimeMs}ms
-            </p>
-          )}
-        </BrowseLayout>
+
       </main>
     </>
   );
