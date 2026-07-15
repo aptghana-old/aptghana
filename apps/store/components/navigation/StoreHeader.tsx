@@ -135,17 +135,17 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
         className={`sticky top-0 z-50 transition-shadow duration-200 ${scrolled ? "shadow-[0_4px_24px_rgba(0,0,0,0.4)]" : ""}`}
       >
         {/* ── Desktop header row (lg+): Logo · Search · Actions ── */}
-        <div className="hidden lg:block bg-[var(--apt-bg)]">
+        <div className="hidden lg:block bg-[var(--apt-header-bg)]">
           <div className="container-store">
             <div className="flex items-center gap-3 h-15">
 
               {/* Logo */}
               <Link href="/" className="flex items-center shrink-0">
                 <Image src="/logo.png" alt="APT Ghana" width={140} height={69}
-                  className="h-10 w-auto object-contain dark:invert" priority />
+                  className="h-10 w-auto object-contain invert" priority />
               </Link>
 
-              {/* Search bar with autocomplete */}
+              {/* Search bar with autocomplete — no elevated/raised background, sits flush on the header */}
               <div className="flex-1 flex max-w-2xl mx-auto">
                 <SearchAutocomplete variant="desktop" className="flex-1" />
               </div>
@@ -156,7 +156,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
 
                 <Link
                   href="/cart"
-                  className="relative p-2 text-[var(--apt-text-muted)] hover:text-[var(--apt-text)] hover:bg-[var(--apt-bg-subtle)] rounded-lg transition-all"
+                  className="relative p-2 text-[var(--apt-header-text-muted)] hover:text-[var(--apt-header-text)] hover:bg-[var(--apt-header-bg-subtle)] rounded-lg transition-all"
                   aria-label="Cart"
                 >
                   <Icon d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" size={20} />
@@ -169,7 +169,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
 
                 <Link
                   href="/rfq"
-                  className="flex items-center gap-1.5 h-9 px-4 bg-[var(--apt-color-primary)] hover:bg-[var(--apt-color-primary)_/90] text-white text-[13px] font-bold rounded-lg ml-1 transition-colors shadow-md"
+                  className="flex items-center gap-1.5 h-9 px-4 bg-[var(--apt-color-primary)] hover:bg-[var(--apt-color-primary)]/90 text-white text-[13px] font-bold rounded-lg ml-1 transition-colors shadow-md"
                 >
                   <Icon d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25M9 16.5v.75m3-3v3M15 12v5.25m-4.5-15H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" size={16} />
                   RFQ
@@ -180,14 +180,14 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
         </div>
 
         {/* ── Mobile header (< lg): Row 1 + Row 2 ── */}
-        <div className="lg:hidden bg-[var(--apt-bg)]">
+        <div className="lg:hidden bg-[var(--apt-header-bg)]">
           <div className="container-store">
 
             {/* Row 1: Logo (left) · Account, Wishlist, Cart, Menu (right) */}
             <div className="flex items-center h-14">
               <Link href="/" className="flex items-center shrink-0">
                 <Image src="/logo.png" alt="APT Ghana" width={120} height={59}
-                  className="h-9 w-auto object-contain" priority />
+                  className="h-9 w-auto object-contain invert" priority />
               </Link>
 
               <div className="ml-auto flex items-center gap-0.5">
@@ -195,7 +195,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
 
                 <Link
                   href="/cart"
-                  className="relative p-2 text-[var(--apt-text-muted)] hover:text-[var(--apt-text)] hover:bg-[var(--apt-bg-subtle)] rounded-lg transition-all"
+                  className="relative p-2 text-[var(--apt-header-text-muted)] hover:text-[var(--apt-header-text)] hover:bg-[var(--apt-header-bg-subtle)] rounded-lg transition-all"
                   aria-label="Cart"
                 >
                   <Icon d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" size={20} />
@@ -208,7 +208,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
 
                 <button
                   onClick={() => setMobileOpen(!mobileOpen)}
-                  className="p-2 text-[var(--apt-text-muted)] hover:text-[var(--apt-text)] hover:bg-[var(--apt-bg-subtle)] rounded-lg ml-0.5 transition-all"
+                  className="p-2 text-[var(--apt-header-text-muted)] hover:text-[var(--apt-header-text)] hover:bg-[var(--apt-header-bg-subtle)] rounded-lg ml-0.5 transition-all"
                   aria-label="Menu"
                 >
                   {mobileOpen
@@ -219,7 +219,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
               </div>
             </div>
 
-            {/* Row 2: Full-width search with autocomplete */}
+            {/* Row 2: Full-width search with autocomplete — stays flush, no raised background */}
             <div className="pb-3">
               <SearchAutocomplete variant="mobile" />
             </div>
@@ -227,7 +227,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
         </div>
 
         {/* Desktop nav strip */}
-        <div className="hidden lg:block bg-[var(--apt-bg-subtle)] border-t border-[var(--apt-border)]/[0.05]">
+        <div className="hidden lg:block bg-[var(--apt-header-bg-subtle)] border-t border-[var(--apt-header-border)]/[0.4]">
           <div className="container-store">
             <nav
               className="flex items-center h-10 gap-0.5"
@@ -241,13 +241,13 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                   onClick={() => { setMegaOpen(true); setActiveGroup(0); }}
                   aria-expanded={megaOpen}
                   aria-label="Catalogue menu"
-                  className={`group flex items-center gap-1 h-full px-3.5 text-[13px] font-medium rounded-md transition-colors ${megaOpen ? "text-[var(--apt-text)] bg-[var(--apt-bg)]/[0.1]" : "text-[var(--apt-text-muted)] hover:text-[var(--apt-text)] hover:bg-[var(--apt-bg)]/[0.06]"}`}
+                  className={`group flex items-center gap-1 h-full px-3.5 text-[13px] font-medium rounded-md transition-colors ${megaOpen ? "text-[var(--apt-header-text)] bg-[var(--apt-header-bg)]/[0.4]" : "text-[var(--apt-header-text-muted)] hover:text-[var(--apt-header-text)] hover:bg-[var(--apt-header-bg)]/[0.3]"}`}
                 >
                   Catalogue
                   <Icon d="M19.5 8.25l-7.5 7.5-7.5-7.5" size={14} strokeWidth={2.5} className={`transition-transform duration-200 ${megaOpen ? "rotate-180" : ""}`} />
                 </button>
               ) : (
-                <Link href="/catalog" className="h-full px-3.5 flex items-center text-[13px] font-medium text-[var(--apt-text-muted)] hover:text-[var(--apt-text)] hover:bg-[var(--apt-bg)]/[0.06] rounded-md transition-colors">
+                <Link href="/catalog" className="h-full px-3.5 flex items-center text-[13px] font-medium text-[var(--apt-header-text-muted)] hover:text-[var(--apt-header-text)] hover:bg-[var(--apt-header-bg)]/[0.3] rounded-md transition-colors">
                   Catalogue
                 </Link>
               )}
@@ -257,18 +257,18 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                   key={link.href}
                   href={link.href}
                   onMouseEnter={delayedCloseMega}
-                  className="h-full px-3.5 flex items-center text-[13px] font-medium text-[var(--apt-text-muted)] hover:text-[var(--apt-text)] hover:bg-[var(--apt-bg)]/[0.06] rounded-md transition-colors"
+                  className="h-full px-3.5 flex items-center text-[13px] font-medium text-[var(--apt-header-text-muted)] hover:text-[var(--apt-header-text)] hover:bg-[var(--apt-header-bg)]/[0.3] rounded-md transition-colors"
                 >
                   {link.label}
                 </Link>
               ))}
 
-              <div className="ml-auto flex items-center gap-3 text-[11px] text-[var(--apt-text-muted)]/60 font-medium">
+              <div className="ml-auto flex items-center gap-3 text-[11px] text-[var(--apt-header-text-muted)]/80 font-medium">
                 <span className="hidden xl:block">6,000+ Products</span>
-                <span className="w-px h-3 bg-[var(--apt-border)]/[0.2] hidden xl:block" />
+                <span className="w-px h-3 bg-[var(--apt-header-border)] hidden xl:block" />
                 <span>26 Global Brands</span>
-                <span className="w-px h-3 bg-[var(--apt-border)]/[0.2]" />
-                <a href="tel:+233303964346" className="hover:text-[var(--apt-text)] transition-colors">+233 30 396 4346</a>
+                <span className="w-px h-3 bg-[var(--apt-header-border)]" />
+                <a href="tel:+233303964346" className="hover:text-[var(--apt-header-text)] transition-colors">+233 30 396 4346</a>
               </div>
             </nav>
           </div>
