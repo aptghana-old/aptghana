@@ -90,34 +90,10 @@ export default function BrandsPageContent({ brands, config }: Props) {
           className={containerClass}
           style={{
             position: "relative",
-            // paddingTop: "clamp(44px,6vw,88px)",
+            paddingTop: "clamp(44px,6vw,88px)",
             paddingBottom: "clamp(56px,7vw,96px)",
           }}
         >
-          {/* Breadcrumb */}
-          <nav
-            aria-label="Breadcrumb"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              flexWrap: "wrap",
-              fontSize: 12,
-              marginBottom: 40,
-              color: "var(--text-4)",
-            }}
-          >
-            <Link href="/" style={{ color: "var(--text-4)", textDecoration: "none" }}>
-              Home
-            </Link>
-            <span aria-hidden style={{ color: "var(--border)" }}>
-              /
-            </span>
-            <span style={{ color: "var(--text-2)", fontWeight: 600 }} aria-current="page">
-              Brands
-            </span>
-          </nav>
-
           <div className="grid grid-cols-1 lg:grid-cols-[1.5fr_1fr] gap-10 xl:gap-16 items-end">
             {/* Left: headline + CTAs */}
             <div>

@@ -72,7 +72,7 @@ async function getHomeData() {
     const products: ProductCardData[] = featuredProducts.map((p: any) => ({
       id: String(p._id),
       name: p.name,
-      slug: p.slug,
+      slug: p.sku,
       sku: p.sku,
       mpn: p.mpn,
       brandSlug: p.brandSlug ?? "",

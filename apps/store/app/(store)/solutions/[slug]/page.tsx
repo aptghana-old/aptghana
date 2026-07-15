@@ -72,7 +72,7 @@ export default async function SolutionPage({ params }: { params: Promise<{ slug:
   return (
     <>      <main className="min-h-screen bg-[#f9fafb]">
       {/* Header */}
-      <div className="bg-[#0a1628] pt-6 sm:pb-14">
+      <div className="bg-[#0a1628] pt-6 pb-10 sm:py-14">
         <div className="container-store">
           {/* <Link href="/solutions" className="inline-flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 font-medium mb-5 transition-colors">
             <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>

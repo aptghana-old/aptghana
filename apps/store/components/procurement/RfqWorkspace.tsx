@@ -80,7 +80,7 @@ export default function RfqWorkspace({
   return (
     <main className="flex-1" style={{ background: "var(--bg-base)" }}>
       {/* Hero */}
-      <div className="bg-navy-300 py-10">
+      <div className="bg-[#0a1628] py-10">
         <div className="container-store">
           <p className="text-xs font-semibold text-se-green uppercase tracking-widest mb-2">Quotation</p>
           <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">Request for Quotation</h1>
