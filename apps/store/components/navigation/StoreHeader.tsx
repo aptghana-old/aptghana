@@ -180,7 +180,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
         </div>
 
         {/* ── Mobile header (< lg): Row 1 + Row 2 ── */}
-        <div className="lg:hidden bg-navy-900">
+        <div className="lg:hidden bg-[var(--apt-bg)]">
           <div className="container-store">
 
             {/* Row 1: Logo (left) · Account, Wishlist, Cart, Menu (right) */}
@@ -286,7 +286,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
 
                 {/* Left: group selector */}
                 <div className="w-52 shrink-0 space-y-0.5">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-theme-4 px-3 pb-1.5">Categories</p>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--apt-text-muted)] px-3 pb-1.5">Categories</p>
                   {displayGroups.map((grp, i) => (
                     <button
                       key={grp.id}
@@ -313,12 +313,12 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                             loading="lazy"
                           />
                         ) : (
-                          <Icon d={grp.iconPath} size={15} strokeWidth={1.75} className={activeGroup === i ? "" : "text-theme-3"} style={{ color: activeGroup === i ? grp.color : undefined } as React.CSSProperties} />
+                          <Icon d={grp.iconPath} size={15} strokeWidth={1.75} className={activeGroup === i ? "" : "text-[var(--apt-text-muted)]"} style={{ color: activeGroup === i ? grp.color : undefined } as React.CSSProperties} />
                         )}
                       </div>
                       <span className="truncate">{grp.label}</span>
                       {activeGroup === i && (
-                        <Icon d="M8.25 4.5l7.5 7.5-7.5 7.5" size={14} strokeWidth={2.5} className="ml-auto shrink-0 text-navy-500" />
+                        <Icon d="M8.25 4.5l7.5 7.5-7.5 7.5" size={14} strokeWidth={2.5} className="ml-auto shrink-0 text-[var(--apt-color-primary)]" />
                       )}
                     </button>
                   ))}
@@ -340,7 +340,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
 
                 {/* Center: subcategories */}
                 <div className="flex-1 min-w-0">
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-theme-4 mb-3" style={{ color: group.color }}>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--apt-text-muted)] mb-3" style={{ color: group.color }}>
                     {group.label}
                   </p>
                   <div className="grid grid-cols-2 xl:grid-cols-3 gap-1">
@@ -358,8 +358,8 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                           <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0 transition-all" style={{ background: group.color }} />
                         )}
                         <div>
-                          <p className="text-sm font-semibold text-theme-1 group-hover:text-navy-500 transition-colors leading-snug">{cat.name}</p>
-                          <p className="text-xs text-theme-3 mt-0.5 leading-relaxed">{cat.desc}</p>
+                          <p className="text-sm font-semibold text-[var(--apt-text)] group-hover:text-[var(--apt-color-primary)] transition-colors leading-snug">{cat.name}</p>
+                          <p className="text-xs text-[var(--apt-text-muted)] mt-0.5 leading-relaxed">{cat.desc}</p>
                         </div>
                       </Link>
                     ))}
@@ -469,25 +469,25 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                         </button>
 
                         {mobileGroup === i && (
-                          <div className="ml-4 mt-1 space-y-0.5 pl-3 border-l border-white/10">
+                          <div className="ml-4 mt-1 space-y-0.5 pl-3 border-l border-[var(--apt-border)]/[0.2]">
                             {grp.categories.map((cat) => (
                               <Link
                                 key={cat.href}
                                 href={cat.href}
                                 onClick={() => setMobileOpen(false)}
-                                className="block px-2 py-2.5 sm:py-1.5 text-xs text-white/50 hover:text-white transition-colors"
+                                className="block px-2 py-2.5 sm:py-1.5 text-xs text-[var(--apt-text-muted)]/50 hover:text-[var(--apt-text)] transition-colors"
                               >
                                 {cat.name}
                               </Link>
                             ))}
-                            <Link href={grp.href} onClick={() => setMobileOpen(false)} className="block px-2 py-1.5 text-xs font-semibold text-navy-300 hover:text-white transition-colors">
+                            <Link href={grp.href} onClick={() => setMobileOpen(false)} className="block px-2 py-1.5 text-xs font-semibold text-[var(--apt-color-primary)] hover:text-[var(--apt-color-primary)_/80] transition-colors">
                               All {grp.label} →
                             </Link>
                           </div>
                         )}
                       </div>
                     ))}
-                    <Link href="/catalog" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-sm font-semibold text-apt-orange mt-1">
+                    <Link href="/catalog" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-sm font-semibold text-[var(--apt-color-primary)] hover:text-[var(--apt-color-primary)_/80] mt-1">
                       Browse Catalogue
                       <Icon d="M17 8l4 4m0 0l-4 4m4-4H3" size={14} strokeWidth={2} />
                     </Link>
@@ -501,7 +501,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center px-3 py-3 text-sm font-medium text-white/60 hover:text-white rounded-xl hover:bg-white/[0.06] transition-all"
+                  className="flex items-center px-3 py-3 text-sm font-medium text-[var(--apt-text-muted)]/60 hover:text-[var(--apt-text)] rounded-xl hover:bg-[var(--apt-bg-subtle)]/[0.06] transition-all"
                 >
                   {link.label}
                 </Link>
@@ -509,21 +509,21 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
             </nav>
 
             {/* Mobile footer actions */}
-            <div className="p-4 border-t border-white/[0.08] space-y-2">
-              <Link href="/rfq" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-2 w-full h-11 bg-apt-orange hover:bg-apt-orange-hover text-white font-bold text-sm rounded-xl transition-colors">
+            <div className="p-4 border-t border-[var(--apt-border)]/[0.08] space-y-2">
+              <Link href="/rfq" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-2 w-full h-11 bg-[var(--apt-color-primary)] hover:bg-[var(--apt-color-primary)_/90] text-[var(--apt-text)] font-bold text-sm rounded-xl transition-colors">
                 Request a Quote
               </Link>
               <div className="flex gap-2">
-                <Link href="/account" onClick={() => setMobileOpen(false)} className="flex-1 flex items-center justify-center gap-2 h-10 bg-white/[0.06] hover:bg-white/[0.10] text-white/70 hover:text-white text-sm font-medium rounded-lg transition-all">
+                <Link href="/account" onClick={() => setMobileOpen(false)} className="flex-1 flex items-center justify-center gap-2 h-10 bg-[var(--apt-bg-subtle)]/[0.06] hover:bg-[var(--apt-bg)]/[0.10] text-[var(--apt-text)]/70 hover:text-[var(--apt-text)] text-sm font-medium rounded-lg transition-all">
                   <Icon d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" size={16} />
                   Account
                 </Link>
-                <Link href="/cart" onClick={() => setMobileOpen(false)} className="flex-1 flex items-center justify-center gap-2 h-10 bg-white/[0.06] hover:bg-white/[0.10] text-white/70 hover:text-white text-sm font-medium rounded-lg transition-all">
+                <Link href="/cart" onClick={() => setMobileOpen(false)} className="flex-1 flex items-center justify-center gap-2 h-10 bg-[var(--apt-bg-subtle)]/[0.06] hover:bg-[var(--apt-bg)]/[0.10] text-[var(--apt-text)]/70 hover:text-[var(--apt-text)] text-sm font-medium rounded-lg transition-all">
                   <Icon d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" size={16} />
                   Cart
                 </Link>
               </div>
-              <a href="tel:+233303964346" className="flex items-center justify-center gap-2 text-xs text-white/30 hover:text-white/60 transition-colors py-1">
+              <a href="tel:+233303964346" className="flex items-center justify-center gap-2 text-[var(--apt-text-muted)]/30 hover:text-[var(--apt-text)]/60 transition-colors py-1">
                 <Icon d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" size={13} strokeWidth={1.75} />
                 +233 30 396 4346
               </a>

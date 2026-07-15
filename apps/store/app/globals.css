@@ -19,9 +19,9 @@
   --color-navy-100: #ddeeff;
   --color-navy-50: #f0f7ff;
 
-  --color-se-green: #3dcd58;
-  --color-se-green-hover: #2aa347;
-  --color-se-green-light: #e8f9ed;
+  --color-se-green: #009e4d; /* Schneider Electric Spanish Green (official) */
+  --color-se-green-hover: #00873f;
+  --color-se-green-light: #e6f4ea;
 
   --color-apt-orange: #e65c00;
   --color-apt-orange-hover: #cc5200;
@@ -63,11 +63,11 @@
     --shadow-3:
       0 12px 40px -8px rgba(0, 0, 0, 0.12), 0 4px 8px -2px rgba(0, 0, 0, 0.06);
 
-    --apt-color-primary: #006233; /* Schneider Green */
+    --apt-color-primary: #009e4d; /* Schneider Electric Spanish Green */
   }
 
   [data-theme="dark"] {
-    --apt-color-primary: #34d399; /* Green in dark */
+    --apt-color-primary: #3ecf7a; /* Lightened Schneider green for dark-bg contrast */
   }
 
   *,
@@ -260,7 +260,7 @@
   }
   .card-action:hover {
     box-shadow: var(--shadow-3);
-    border-color: rgba(0, 87, 184, 0.35);
+    border-color: rgba(0, 158, 77, 0.35);
     transform: translateY(-1px);
   }
 
@@ -307,7 +307,7 @@
 
   .can-hover .btn-primary:hover,
   .can-hover .btn-item:hover {
-    background-color: #004c28; /* darker green */
+    background-color: var(--color-se-green-hover);
   }
 
   .btn-primary:active,
@@ -365,8 +365,8 @@
       -45deg,
       #050d1a,
       #0a1628,
-      #0a2d5c,
-      #0057b8,
+      #00873f,
+      #009e4d,
       #0a1628
     );
     background-size: 400% 400%;

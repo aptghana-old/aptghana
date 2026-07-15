@@ -22,7 +22,7 @@
     --apt-text-muted: #9ca3af;
     --apt-color-error: #dc2626;
     --apt-color-info: #0057b8;
-    --apt-color-success: #16a34a;
+    --apt-color-success: #009e4d; /* Schneider Electric Spanish Green */
     --apt-color-warning: #d97706;
   }
 
@@ -34,7 +34,7 @@
     --apt-bg-sunken: #475569;
     --apt-bg-error: #472d2d;
     --apt-bg-info: #1e293b;
-    --apt-bg-success: #0f172a;
+    --apt-bg-success: #10281c;
     --apt-bg-warning: #473502;
     --apt-border: #334155;
     --apt-border-hi: #475569;
@@ -44,7 +44,7 @@
     --apt-text-muted: #94a3b8;
     --apt-color-error: #f87171;
     --apt-color-info: #60a5fa; /* Blue in dark */
-    --apt-color-success: #34d399;
+    --apt-color-success: #3ecf7a; /* Lightened Schneider green for dark-bg contrast */
     --apt-color-warning: #fbbf24;
   }
 }
