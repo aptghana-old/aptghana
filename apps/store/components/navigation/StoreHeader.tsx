@@ -396,13 +396,13 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
       {mobileOpen && (
         <div className="fixed inset-0 z-[90] lg:hidden">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-[min(100vw,380px)] bg-[var(--apt-bg)] overflow-y-auto flex flex-col">
+          <div className="absolute left-0 top-0 bottom-0 w-[min(100vw,380px)] bg-[var(--apt-header-bg)] overflow-y-auto flex flex-col">
 
             {/* Mobile header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[var(--apt-border)]/[0.08]">
-              <Link href="/" onClick={() => setMobileOpen(false)} className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[var(--apt-color-primary)] flex items-center justify-center text-[var(--apt-text)] font-black text-xs">APT</div>
-                <span className="text-[var(--apt-text)] font-bold text-sm">APT Ghana Store</span>
+            <div className="flex items-center justify-between px-5 py-2.5 border-b border-[var(--apt-border)]/[0.08]">
+              <Link href="/" className="flex items-center shrink-0">
+                <Image src="/logo.png" alt="APT Ghana" width={140} height={69}
+                  className="h-10 w-auto object-contain invert" priority />
               </Link>
               <button onClick={() => setMobileOpen(false)} className="w-9 h-9 flex items-center justify-center text-[var(--apt-text-muted)]/50 hover:text-[var(--apt-text)] hover:bg-[var(--apt-bg-subtle)] rounded-lg transition-all">
                 <Icon d="M6 18L18 6M6 6l12 12" size={20} strokeWidth={2} />
@@ -416,7 +416,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                 setMobileOpen(false);
                 if (drawerSearch.trim()) window.location.href = `/search?q=${encodeURIComponent(drawerSearch.trim())}`;
               }}
-              className="px-4 py-3 border-b border-[var(--apt-border)]/[0.06]"
+              className="px-4 py-2.5 border-b border-[var(--apt-border)]/[0.06]"
             >
               <div className="flex rounded-xl overflow-hidden ring-1 ring-[var(--apt-border)]/[0.2]">
                 <input

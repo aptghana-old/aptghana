@@ -34,7 +34,7 @@ export default function AccountHeader() {
         className={`sticky top-0 z-50 transition-shadow duration-200 ${scrolled ? "shadow-[0_4px_24px_rgba(0,0,0,0.4)]" : ""}`}
       >
         {/* ── Desktop header row (lg+): Logo · Search · Actions ── */}
-        <div className="hidden lg:block bg-[var(--apt-bg)]">
+        <div className="hidden lg:block bg-[var(--apt-header-bg)]">
           <div className="container-store">
             <div className="flex items-center gap-3 h-15 justify-between">
 
@@ -74,7 +74,7 @@ export default function AccountHeader() {
         </div>
 
         {/* ── Mobile header (< lg): Row 1 + Row 2 ── */}
-        <div className="lg:hidden bg-[var(--apt-bg)]">
+        <div className="lg:hidden bg-[var(--apt-header-bg)]">
           <div className="container-store">
 
             {/* Row 1: Logo (left) · Account, Wishlist, Cart, Menu (right) */}
