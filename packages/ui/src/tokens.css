@@ -25,12 +25,12 @@
     --apt-color-success: #009e4d; /* Schneider Electric Spanish Green */
     --apt-color-warning: #d97706;
 
-    /* Store header — deep Schneider green, distinct from page background */
-    --apt-header-bg: #063d22;
-    --apt-header-bg-subtle: #0b4b2c;
-    --apt-header-border: #135736;
+    /* Store header — dark navy, matches the brand's existing blue scale */
+    --apt-header-bg: #0a1628;
+    --apt-header-bg-subtle: #0e2040;
+    --apt-header-border: #16305e;
     --apt-header-text: #f4f7f5;
-    --apt-header-text-muted: #9fc2ab;
+    --apt-header-text-muted: #93a3c2;
   }
 
   /* Dark mode */
@@ -54,11 +54,11 @@
     --apt-color-success: #3ecf7a; /* Lightened Schneider green for dark-bg contrast */
     --apt-color-warning: #fbbf24;
 
-    /* Store header stays the same deep green in dark mode — it's already dark */
-    --apt-header-bg: #052e19;
-    --apt-header-bg-subtle: #0a3d23;
-    --apt-header-border: #114a2e;
+    /* Store header stays the same dark navy in dark mode — it's already dark */
+    --apt-header-bg: #050d1a;
+    --apt-header-bg-subtle: #0a1628;
+    --apt-header-border: #16305e;
     --apt-header-text: #f4f7f5;
-    --apt-header-text-muted: #9fc2ab;
+    --apt-header-text-muted: #93a3c2;
   }
 }
