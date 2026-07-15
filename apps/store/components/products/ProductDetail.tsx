@@ -511,7 +511,7 @@ function SectionNav({ sections }: { sections: SectionDef[] }) {
   }
 
   return (
-    <div className="sticky top-16 z-20 -mx-4 sm:-mx-6 lg:-mx-8 xl:-mx-0 mb-6"
+    <div className="sticky top-24 z-20 -mx-4 sm:-mx-6 lg:-mx-8 xl:-mx-0 mb-6"
       style={{ background: "var(--bg-surface)", borderBottom: "1px solid var(--border)", borderTop: "1px solid var(--border)" }}>
       <div className="overflow-x-auto scrollbar-hide">
         <div className="flex px-4 sm:px-6 lg:px-0" role="tablist" aria-label="Product information sections">
@@ -904,7 +904,7 @@ function CompatibilitySection({ product }: { product: ProductFull }) {
   const isRelatedFallback = (product.relatedProducts?.length ?? 0) === 0 && relatedProducts.length > 0;
 
   const groups = [
-    ...(relatedProducts.length > 0 ? [{ label: isRelatedFallback ? "Similar Products" : "Related Products", products: relatedProducts }] : []),
+    ...(relatedProducts.length > 0 ? [ { label: isRelatedFallback ? "Similar Products" : "Related Products", products: relatedProducts } ] : []),
     { label: "Accessories", products: product.accessories ?? [] },
     { label: "Replacement Parts", products: product.replacements ?? [] },
   ].filter(g => g.products.length > 0);

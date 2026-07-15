@@ -7,7 +7,7 @@ import { useProduct } from "@/components/Product/product-context";
 
 /* ─── Zoom constants ─────────────────────────────────────────────────────── */
 const ZOOM = 2.5;   // magnification factor in hover panel
-const PANEL = 440;  // hover panel size in px (square)
+const PANEL = 880;  // hover panel size in px (square)
 
 /* ─── Icons ──────────────────────────────────────────────────────────────── */
 function Ico({ d, size = 18, sw = 1.75, style }: {
