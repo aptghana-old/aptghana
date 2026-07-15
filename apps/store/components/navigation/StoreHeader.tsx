@@ -399,12 +399,12 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
           <div className="absolute left-0 top-0 bottom-0 w-[min(100vw,380px)] bg-[var(--apt-header-bg)] overflow-y-auto flex flex-col">
 
             {/* Mobile header */}
-            <div className="flex items-center justify-between px-5 py-2.5 border-b border-[var(--apt-border)]/[0.08]">
+            <div className="flex items-center justify-between px-5 py-2.5 border-b border-[var(--apt-header-border)]/[0.5]">
               <Link href="/" className="flex items-center shrink-0">
                 <Image src="/logo.png" alt="APT Ghana" width={140} height={69}
                   className="h-10 w-auto object-contain invert" priority />
               </Link>
-              <button onClick={() => setMobileOpen(false)} className="w-9 h-9 flex items-center justify-center text-[var(--apt-text-muted)]/50 hover:text-[var(--apt-text)] hover:bg-[var(--apt-bg-subtle)] rounded-lg transition-all">
+              <button onClick={() => setMobileOpen(false)} className="w-9 h-9 flex items-center justify-center text-[var(--apt-header-text-muted)] hover:text-[var(--apt-header-text)] hover:bg-[var(--apt-header-bg-subtle)] rounded-lg transition-all">
                 <Icon d="M6 18L18 6M6 6l12 12" size={20} strokeWidth={2} />
               </button>
             </div>
@@ -416,18 +416,18 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                 setMobileOpen(false);
                 if (drawerSearch.trim()) window.location.href = `/search?q=${encodeURIComponent(drawerSearch.trim())}`;
               }}
-              className="px-4 py-2.5 border-b border-[var(--apt-border)]/[0.06]"
+              className="px-4 py-2.5 border-b border-[var(--apt-header-border)]/[0.4]"
             >
-              <div className="flex rounded-xl overflow-hidden ring-1 ring-[var(--apt-border)]/[0.2]">
+              <div className="flex rounded-xl overflow-hidden ring-1 ring-[var(--apt-header-border)]">
                 <input
                   type="text"
                   value={drawerSearch}
                   onChange={(e) => setDrawerSearch(e.target.value)}
                   placeholder="Search products..."
-                  className="flex-1 min-w-0 h-11 px-4 bg-[var(--apt-bg-subtle)]/[0.06] text-sm text-[var(--apt-text)] placeholder-[var(--apt-text-muted)]/30 focus:outline-none"
+                  className="flex-1 min-w-0 h-11 px-4 bg-[var(--apt-header-bg-subtle)] text-sm text-[var(--apt-header-text)] placeholder-[var(--apt-header-text-muted)]/60 focus:outline-none"
                   autoComplete="off"
                 />
-                <button type="submit" className="h-11 px-4 bg-[var(--apt-bg-raised)] text-[var(--apt-text)] shrink-0 transition-colors" aria-label="Search">
+                <button type="submit" className="h-11 px-4 bg-[var(--apt-header-border)] hover:bg-[var(--apt-header-bg-subtle)] text-[var(--apt-header-text)] shrink-0 transition-colors" aria-label="Search">
                   <Icon d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" size={17} strokeWidth={2.5} />
                 </button>
               </div>
@@ -441,13 +441,13 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                   <button
                     onClick={() => setMobileGroup(mobileGroup === -1 ? null : -1)}
                     aria-expanded={mobileGroup === -1}
-                    className="w-full flex items-center justify-between px-3 py-3 text-sm font-semibold text-[var(--apt-text)]/80 hover:text-[var(--apt-text)] rounded-xl hover:bg-[var(--apt-bg-subtle)]/[0.06] transition-all"
+                    className="w-full flex items-center justify-between px-3 py-3 text-sm font-semibold text-[var(--apt-header-text)]/80 hover:text-[var(--apt-header-text)] rounded-xl hover:bg-[var(--apt-header-bg-subtle)] transition-all"
                   >
                     Catalogue
                     <Icon d="M19.5 8.25l-7.5 7.5-7.5-7.5" size={16} strokeWidth={2.5} className={`transition-transform ${mobileGroup === -1 ? "rotate-180" : ""}`} />
                   </button>
                 ) : (
-                  <Link href="/catalog" onClick={() => setMobileOpen(false)} className="flex items-center justify-between px-3 py-3 text-sm font-semibold text-[var(--apt-text)]/80 hover:text-[var(--apt-text)] rounded-xl hover:bg-[var(--apt-bg-subtle)]/[0.06] transition-all">
+                  <Link href="/catalog" onClick={() => setMobileOpen(false)} className="flex items-center justify-between px-3 py-3 text-sm font-semibold text-[var(--apt-header-text)]/80 hover:text-[var(--apt-header-text)] rounded-xl hover:bg-[var(--apt-header-bg-subtle)] transition-all">
                     Catalogue
                     <Icon d="M8.25 4.5l7.5 7.5-7.5 7.5" size={16} strokeWidth={2.5} />
                   </Link>
@@ -469,25 +469,25 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                         </button>
 
                         {mobileGroup === i && (
-                          <div className="ml-4 mt-1 space-y-0.5 pl-3 border-l border-[var(--apt-border)]/[0.2]">
+                          <div className="ml-4 mt-1 space-y-0.5 pl-3 border-l border-[var(--apt-header-border)]/[0.6]">
                             {grp.categories.map((cat) => (
                               <Link
                                 key={cat.href}
                                 href={cat.href}
                                 onClick={() => setMobileOpen(false)}
-                                className="block px-2 py-2.5 sm:py-1.5 text-xs text-[var(--apt-text-muted)]/50 hover:text-[var(--apt-text)] transition-colors"
+                                className="block px-2 py-2.5 sm:py-1.5 text-xs text-[var(--apt-header-text-muted)] hover:text-[var(--apt-header-text)] transition-colors"
                               >
                                 {cat.name}
                               </Link>
                             ))}
-                            <Link href={grp.href} onClick={() => setMobileOpen(false)} className="block px-2 py-1.5 text-xs font-semibold text-[var(--apt-color-primary)] hover:text-[var(--apt-color-primary)_/80] transition-colors">
+                            <Link href={grp.href} onClick={() => setMobileOpen(false)} className="block px-2 py-1.5 text-xs font-semibold text-[var(--apt-color-primary)] hover:text-[var(--apt-color-primary)]/80 transition-colors">
                               All {grp.label} →
                             </Link>
                           </div>
                         )}
                       </div>
                     ))}
-                    <Link href="/catalog" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-sm font-semibold text-[var(--apt-color-primary)] hover:text-[var(--apt-color-primary)_/80] mt-1">
+                    <Link href="/catalog" onClick={() => setMobileOpen(false)} className="flex items-center gap-2 px-3 py-2.5 text-sm font-semibold text-[var(--apt-color-primary)] hover:text-[var(--apt-color-primary)]/80 mt-1">
                       Browse Catalogue
                       <Icon d="M17 8l4 4m0 0l-4 4m4-4H3" size={14} strokeWidth={2} />
                     </Link>
@@ -501,7 +501,7 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="flex items-center px-3 py-3 text-sm font-medium text-[var(--apt-text-muted)]/60 hover:text-[var(--apt-text)] rounded-xl hover:bg-[var(--apt-bg-subtle)]/[0.06] transition-all"
+                  className="flex items-center px-3 py-3 text-sm font-medium text-[var(--apt-header-text-muted)] hover:text-[var(--apt-header-text)] rounded-xl hover:bg-[var(--apt-header-bg-subtle)] transition-all"
                 >
                   {link.label}
                 </Link>
@@ -509,21 +509,21 @@ export default function StoreHeader({ navGroups }: { navGroups?: import("@/app/l
             </nav>
 
             {/* Mobile footer actions */}
-            <div className="p-4 border-t border-[var(--apt-border)]/[0.08] space-y-2">
-              <Link href="/rfq" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-2 w-full h-11 bg-[var(--apt-color-primary)] hover:bg-[var(--apt-color-primary)_/90] text-[var(--apt-text)] font-bold text-sm rounded-xl transition-colors">
+            <div className="p-4 border-t border-[var(--apt-header-border)]/[0.5] space-y-2">
+              <Link href="/rfq" onClick={() => setMobileOpen(false)} className="flex items-center justify-center gap-2 w-full h-11 bg-[var(--apt-color-primary)] hover:bg-[var(--apt-color-primary)]/90 text-white font-bold text-sm rounded-xl transition-colors">
                 Request a Quote
               </Link>
               <div className="flex gap-2">
-                <Link href="/account" onClick={() => setMobileOpen(false)} className="flex-1 flex items-center justify-center gap-2 h-10 bg-[var(--apt-bg-subtle)]/[0.06] hover:bg-[var(--apt-bg)]/[0.10] text-[var(--apt-text)]/70 hover:text-[var(--apt-text)] text-sm font-medium rounded-lg transition-all">
+                <Link href="/account" onClick={() => setMobileOpen(false)} className="flex-1 flex items-center justify-center gap-2 h-10 bg-[var(--apt-header-bg-subtle)] hover:bg-[var(--apt-header-border)] text-[var(--apt-header-text-muted)] hover:text-[var(--apt-header-text)] text-sm font-medium rounded-lg transition-all">
                   <Icon d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" size={16} />
                   Account
                 </Link>
-                <Link href="/cart" onClick={() => setMobileOpen(false)} className="flex-1 flex items-center justify-center gap-2 h-10 bg-[var(--apt-bg-subtle)]/[0.06] hover:bg-[var(--apt-bg)]/[0.10] text-[var(--apt-text)]/70 hover:text-[var(--apt-text)] text-sm font-medium rounded-lg transition-all">
+                <Link href="/cart" onClick={() => setMobileOpen(false)} className="flex-1 flex items-center justify-center gap-2 h-10 bg-[var(--apt-header-bg-subtle)] hover:bg-[var(--apt-header-border)] text-[var(--apt-header-text-muted)] hover:text-[var(--apt-header-text)] text-sm font-medium rounded-lg transition-all">
                   <Icon d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" size={16} />
                   Cart
                 </Link>
               </div>
-              <a href="tel:+233303964346" className="flex items-center justify-center gap-2 text-[var(--apt-text-muted)]/30 hover:text-[var(--apt-text)]/60 transition-colors py-1">
+              <a href="tel:+233303964346" className="flex items-center justify-center gap-2 text-[var(--apt-header-text-muted)]/70 hover:text-[var(--apt-header-text)] transition-colors py-1">
                 <Icon d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" size={13} strokeWidth={1.75} />
                 +233 30 396 4346
               </a>
