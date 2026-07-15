@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion, m, useReducedMotion } from "framer-motion";
+import { AnimatePresence, m, useReducedMotion } from "framer-motion";
 import ProductCard, { type ProductCardData } from "@/components/products/ProductCard";
 
 interface Props {

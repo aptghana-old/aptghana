@@ -8,6 +8,7 @@ import type { CatalogPageData, BreadcrumbItem } from "@/lib/catalog";
 import type { ProductSearchHit } from "@apt/search";
 import { STORE_URL } from "@apt/config";
 import { safeJsonLd } from "@apt/auth";
+import AnimatedProductGrid from "../search/AnimatedProductGrid";
 
 function breadcrumbListLd(breadcrumbs: BreadcrumbItem[]) {
   return {
@@ -131,7 +132,7 @@ export default function CatalogBrowse({ data }: Props) {
 
         <BrowseLayout totalHits={totalHits} facets={facets} query="" basePath={basePath}>
           {results && results.hits.length > 0 && (
-            <ResultsGrid hits={results.hits} view={view} />
+            <AnimatedProductGrid products={results.hits.map(hitToCard)} view={view} />
           )}
 
           {results && results.hits.length === 0 && !error && (
