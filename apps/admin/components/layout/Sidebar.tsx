@@ -221,7 +221,7 @@ export default function Sidebar({ mobileOpen, onMobileClose, role, permissions, 
         {/* Desktop collapse toggle */}
         <button
           onClick={() => setCollapsed((c) => !c)}
-          className="hidden md:flex absolute -right-3 top-[42px] z-10 w-6 h-6 rounded-full bg-slate-700 border border-slate-600 items-center justify-center text-white/60 hover:text-white hover:bg-slate-600 transition-colors shadow-md"
+          className="hidden md:flex absolute -right-3 top-[42px] z-100 w-6 h-6 rounded-full bg-slate-700 border border-slate-600 items-center justify-center text-white/60 hover:text-white hover:bg-slate-600 transition-colors shadow-md"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
         >
           {collapsed ? <ChevronRight size={12} /> : <ChevronsLeft size={12} />}
